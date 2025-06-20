@@ -6,7 +6,7 @@ document.getElementById('signupForm').addEventListener('submit', async function 
     const password = document.getElementById('password').value;
     const messageDiv = document.getElementById('message');
 
-    const apiUrl = 'http://your-project.infinityfreeapp.com/api/signup.php'; // এখানে আপনার PHP API-এর সঠিক URL দিন
+    const apiUrl = 'https://uthost.wuaze.com/signup.php'; // এখানে আপনার PHP API-এর সঠিক URL দিন
 
     try {
         const response = await fetch(apiUrl, {
