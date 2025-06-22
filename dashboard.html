@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* CSS কোড আগের মতোই থাকবে, কোনো পরিবর্তন নেই */
+        /* CSS কোড আগের মতোই থাকবে */
         :root {
             --primary-bg: #f7f9fc;
             --secondary-bg: #ffffff;
@@ -117,24 +117,24 @@
             return false;
         }
 
-        let totalRewardToAdd = 0;
-        const submissionsToUpdate = [];
+        let tasksWereProcessed = false;
         
         for (const sub of pendingSubmissions) {
             if (sub.tasks && sub.tasks.reward_amount) {
-                totalRewardToAdd += sub.tasks.reward_amount;
-                submissionsToUpdate.push(sub.id);
+                // Call the safe RPC function
+                const { error: rpcError } = await supabaseClient.rpc('complete_submission_and_update_balance', {
+                    submission_id_to_update: sub.id,
+                    user_id_to_update: sub.user_id,
+                    reward_amount_to_add: sub.tasks.reward_amount
+                });
+                if (!rpcError) {
+                    tasksWereProcessed = true;
+                } else {
+                    console.error(`Error processing submission #${sub.id} via RPC:`, rpcError.message);
+                }
             }
         }
-        
-        if (totalRewardToAdd > 0) {
-            await supabaseClient.from('submissions').update({ status: 'completed' }).in('id', submissionsToUpdate);
-            const { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', currentUser.id).single();
-            const newBalance = profile.balance + totalRewardToAdd;
-            await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', currentUser.id);
-            return true;
-        }
-        return false;
+        return tasksWereProcessed;
     }
 
     async function initializeProfile() {
@@ -145,11 +145,8 @@
         }
         currentUser = session.user;
         
-        // --- রিফ্রেশ লুপ সমাধানের কোড ---
         const urlParams = new URLSearchParams(window.location.search);
-        const wasReloaded = urlParams.get('reloaded');
-        
-        if (!wasReloaded) {
+        if (!urlParams.get('reloaded')) {
             const balanceWasUpdated = await checkAndCompleteTasks();
             if (balanceWasUpdated) {
                 alert('Your pending rewards have been added to your balance!');
@@ -157,8 +154,7 @@
                 return;
             }
         }
-        // --- সমাধান শেষ ---
-
+        
         document.getElementById('main-content').classList.add('loaded');
         
         const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
