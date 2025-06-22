@@ -1,105 +1,234 @@
-<!-- dashboard.html (সম্পূর্ণ সংশোধিত) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <title>My Profile - Riseii</title>
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-bg: #f7f9fc;
+            --secondary-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --accent-color: #4f46e5;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+        }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: var(--primary-bg); color: var(--text-dark); margin: 0; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; }
+        .main-header { background-color: var(--secondary-bg); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .header-left a { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-decoration: none; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .tasks-link { font-weight: 600; color: var(--accent-color); text-decoration: none; border: 2px solid var(--accent-color); padding: 8px 16px; border-radius: 6px; transition: all 0.3s ease; }
+        .tasks-link:hover { background-color: var(--accent-color); color: #fff; }
+        .logout-btn { background: none; border: none; color: var(--danger-color); font-size: 1.5rem; cursor: pointer; padding: 5px; }
+        .main-content { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+
+        /* Profile Card Styles */
+        .profile-card { background-color: var(--secondary-bg); border-radius: 12px; padding: 30px; display: flex; align-items: center; gap: 30px; margin-bottom: 30px; }
+        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background-color: var(--accent-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; flex-shrink: 0; }
+        .profile-details h2 { margin: 0; font-size: 1.8rem; }
+        .profile-details p { color: var(--text-light); margin: 5px 0 0; }
+        .referral-info { margin-top: 15px; }
+        .referral-info input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--primary-bg); cursor: copy; }
+        
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-item { background-color: var(--secondary-bg); padding: 20px; border-radius: 12px; text-align: center; }
+        .stat-icon { font-size: 2rem; color: var(--accent-color); margin-bottom: 10px; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; }
+        .stat-label { color: var(--text-light); }
+
+        /* History Section */
+        .history-section { background-color: var(--secondary-bg); border-radius: 12px; padding: 30px; }
+        .history-section h3 { font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .history-list { max-height: 400px; overflow-y: auto; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+        .history-item:last-child { border-bottom: none; }
+        .history-info p { margin: 0; font-size: 0.9rem; color: var(--text-light); }
+        .history-status { text-align: right; }
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; text-transform: capitalize; }
+        .status-pending { background-color: var(--warning-color); color: white; }
+        .status-completed { background-color: var(--success-color); color: white; }
+        .status-rejected { background-color: var(--danger-color); color: white; }
+        .reward { display: block; font-size: 0.9rem; color: #333; font-weight: 600; margin-top: 5px; }
+    </style>
 </head>
-<!-- onload="loadDashboard()" ঠিক থাকবে কারণ এটি async ফাংশন কল করতে পারে -->
-<body onload="loadDashboard()">
-    <div class="container">
-        <h2 id="welcomeMessage">Welcome!</h2>
-        <div class="profile-info">
-            <!-- ... বাকি HTML আগের মতোই থাকবে ... -->
-            <p><strong>Full Name:</strong> <span id="fullName"></span></p>
-            <p><strong>Email:</strong> <span id="email"></span></p>
-            <p><strong>Phone:</strong> <span id="phoneNumber"></span></p>
-            <p><strong>Age:</strong> <span id="age"></span></p>
-            <p><strong>Balance:</strong> ৳<span id="balance">0.00</span></p>
-            <p><strong>Your Referral Link:</strong></p>
-            <textarea id="referralLink" rows="2" readonly></textarea>
+<body>
+
+    <header class="main-header">
+        <div class="header-left"><a href="index.html">Riseii</a></div>
+        <div class="header-right">
+            <a href="tasks.html" class="tasks-link"><i class="fas fa-tasks"></i> Go to Tasks</a>
+            <button class="logout-btn" id="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </header>
+
+    <main class="main-content" id="main-content" style="display:none;">
+        <!-- Profile Summary Card -->
+        <div class="profile-card">
+            <div class="profile-avatar" id="avatar-initial"></div>
+            <div class="profile-details">
+                <h2 id="profile-name"></h2>
+                <p id="profile-email"></p>
+                <div class="referral-info">
+                    <label for="referralLink">Your Referral Link (Click to copy):</label>
+                    <input type="text" id="referralLink" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-icon"><i class="fas fa-wallet"></i></div><div class="stat-value" id="stat-balance">৳0.00</div><div class="stat-label">Current Balance</div></div>
+            <div class="stat-item"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="stat-tasks-completed">0</div><div class="stat-label">Tasks Completed</div></div>
+            <div class="stat-item"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="stat-referrals">0</div><div class="stat-label">Total Referrals</div></div>
+        </div>
+
+        <!-- Task History Section -->
+        <div class="history-section">
+            <h3><i class="fas fa-history"></i> Task Submission History</h3>
+            <div class="history-list" id="task-history-list"><p>Loading history...</p></div>
         </div>
         
-        <div class="tasks">
-            <h3>Complete Tasks to Earn</h3>
-            <div class="task">
-                <span>Join Telegram Channel</span>
-                <button onclick="completeTask(5, 'Joined Telegram Channel')">Earn ৳5</button>
-            </div>
-             <div class="task">
-                <span>Watch a Video</span>
-                <button onclick="completeTask(2, 'Watched a Video')">Earn ৳2</button>
-            </div>
+        <!-- Referral History Section -->
+        <div class="history-section" style="margin-top: 30px;">
+            <h3><i class="fas fa-user-friends"></i> Referral History</h3>
+            <div class="history-list" id="referral-history-list"><p>Loading history...</p></div>
         </div>
+    </main>
 
-        <button onclick="logout()">Logout</button>
-    </div>
+<script>
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    <script src="main.js"></script>
-    <script>
-        async function loadDashboard() {
-            // checkUser() ফাংশনটি main.js থেকে নিজে থেকেই কল হবে
-            
-            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-            
-            if (sessionError || !session) {
-                console.error('No session found. Redirecting to login.');
-                window.location.href = 'index.html'; // সেশন না পেলে লগইন পেজে পাঠাও
-                return;
-            }
+    let currentUser = null;
 
-            const user = session.user; // সেশন থেকে user অবজেক্ট নাও
-            
-            const { data, error } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single();
+    async function initializeProfile() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+        currentUser = session.user;
+        document.getElementById('main-content').style.display = 'block';
 
-            if (error || !data) {
-                console.error('Error fetching profile or profile not found:', error);
-                logout();
-            } else {
-                document.getElementById('welcomeMessage').innerText = `Welcome, ${data.full_name}!`;
-                document.getElementById('fullName').innerText = data.full_name;
-                document.getElementById('email').innerText = data.email;
-                document.getElementById('phoneNumber').innerText = data.phone_number;
-                document.getElementById('age').innerText = data.age;
-                document.getElementById('balance').innerText = data.balance.toFixed(2);
-                
-                const referralLink = `${window.location.origin}/signup.html?ref=${data.referral_code}`;
-                document.getElementById('referralLink').value = referralLink;
-            }
+        const { data: profile, error } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .single();
+        
+        if (error || !profile) {
+            console.error('Error fetching profile:', error);
+            logout(); // If profile is not found, something is wrong, so log out.
+            return;
         }
 
-        async function completeTask(amount, taskName) {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                alert('You must be logged in to complete tasks.');
-                return;
-            }
-            const user = session.user;
+        // 1. Populate Profile Card
+        document.getElementById('avatar-initial').textContent = profile.full_name.charAt(0).toUpperCase();
+        document.getElementById('profile-name').textContent = profile.full_name;
+        document.getElementById('profile-email').textContent = profile.email;
+        const referralLinkInput = document.getElementById('referralLink');
+        referralLinkInput.value = `${window.location.origin}/signup.html?ref=${profile.referral_code}`;
+        referralLinkInput.addEventListener('click', () => {
+            referralLinkInput.select();
+            document.execCommand('copy');
+            alert('Referral link copied to clipboard!');
+        });
+        
+        // 2. Populate Stats
+        document.getElementById('stat-balance').textContent = `৳${profile.balance.toFixed(2)}`;
 
-            const { data: profile } = await supabaseClient
-                .from('profiles').select('balance').eq('id', user.id).single();
+        // Load other stats and histories
+        loadTaskHistory();
+        loadReferralHistory();
+        loadCompletedTaskCount();
+    }
 
-            if (!profile) return alert('Could not fetch your profile!');
+    async function loadTaskHistory() {
+        const listDiv = document.getElementById('task-history-list');
+        const { data, error } = await supabaseClient
+            .from('submissions')
+            .select('task_id, status, created_at, tasks(task_type, reward_amount)')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
 
-            const newBalance = profile.balance + amount;
-
-            const { error } = await supabaseClient
-                .from('profiles').update({ balance: newBalance }).eq('id', user.id);
-
-            if (error) {
-                alert('Error updating balance!');
-            } else {
-                alert(`Task "${taskName}" completed! You earned ৳${amount}.`);
-                document.getElementById('balance').innerText = newBalance.toFixed(2);
-            }
+        if (error || !data || data.length === 0) {
+            listDiv.innerHTML = '<p>No task history yet.</p>';
+            return;
         }
-    </script>
+
+        let html = '';
+        data.forEach(sub => {
+            const taskTypeName = sub.tasks ? sub.tasks.task_type.replace('_', ' ') : 'Unknown Task';
+            const rewardAmount = sub.tasks ? sub.tasks.reward_amount : 0;
+            html += `
+                <div class="history-item">
+                    <div class="history-info">
+                        <strong>${taskTypeName.charAt(0).toUpperCase() + taskTypeName.slice(1)} (#${sub.task_id})</strong>
+                        <p>Submitted: ${new Date(sub.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="history-status">
+                        <span class="status-badge status-${sub.status}">${sub.status}</span>
+                        <span class="reward">Reward: ৳${rewardAmount}</span>
+                    </div>
+                </div>`;
+        });
+        listDiv.innerHTML = html;
+    }
+    
+    async function loadReferralHistory() {
+        const listDiv = document.getElementById('referral-history-list');
+        const { data, error, count } = await supabaseClient
+            .from('profiles')
+            .select('full_name, created_at', { count: 'exact' })
+            .eq('referred_by', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        document.getElementById('stat-referrals').textContent = count || 0;
+
+        if (error || !data || data.length === 0) {
+            listDiv.innerHTML = '<p>No one has joined using your referral link yet.</p>';
+            return;
+        }
+
+        let html = '';
+        data.forEach(ref => {
+            html += `
+                <div class="history-item">
+                    <strong>${ref.full_name}</strong>
+                    <span>Joined on: ${new Date(ref.created_at).toLocaleDateString()}</span>
+                </div>`;
+        });
+        listDiv.innerHTML = html;
+    }
+
+    async function loadCompletedTaskCount() {
+        const { error, count } = await supabaseClient
+            .from('submissions')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', currentUser.id)
+            .eq('status', 'completed');
+            
+        document.getElementById('stat-tasks-completed').textContent = count || 0;
+    }
+
+    // Logout Functionality
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'index.html';
+    });
+    
+    document.addEventListener('DOMContentLoaded', initializeProfile);
+</script>
 </body>
 </html>
