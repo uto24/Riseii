@@ -1,4 +1,4 @@
-<!-- dashboard.html -->
+<!-- dashboard.html (সম্পূর্ণ সংশোধিত) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,10 +8,12 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+<!-- onload="loadDashboard()" ঠিক থাকবে কারণ এটি async ফাংশন কল করতে পারে -->
 <body onload="loadDashboard()">
     <div class="container">
         <h2 id="welcomeMessage">Welcome!</h2>
         <div class="profile-info">
+            <!-- ... বাকি HTML আগের মতোই থাকবে ... -->
             <p><strong>Full Name:</strong> <span id="fullName"></span></p>
             <p><strong>Email:</strong> <span id="email"></span></p>
             <p><strong>Phone:</strong> <span id="phoneNumber"></span></p>
@@ -39,48 +41,59 @@
     <script src="main.js"></script>
     <script>
         async function loadDashboard() {
-            checkUser(); // লগইন করা আছে কি না চেক করবে
-            const user = supabase.auth.user();
+            // checkUser() ফাংশনটি main.js থেকে নিজে থেকেই কল হবে
             
-            if (user) {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .single();
+            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+            
+            if (sessionError || !session) {
+                console.error('No session found. Redirecting to login.');
+                window.location.href = 'index.html'; // সেশন না পেলে লগইন পেজে পাঠাও
+                return;
+            }
 
-                if (error) {
-                    console.error('Error fetching profile:', error.message);
-                    if (!data) logout(); // প্রোফাইল না পেলে লগআউট করে দেবে
-                } else {
-                    document.getElementById('welcomeMessage').innerText = `Welcome, ${data.full_name}!`;
-                    document.getElementById('fullName').innerText = data.full_name;
-                    document.getElementById('email').innerText = data.email;
-                    document.getElementById('phoneNumber').innerText = data.phone_number;
-                    document.getElementById('age').innerText = data.age;
-                    document.getElementById('balance').innerText = data.balance.toFixed(2);
-                    
-                    const referralLink = `${window.location.origin}/signup.html?ref=${data.referral_code}`;
-                    document.getElementById('referralLink').value = referralLink;
-                }
+            const user = session.user; // সেশন থেকে user অবজেক্ট নাও
+            
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (error || !data) {
+                console.error('Error fetching profile or profile not found:', error);
+                logout();
+            } else {
+                document.getElementById('welcomeMessage').innerText = `Welcome, ${data.full_name}!`;
+                document.getElementById('fullName').innerText = data.full_name;
+                document.getElementById('email').innerText = data.email;
+                document.getElementById('phoneNumber').innerText = data.phone_number;
+                document.getElementById('age').innerText = data.age;
+                document.getElementById('balance').innerText = data.balance.toFixed(2);
+                
+                const referralLink = `${window.location.origin}/signup.html?ref=${data.referral_code}`;
+                document.getElementById('referralLink').value = referralLink;
             }
         }
 
         async function completeTask(amount, taskName) {
-            const user = supabase.auth.user();
-            if (!user) return;
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                alert('You must be logged in to complete tasks.');
+                return;
+            }
+            const user = session.user;
 
-            const { data: profile, error: fetchError } = await supabase
+            const { data: profile } = await supabaseClient
                 .from('profiles').select('balance').eq('id', user.id).single();
 
-            if (fetchError) return alert('Could not fetch balance!');
+            if (!profile) return alert('Could not fetch your profile!');
 
             const newBalance = profile.balance + amount;
 
-            const { error: updateError } = await supabase
+            const { error } = await supabaseClient
                 .from('profiles').update({ balance: newBalance }).eq('id', user.id);
 
-            if (updateError) {
+            if (error) {
                 alert('Error updating balance!');
             } else {
                 alert(`Task "${taskName}" completed! You earned ৳${amount}.`);
