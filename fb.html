@@ -10,9 +10,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* CSS কোড আগের মতোই থাকবে, কোনো পরিবর্তন নেই */
-        :root { /* ... */ } body { /* ... */ } /* ... all previous CSS ... */
-        .task-item { background-color: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px; padding: 20px; }
+        :root {
+            --primary-bg: #f7f9fc;
+            --secondary-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --accent-color: #4f46e5;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+        }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: var(--primary-bg); color: var(--text-dark); margin: 0; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; }
         .main-header { background-color: var(--secondary-bg); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         .header-left a { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-decoration: none; }
         .header-right { display: flex; align-items: center; gap: 20px; }
@@ -22,17 +32,28 @@
         .page-title h1 { font-size: 2.2rem; }
         .page-title p { color: var(--text-light); }
         #task-list { margin-top: 30px; }
+        .task-item { background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; padding: 20px; }
         .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .task-id { font-weight: 700; color: var(--accent-color); }
         .task-reward { font-weight: 600; background-color: var(--success-color); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.9rem; }
-        .task-body .caption-box { background-color: var(--primary-bg); border: 1px dashed var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; }
+        .caption-box { background-color: var(--primary-bg); border: 1px dashed var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; }
         .caption-box p { margin: 0; color: var(--text-dark); }
         .copy-btn { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid var(--border-color); color: var(--text-light); cursor: pointer; padding: 5px 8px; border-radius: 6px; }
         .task-actions { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
         .download-btn { text-decoration: none; background-color: #3b82f6; color: white; padding: 10px 15px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
-        .submit-box input[type="file"] { border: 2px dashed var(--border-color); padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; }
-        .submit-btn { width: 100%; padding: 12px; background-color: var(--accent-color); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-        .submit-btn:disabled { background-color: #9ca3af; }
+        .submit-box label { font-weight: 600; display: block; margin-bottom: 8px; }
+        .submit-box input[type="file"] {
+            width: 100%;
+            border: 2px dashed var(--border-color);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-light);
+            background-color: var(--primary-bg);
+        }
+        .submit-btn { width: 100%; padding: 12px; background-color: var(--accent-color); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background-color 0.3s; }
+        .submit-btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -79,15 +100,11 @@
     }
 
     async function loadTasks() {
-        const { data: submittedTasks, error: submittedError } = await supabaseClient
+        const { data: submittedTasks } = await supabaseClient
             .from('submissions')
             .select('task_id')
             .eq('user_id', currentUser.id);
 
-        if (submittedError) {
-            console.error("Error fetching submitted tasks:", submittedError);
-            return;
-        }
         const submittedTaskIds = submittedTasks.map(sub => sub.task_id);
 
         const taskListDiv = document.getElementById('task-list');
@@ -109,7 +126,7 @@
         }
         
         let taskHTML = '';
-        for (const task of tasks) {
+        tasks.forEach(task => {
             taskHTML += `
                 <div class="task-item" id="task-${task.id}">
                     <div class="task-header">
@@ -120,24 +137,38 @@
                         <div class="caption-box"><p>${task.caption}</p><button class="copy-btn" onclick="copyCaption(this, \`${task.caption}\`)"><i class="fas fa-copy"></i></button></div>
                         <div class="task-actions"><a href="${task.image_url}" download="task-image-${task.id}.jpg" class="download-btn"><i class="fas fa-download"></i> Download Image</a></div>
                         <div class="submit-box">
-                            <input type="file" accept="image/png, image/jpeg" onchange="enableSubmit(this, ${task.id})">
-                            <button class="submit-btn" disabled onclick="submitTask(${task.id})">Submit Screenshot</button>
+                            <label for="file-upload-${task.id}">Upload a screenshot of your post:</label>
+                            <input type="file" id="file-upload-${task.id}" accept="image/png, image/jpeg" onchange="enableSubmit(${task.id})">
+                            <button class="submit-btn" id="submit-btn-${task.id}" disabled onclick="submitTask(${task.id})">Submit Screenshot</button>
                         </div>
                     </div>
                 </div>
             `;
-        }
+        });
         taskListDiv.innerHTML = taskHTML;
     }
 
+    // --- সমাধান: ফাইল সিলেক্ট করলেই বাটন অ্যাক্টিভ হবে ---
+    function enableSubmit(taskId) {
+        const fileInput = document.getElementById(`file-upload-${taskId}`);
+        const submitBtn = document.getElementById(`submit-btn-${taskId}`);
+        if (fileInput.files.length > 0) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+
     async function submitTask(taskId) {
-        // submitTask ফাংশনটি আগের মতোই থাকবে, কোনো পরিবর্তন নেই
         if (!currentUser) return;
-        const fileInput = document.querySelector(`#task-${taskId} input[type="file"]`);
+        const fileInput = document.getElementById(`file-upload-${taskId}`);
         const file = fileInput.files[0];
-        if (!file) return alert('Please select a screenshot.');
-        
-        const submitBtn = fileInput.nextElementSibling;
+        if (!file) {
+            alert('Please select a screenshot file.');
+            return;
+        }
+
+        const submitBtn = document.getElementById(`submit-btn-${taskId}`);
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
 
@@ -168,13 +199,14 @@
             alert('Task submitted successfully! Your submission will be reviewed.');
             document.getElementById(`task-${taskId}`).style.display = 'none';
         }
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Submit Screenshot';
     }
 
-    // Helper functions (আগের মতোই থাকবে)
-    function copyCaption(btn, text) { /* ... */ }
-    function enableSubmit(fileInput, taskId) { /* ... */ }
+    function copyCaption(btn, text) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 2000);
+        });
+    }
 
     document.addEventListener('DOMContentLoaded', initializePage);
 </script>
