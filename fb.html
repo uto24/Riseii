@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Post Tasks - Riseii</title>
+    <!-- Dependencies (Font Awesome, Fonts, Supabase) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-bg: #f7f9fc;
+            --secondary-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --accent-color: #4f46e5;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+        }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: var(--primary-bg); color: var(--text-dark); margin: 0; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; }
+        .main-header { background-color: var(--secondary-bg); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .header-left a { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-decoration: none; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .user-profile-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-dark); font-weight: 600; background-color: var(--primary-bg); padding: 8px 15px; border-radius: 20px; }
+        .user-profile-link .balance { color: var(--success-color); }
+        .main-content { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .page-title h1 { font-size: 2.2rem; }
+        .page-title p { color: var(--text-light); }
+        #task-list, #history-list { margin-top: 30px; }
+        .task-item, .history-item { background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; padding: 20px; }
+        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .task-id { font-weight: 700; color: var(--accent-color); }
+        .task-reward { font-weight: 600; background-color: var(--success-color); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.9rem; }
+        .task-body .caption-box { background-color: var(--primary-bg); border: 1px dashed var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; }
+        .caption-box p { margin: 0; color: var(--text-dark); }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid var(--border-color); color: var(--text-light); cursor: pointer; padding: 5px 8px; border-radius: 6px; }
+        .task-actions { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+        .download-btn { text-decoration: none; background-color: #3b82f6; color: white; padding: 10px 15px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .download-btn i { font-size: 1.1rem; }
+        .submit-box input[type="file"] { border: 2px dashed var(--border-color); padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; }
+        .submit-btn { width: 100%; padding: 12px; background-color: var(--accent-color); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .submit-btn:disabled { background-color: #9ca3af; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
+        .status-pending { background-color: var(--warning-color); color: white; }
+        .status-completed { background-color: var(--success-color); color: white; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left"><a href="tasks.html">Riseii Tasks</a></div>
+        <div class="header-right">
+            <a href="profile.html" class="user-profile-link">
+                <span id="header-username">User</span> - <span class="balance" id="header-balance">৳0.00</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page-title">
+            <h1><i class="fab fa-facebook-square"></i> Facebook Post Tasks</h1>
+            <p class="bengali-text">নিচের কাজগুলো সম্পন্ন করে আপনার আয় বৃদ্ধি করুন।</p>
+        </div>
+
+        <div id="task-list">
+            <!-- Tasks will be dynamically loaded here -->
+            <p>Loading tasks...</p>
+        </div>
+
+        <div class="page-title" style="margin-top: 50px;">
+            <h2>Task History</h2>
+            <p class="bengali-text">আপনার জমাকৃত ফেসবুক পোস্ট টাস্কগুলোর অবস্থা।</p>
+        </div>
+
+        <div id="history-list">
+            <!-- Submission history will be loaded here -->
+            <p>No submission history yet.</p>
+        </div>
+    </main>
+
+<script>
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+
+    async function initializePage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+        currentUser = session.user;
+
+        const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
+        if (profile) {
+            document.getElementById('header-username').textContent = profile.full_name;
+            document.getElementById('header-balance').textContent = `৳${profile.balance.toFixed(2)}`;
+        }
+
+        loadTasks();
+        loadHistory();
+    }
+
+    async function loadTasks() {
+        const taskListDiv = document.getElementById('task-list');
+        const { data: tasks, error } = await supabaseClient
+            .from('tasks')
+            .select('*')
+            .eq('task_type', 'facebook_post')
+            .eq('is_active', true)
+            .limit(15);
+        
+        if (error || !tasks || tasks.length === 0) {
+            taskListDiv.innerHTML = '<p>No new tasks available right now. Please check back later.</p>';
+            return;
+        }
+
+        let taskHTML = '';
+        for (const task of tasks) {
+            taskHTML += `
+                <div class="task-item" id="task-${task.id}">
+                    <div class="task-header">
+                        <span class="task-id">Task ID: #${task.id}</span>
+                        <span class="task-reward">Reward: ৳${task.reward_amount}</span>
+                    </div>
+                    <div class="task-body">
+                        <div class="caption-box">
+                            <p>${task.caption}</p>
+                            <button class="copy-btn" onclick="copyCaption(this, \`${task.caption}\`)"><i class="fas fa-copy"></i></button>
+                        </div>
+                        <div class="task-actions">
+                            <a href="${task.image_url}" download="task-image-${task.id}.jpg" class="download-btn"><i class="fas fa-download"></i> Download Image</a>
+                        </div>
+                        <div class="submit-box">
+                            <input type="file" accept="image/png, image/jpeg" onchange="enableSubmit(this, ${task.id})">
+                            <button class="submit-btn" disabled onclick="submitTask(${task.id})">Submit Screenshot</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        taskListDiv.innerHTML = taskHTML;
+    }
+
+    function copyCaption(btn, text) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 2000);
+        });
+    }
+
+    function enableSubmit(fileInput, taskId) {
+        const submitBtn = fileInput.nextElementSibling;
+        if (fileInput.files.length > 0) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+
+    async function submitTask(taskId) {
+        if (!currentUser) return;
+        const fileInput = document.querySelector(`#task-${taskId} input[type="file"]`);
+        const file = fileInput.files[0];
+        if (!file) {
+            alert('Please select a screenshot to submit.');
+            return;
+        }
+
+        const submitBtn = fileInput.nextElementSibling;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        const fileName = `${currentUser.id}/${taskId}-${Date.now()}`;
+        
+        // 1. Upload screenshot to Supabase Storage
+        const { error: uploadError } = await supabaseClient.storage.from('screenshots').upload(fileName, file);
+        if (uploadError) {
+            alert('Error uploading screenshot: ' + uploadError.message);
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Submit Screenshot';
+            return;
+        }
+
+        // 2. Get the public URL of the uploaded file
+        const { data: { publicUrl } } = supabaseClient.storage.from('screenshots').getPublicUrl(fileName);
+
+        // 3. Insert submission record into the 'submissions' table
+        const thirtyMinutesFromNow = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+        const { error: insertError } = await supabaseClient.from('submissions').insert({
+            user_id: currentUser.id,
+            task_id: taskId,
+            screenshot_url: publicUrl,
+            status: 'pending',
+            completed_at: thirtyMinutesFromNow
+        });
+
+        if (insertError) {
+            alert('Error submitting task: ' + insertError.message);
+        } else {
+            alert('Task submitted successfully! Your balance will be updated in 30 minutes.');
+            document.getElementById(`task-${taskId}`).style.display = 'none'; // Hide the submitted task
+            loadHistory(); // Refresh history
+        }
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Submit Screenshot';
+    }
+
+    async function loadHistory() {
+        if (!currentUser) return;
+        const historyListDiv = document.getElementById('history-list');
+        const { data: submissions, error } = await supabaseClient
+            .from('submissions')
+            .select('task_id, status, created_at')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        if (error || !submissions || submissions.length === 0) {
+            historyListDiv.innerHTML = '<p>No submission history yet.</p>';
+            return;
+        }
+
+        let historyHTML = '';
+        submissions.forEach(sub => {
+            historyHTML += `
+                <div class="history-item">
+                    <span>Task #${sub.task_id} - Submitted on: ${new Date(sub.created_at).toLocaleString()}</span>
+                    <span class="status-badge status-${sub.status}">${sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}</span>
+                </div>
+            `;
+        });
+        historyListDiv.innerHTML = historyHTML;
+    }
+
+    // This is a simplified auto-completion logic. In a real-world app,
+    // this should be handled by a secure backend server or a scheduled database function.
+    // This client-side function will only work if the user keeps the page open.
+    async function checkPendingSubmissions() {
+        if (!currentUser) return;
+        const { data: pending, error } = await supabaseClient
+            .from('submissions')
+            .select('id, user_id, status, completed_at, tasks(reward_amount)')
+            .eq('user_id', currentUser.id)
+            .eq('status', 'pending');
+
+        if (error || !pending) return;
+
+        for (const sub of pending) {
+            if (new Date() >= new Date(sub.completed_at)) {
+                // Time is up, complete the task
+                const { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', sub.user_id).single();
+                const newBalance = profile.balance + sub.tasks.reward_amount;
+                
+                // Use a transaction to update both tables safely
+                await supabaseClient.rpc('complete_submission_and_update_balance', {
+                    submission_id: sub.id,
+                    user_id_to_update: sub.user_id,
+                    reward: sub.tasks.reward_amount
+                });
+            }
+        }
+        loadHistory(); // Refresh history after checking
+    }
+
+    // Call initialize function when the page loads
+    document.addEventListener('DOMContentLoaded', initializePage);
+    // Periodically check for pending tasks to auto-complete (every minute)
+    setInterval(checkPendingSubmissions, 60000);
+
+</script>
+</body>
+</html>
