@@ -21,58 +21,62 @@
     </div>
 
     <script src="main.js"></script>
-    <script>
-        document.getElementById('signupButton').addEventListener('click', async () => {
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const age = document.getElementById('age').value;
-            const password = document.getElementById('password').value;
+<!-- signup.html এর ভেতরের script ট্যাগ -->
+<script>
+    document.getElementById('signupButton').addEventListener('click', async () => {
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const age = document.getElementById('age').value;
+        const password = document.getElementById('password').value;
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref');
-            let referredByUserId = null;
+        // ... রেফারেল কোড চেক করার অংশ আগের মতোই থাকবে ...
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        let referredByUserId = null;
 
-            if (refCode) {
-                const { data: referrer } = await supabaseClient
-                    .from('profiles')
-                    .select('id, balance')
-                    .eq('referral_code', refCode)
-                    .single();
-                
-                if (referrer) {
-                    referredByUserId = referrer.id;
-                    const newBalance = referrer.balance + 10;
-                    await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', referrer.id);
-                }
-            }
-
-            const { user, error: signUpError } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-            });
-
-            if (signUpError) return alert('Error signing up: ' + signUpError.message);
-            
-            const referralCode = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
-
-            const { error: profileError } = await supabaseClient
+        if (refCode) {
+            const { data: referrer } = await supabaseClient
                 .from('profiles')
-                .insert([{
-                    id: user.id,
-                    full_name: fullName,
-                    email: email,
-                    phone_number: phoneNumber,
-                    age: age,
-                    referral_code: referralCode,
-                    referred_by: referredByUserId
-                }]);
-
-            if (profileError) return alert('Error creating profile: ' + profileError.message);
+                .select('id, balance')
+                .eq('referral_code', refCode)
+                .single();
             
-            alert('Signup successful! Please check your email to verify your account.');
-            window.location.href = 'index.html';
+            if (referrer) {
+                referredByUserId = referrer.id;
+                const newBalance = referrer.balance + 10;
+                await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', referrer.id);
+            }
+        }
+
+        // --- সমস্যা ১ এর সমাধান এখানে ---
+        const { data: { user }, error: signUpError } = await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
         });
-    </script>
+
+        if (signUpError) return alert('Error signing up: ' + signUpError.message);
+        if (!user) return alert('Signup successful, but user object not returned. Please check email verification settings.');
+        
+        const referralCode = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        const { error: profileError } = await supabaseClient
+            .from('profiles')
+            .insert([{
+                id: user.id, // এখন আর এরর আসবে না
+                full_name: fullName,
+                email: email,
+                phone_number: phoneNumber,
+                age: age,
+                referral_code: referralCode,
+                referred_by: referredByUserId
+            }]);
+
+        if (profileError) return alert('Error creating profile: ' + profileError.message);
+        
+        alert('Signup successful! Please check your email to verify your account.');
+        window.location.href = 'index.html';
+    });
+</script>
 </body>
 </html>
