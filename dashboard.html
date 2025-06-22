@@ -169,7 +169,7 @@
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error("Task History Error:", error);
+            console.error("Task History Error:", error.message, error);
             listDiv.innerHTML = '<p>Could not load task history.</p>';
             return;
         }
