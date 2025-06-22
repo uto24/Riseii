@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* CSS কোড আগের মতোই থাকবে, কোনো পরিবর্তন নেই */
         :root {
             --primary-bg: #f7f9fc;
             --secondary-bg: #ffffff;
@@ -31,23 +32,17 @@
         .logout-btn { background: none; border: none; color: var(--danger-color); font-size: 1.5rem; cursor: pointer; padding: 5px; }
         .main-content { max-width: 900px; margin: 30px auto; padding: 0 20px; opacity: 0; transition: opacity 0.5s; }
         .main-content.loaded { opacity: 1; }
-
-        /* Profile Card Styles */
         .profile-card { background-color: var(--secondary-bg); border-radius: 12px; padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 30px; text-align: center; }
         .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background-color: var(--accent-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; flex-shrink: 0; }
         .profile-details h2 { margin: 0; font-size: 1.8rem; }
         .profile-details p { color: var(--text-light); margin: 5px 0 0; }
         .referral-info { margin-top: 15px; width: 100%; }
         .referral-info input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--primary-bg); cursor: copy; text-align: center; }
-        
-        /* Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-item { background-color: var(--secondary-bg); padding: 20px; border-radius: 12px; text-align: center; }
         .stat-icon { font-size: 2rem; color: var(--accent-color); margin-bottom: 10px; }
         .stat-value { font-size: 1.8rem; font-weight: 700; }
         .stat-label { color: var(--text-light); }
-
-        /* History Section */
         .history-section { background-color: var(--secondary-bg); border-radius: 12px; padding: 30px; }
         .history-section h3 { font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
         .history-list { max-height: 400px; overflow-y: auto; }
@@ -73,7 +68,7 @@
     </header>
 
     <main class="main-content" id="main-content">
-        <!-- Profile Summary Card -->
+        <!-- Profile Content... -->
         <div class="profile-card">
             <div class="profile-avatar" id="avatar-initial">L</div>
             <div class="profile-details">
@@ -85,21 +80,15 @@
                 </div>
             </div>
         </div>
-
-        <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-item"><div class="stat-icon"><i class="fas fa-wallet"></i></div><div class="stat-value" id="stat-balance">৳0.00</div><div class="stat-label">Current Balance</div></div>
             <div class="stat-item"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="stat-tasks-completed">0</div><div class="stat-label">Tasks Completed</div></div>
             <div class="stat-item"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="stat-referrals">0</div><div class="stat-label">Total Referrals</div></div>
         </div>
-
-        <!-- Task History Section -->
         <div class="history-section">
             <h3><i class="fas fa-history"></i> Task Submission History</h3>
             <div class="history-list" id="task-history-list"><p>Loading history...</p></div>
         </div>
-        
-        <!-- Referral History Section -->
         <div class="history-section" style="margin-top: 30px;">
             <h3><i class="fas fa-user-friends"></i> Referral History</h3>
             <div class="history-list" id="referral-history-list"><p>Loading history...</p></div>
@@ -113,6 +102,50 @@
 
     let currentUser = null;
 
+    // --- ব্যালেন্স আপডেটের জন্য নতুন ফাংশন ---
+    async function checkAndCompleteTasks() {
+        if (!currentUser) return false;
+
+        const { data: pendingSubmissions, error } = await supabaseClient
+            .from('submissions')
+            .select('id, user_id, tasks(reward_amount)')
+            .eq('user_id', currentUser.id)
+            .eq('status', 'pending')
+            .not('completed_at', 'is', null) // Only check tasks that have a completion time
+            .lt('completed_at', new Date().toISOString());
+
+        if (error || !pendingSubmissions || pendingSubmissions.length === 0) {
+            return false;
+        }
+
+        let totalRewardToAdd = 0;
+        const submissionsToUpdate = [];
+        
+        for (const sub of pendingSubmissions) {
+            if (sub.tasks && sub.tasks.reward_amount) {
+                totalRewardToAdd += sub.tasks.reward_amount;
+                submissionsToUpdate.push(sub.id);
+            }
+        }
+        
+        if (totalRewardToAdd > 0) {
+            // Update submission statuses to 'completed'
+            await supabaseClient
+                .from('submissions')
+                .update({ status: 'completed' })
+                .in('id', submissionsToUpdate);
+
+            // Update user's balance
+            const { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', currentUser.id).single();
+            const newBalance = profile.balance + totalRewardToAdd;
+            await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', currentUser.id);
+            
+            return true; // Indicate that balance was updated
+        }
+
+        return false;
+    }
+
     async function initializeProfile() {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) {
@@ -121,128 +154,64 @@
         }
         currentUser = session.user;
         
-        // Fetch main profile data
-        const { data: profile, error } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('id', currentUser.id)
-            .single();
-        
-        if (error || !profile) {
-            console.error('Error fetching profile:', error);
-            logout();
+        const balanceWasUpdated = await checkAndCompleteTasks();
+        if (balanceWasUpdated) {
+            alert('Your pending rewards have been added to your balance!');
+            window.location.reload(); // Refresh to show the latest data
             return;
         }
 
-        // Populate Profile Card
+        document.getElementById('main-content').classList.add('loaded');
+        
+        const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
+        if (error || !profile) { logout(); return; }
+
+        // Populate Profile Card & Stats
         document.getElementById('avatar-initial').textContent = profile.full_name.charAt(0).toUpperCase();
         document.getElementById('profile-name').textContent = profile.full_name;
         document.getElementById('profile-email').textContent = profile.email;
         const referralLinkInput = document.getElementById('referralLink');
         referralLinkInput.value = `${window.location.origin}/signup.html?ref=${profile.referral_code}`;
         referralLinkInput.addEventListener('click', () => {
-            referralLinkInput.select();
-            document.execCommand('copy');
-            alert('Referral link copied to clipboard!');
+            referralLinkInput.select(); document.execCommand('copy'); alert('Referral link copied!');
         });
-        
-        // Populate Balance Stat
         document.getElementById('stat-balance').textContent = `৳${profile.balance.toFixed(2)}`;
-
-        // Make content visible after loading
-        document.getElementById('main-content').classList.add('loaded');
-
-        // Load all histories and stats in parallel
-        await Promise.all([
-            loadTaskHistory(),
-            loadReferralHistory(),
-            loadCompletedTaskCount()
-        ]);
+        
+        await Promise.all([loadTaskHistory(), loadReferralHistory(), loadCompletedTaskCount()]);
     }
 
     async function loadTaskHistory() {
         const listDiv = document.getElementById('task-history-list');
-        const { data, error } = await supabaseClient
-            .from('submissions')
-            .select('task_id, status, created_at, tasks(task_type, reward_amount)')
-            .eq('user_id', currentUser.id)
-            .order('created_at', { ascending: false });
+        const { data, error } = await supabaseClient.from('submissions').select('task_id, status, created_at, tasks(task_type, reward_amount)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
 
-        if (error) {
-            console.error("Task History Error:", error.message, error);
-            listDiv.innerHTML = '<p>Could not load task history.</p>';
-            return;
+        if (error || !data || data.length === 0) {
+            listDiv.innerHTML = '<p>No task history yet.</p>'; return;
         }
-        if (!data || data.length === 0) {
-            listDiv.innerHTML = '<p>No task history yet.</p>';
-            return;
-        }
-
         let html = '';
         data.forEach(sub => {
-            if (!sub.tasks) { // Handle cases where the linked task might have been deleted
-                console.warn(`Submission for task_id ${sub.task_id} has no linked task data.`);
-                return;
-            }
+            if (!sub.tasks) return;
             const taskTypeName = sub.tasks.task_type.replace('_', ' ');
-            const rewardAmount = sub.tasks.reward_amount;
-            html += `
-                <div class="history-item">
-                    <div class="history-info">
-                        <strong>${taskTypeName.charAt(0).toUpperCase() + taskTypeName.slice(1)} (#${sub.task_id})</strong>
-                        <p>Submitted: ${new Date(sub.created_at).toLocaleString()}</p>
-                    </div>
-                    <div class="history-status">
-                        <span class="status-badge status-${sub.status}">${sub.status}</span>
-                        <span class="reward">Reward: ৳${rewardAmount}</span>
-                    </div>
-                </div>`;
+            html += `<div class="history-item"><div class="history-info"><strong>${taskTypeName.charAt(0).toUpperCase() + taskTypeName.slice(1)} (#${sub.task_id})</strong><p>Submitted: ${new Date(sub.created_at).toLocaleString()}</p></div><div class="history-status"><span class="status-badge status-${sub.status}">${sub.status}</span><span class="reward">Reward: ৳${sub.tasks.reward_amount}</span></div></div>`;
         });
         listDiv.innerHTML = html;
     }
     
     async function loadReferralHistory() {
         const listDiv = document.getElementById('referral-history-list');
-        const { data, error, count } = await supabaseClient
-            .from('profiles')
-            .select('full_name, created_at', { count: 'exact' })
-            .eq('referred_by', currentUser.id)
-            .order('created_at', { ascending: false });
-            
+        const { data, count } = await supabaseClient.from('profiles').select('full_name, created_at', { count: 'exact' }).eq('referred_by', currentUser.id).order('created_at', { ascending: false });
         document.getElementById('stat-referrals').textContent = count || 0;
-
-        if (error) {
-            console.error("Referral History Error:", error);
-            listDiv.innerHTML = '<p>Could not load referral history.</p>';
-            return;
-        }
         if (!data || data.length === 0) {
-            listDiv.innerHTML = '<p>No one has joined using your referral link yet.</p>';
-            return;
+            listDiv.innerHTML = '<p>No one has joined using your referral link yet.</p>'; return;
         }
-
         let html = '';
         data.forEach(ref => {
-            html += `
-                <div class="history-item">
-                    <strong>${ref.full_name}</strong>
-                    <span>Joined on: ${new Date(ref.created_at).toLocaleDateString()}</span>
-                </div>`;
+            html += `<div class="history-item"><strong>${ref.full_name}</strong><span>Joined on: ${new Date(ref.created_at).toLocaleDateString()}</span></div>`;
         });
         listDiv.innerHTML = html;
     }
 
     async function loadCompletedTaskCount() {
-        const { error, count } = await supabaseClient
-            .from('submissions')
-            .select('id', { count: 'exact', head: true })
-            .eq('user_id', currentUser.id)
-            .eq('status', 'completed');
-            
-        if (error) {
-            console.error("Completed Task Count Error:", error);
-            return;
-        }
+        const { count } = await supabaseClient.from('submissions').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('status', 'completed');
         document.getElementById('stat-tasks-completed').textContent = count || 0;
     }
 
@@ -252,7 +221,6 @@
     }
 
     document.getElementById('logout-btn').addEventListener('click', logout);
-    
     document.addEventListener('DOMContentLoaded', initializeProfile);
 </script>
 </body>
