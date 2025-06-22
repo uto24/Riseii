@@ -1,15 +1,16 @@
 // main.js
 
-// আপনার Supabase URL এবং Key এখানে দিন
 const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
 
-// Supabase ক্লায়েন্ট তৈরি করুন
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Supabase ক্লায়েন্ট তৈরি (সঠিক পদ্ধতি)
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ব্যবহারকারী লগইন করা আছে কি না তা চেক করার ফাংশন
+/**
+ * ব্যবহারকারী লগইন করা আছে কি না তা চেক করে এবং প্রয়োজনে পেজ পরিবর্তন করে।
+ */
 function checkUser() {
-    const user = supabase.auth.user();
+    const user = supabaseClient.auth.user();
     if (user) {
         // যদি ব্যবহারকারী লগইন করা থাকে এবং লগইন/সাইনআপ পেজে থাকে,
         // তাহলে তাকে ড্যাশবোর্ডে পাঠিয়ে দিন।
@@ -26,9 +27,11 @@ function checkUser() {
     }
 }
 
-// লগআউট ফাংশন
+/**
+ * ব্যবহারকারীকে লগআউট করে এবং লগইন পেজে পাঠিয়ে দেয়।
+ */
 async function logout() {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
     if (error) {
         console.error('Error logging out:', error.message);
     } else {
