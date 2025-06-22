@@ -1,0 +1,92 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body onload="loadDashboard()">
+    <div class="container">
+        <h2 id="welcomeMessage">Welcome!</h2>
+        <div class="profile-info">
+            <p><strong>Full Name:</strong> <span id="fullName"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>Phone:</strong> <span id="phoneNumber"></span></p>
+            <p><strong>Age:</strong> <span id="age"></span></p>
+            <p><strong>Balance:</strong> ৳<span id="balance">0.00</span></p>
+            <p><strong>Your Referral Link:</strong></p>
+            <textarea id="referralLink" rows="2" readonly></textarea>
+        </div>
+        
+        <div class="tasks">
+            <h3>Complete Tasks to Earn</h3>
+            <div class="task">
+                <span>Join Telegram Channel</span>
+                <button onclick="completeTask(5, 'Joined Telegram Channel')">Earn ৳5</button>
+            </div>
+             <div class="task">
+                <span>Watch a Video</span>
+                <button onclick="completeTask(2, 'Watched a Video')">Earn ৳2</button>
+            </div>
+        </div>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        async function loadDashboard() {
+            checkUser(); // লগইন করা আছে কি না চেক করবে
+            const user = supabase.auth.user();
+            
+            if (user) {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching profile:', error.message);
+                    if (!data) logout(); // প্রোফাইল না পেলে লগআউট করে দেবে
+                } else {
+                    document.getElementById('welcomeMessage').innerText = `Welcome, ${data.full_name}!`;
+                    document.getElementById('fullName').innerText = data.full_name;
+                    document.getElementById('email').innerText = data.email;
+                    document.getElementById('phoneNumber').innerText = data.phone_number;
+                    document.getElementById('age').innerText = data.age;
+                    document.getElementById('balance').innerText = data.balance.toFixed(2);
+                    
+                    const referralLink = `${window.location.origin}/signup.html?ref=${data.referral_code}`;
+                    document.getElementById('referralLink').value = referralLink;
+                }
+            }
+        }
+
+        async function completeTask(amount, taskName) {
+            const user = supabase.auth.user();
+            if (!user) return;
+
+            const { data: profile, error: fetchError } = await supabase
+                .from('profiles').select('balance').eq('id', user.id).single();
+
+            if (fetchError) return alert('Could not fetch balance!');
+
+            const newBalance = profile.balance + amount;
+
+            const { error: updateError } = await supabase
+                .from('profiles').update({ balance: newBalance }).eq('id', user.id);
+
+            if (updateError) {
+                alert('Error updating balance!');
+            } else {
+                alert(`Task "${taskName}" completed! You earned ৳${amount}.`);
+                document.getElementById('balance').innerText = newBalance.toFixed(2);
+            }
+        }
+    </script>
+</body>
+</html>
