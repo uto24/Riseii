@@ -4,15 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing Tasks - Riseii</title>
-    <!-- Dependencies (Font Awesome, Fonts, Supabase) -->
+    <!-- Dependencies -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* CSS কোড fb-tasks.html এর মতোই থাকবে, তাই এখানে পুনরাবৃত্তি করা হলো না। 
-           আপনি চাইলে একটি কমন style.css ফাইল ব্যবহার করতে পারেন। 
-           শুধু এই পেজের জন্য প্রয়োজনীয় কিছু স্টাইল নিচে যোগ করা হলো। */
         :root {
             --primary-bg: #f7f9fc;
             --secondary-bg: #ffffff;
@@ -41,28 +38,9 @@
         .task-reward { font-weight: 600; background-color: var(--success-color); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.9rem; }
         
         /* Typing Task Specific Styles */
-        .typing-image-container {
-            width: 100%;
-            max-height: 400px;
-            overflow: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        .typing-image-container img {
-            width: 100%;
-            display: block;
-        }
-        .typing-input {
-            width: 100%;
-            min-height: 150px;
-            padding: 15px;
-            font-size: 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            resize: vertical;
-            margin-bottom: 15px;
-        }
+        .typing-image-container { width: 100%; max-height: 400px; overflow: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; }
+        .typing-image-container img { width: 100%; display: block; }
+        .typing-input { width: 100%; min-height: 150px; padding: 15px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 8px; resize: vertical; margin-bottom: 15px; }
         .submit-btn { width: 100%; padding: 12px; background-color: var(--accent-color); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .submit-btn:disabled { background-color: #9ca3af; }
     </style>
@@ -83,11 +61,7 @@
             <h1><i class="fas fa-keyboard"></i> Typing Tasks</h1>
             <p class="bengali-text">ছবি দেখে নির্ভুলভাবে টাইপ করুন এবং উপার্জন করুন।</p>
         </div>
-
-        <div id="task-list">
-            <!-- Typing tasks will be dynamically loaded here -->
-            <p>Loading tasks...</p>
-        </div>
+        <div id="task-list"><p>Loading tasks...</p></div>
     </main>
 
 <script>
@@ -115,16 +89,34 @@
     }
 
     async function loadTypingTasks() {
+        // Step 1: Get the list of task IDs the user has already submitted.
+        const { data: submittedTasks, error: submittedError } = await supabaseClient
+            .from('submissions')
+            .select('task_id')
+            .eq('user_id', currentUser.id);
+
+        if (submittedError) {
+            console.error("Error fetching submitted tasks:", submittedError);
+            return;
+        }
+        const submittedTaskIds = submittedTasks.map(sub => sub.task_id);
+
+        // Step 2: Fetch typing tasks that are NOT in the submitted list.
         const taskListDiv = document.getElementById('task-list');
-        const { data: tasks, error } = await supabaseClient
+        const query = supabaseClient
             .from('tasks')
             .select('*')
-            .eq('task_type', 'typing_task') // শুধু টাইপিং টাস্ক আনা হচ্ছে
-            .eq('is_active', true)
-            .limit(15);
+            .eq('task_type', 'typing_task')
+            .eq('is_active', true);
+        
+        if (submittedTaskIds.length > 0) {
+            query.not('id', 'in', `(${submittedTaskIds.join(',')})`);
+        }
+
+        const { data: tasks, error } = await query.limit(15);
         
         if (error || !tasks || tasks.length === 0) {
-            taskListDiv.innerHTML = '<p>No new typing tasks available right now.</p>';
+            taskListDiv.innerHTML = '<p>No new typing tasks available right now. Please check back later.</p>';
             return;
         }
 
@@ -166,18 +158,14 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
 
-        // এখানে আমরা টাইপ করা টেক্সটটি screenshot_url কলামে সেভ করব,
-        // যদিও কলামের নাম ম্যাচ করছে না, তবে দ্রুততার জন্য এটি করা যায়।
-        // আদর্শ সমাধান হলো submissions টেবিলে 'submission_data' নামে একটি নতুন text কলাম তৈরি করা।
-        // আপাতত আমরা screenshot_url ব্যবহার করছি।
-        
-        const thirtyMinutesFromNow = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+        // এখানে আমরা submissions টেবিলে একটি নতুন কলাম 'submission_data' ব্যবহার করব।
+        // যদি এই কলামটি না থাকে, তাহলে আপনাকে এটি text টাইপ দিয়ে তৈরি করতে হবে।
         const { error } = await supabaseClient.from('submissions').insert({
             user_id: currentUser.id,
             task_id: taskId,
-            screenshot_url: typedText, // টাইপ করা টেক্সট এখানে সেভ হচ্ছে
-            status: 'pending',
-            completed_at: thirtyMinutesFromNow
+            submission_data: typedText, // টাইপ করা টেক্সট submission_data তে সেভ হচ্ছে
+            status: 'pending'
+            // completed_at এখানে தேவையில்லை কারণ এটি ম্যানুয়ালি রিভিউ হবে
         });
 
         if (error) {
@@ -185,9 +173,8 @@
             submitBtn.disabled = false;
             submitBtn.innerText = 'Submit Typed Text';
         } else {
-            alert('Task submitted successfully! Your submission is pending review.');
-            taskDiv.style.display = 'none'; // টাস্কটি হাইড করে দিন
-            // এখানে হিস্টোরি পেজ থাকলে সেখানে রিডাইরেক্ট করা যেত বা হিস্টোরি রিফ্রেশ করা যেত।
+            alert('Task submitted successfully! Your submission will be reviewed by an admin.');
+            taskDiv.style.display = 'none';
         }
     }
 
