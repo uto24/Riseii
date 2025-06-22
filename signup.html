@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Supabase লাইব্রেরি -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body onload="checkUser()">
@@ -21,25 +20,21 @@
         <p>Already have an account? <a href="index.html">Login</a></p>
     </div>
 
-    <!-- আমাদের JavaScript ফাইলগুলো -->
     <script src="main.js"></script>
     <script>
         document.getElementById('signupButton').addEventListener('click', async () => {
-            // ফর্ম থেকে সব ডেটা নেওয়া
             const fullName = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
             const phoneNumber = document.getElementById('phoneNumber').value;
             const age = document.getElementById('age').value;
             const password = document.getElementById('password').value;
 
-            // URL থেকে রেফারেল কোড চেক করা
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             let referredByUserId = null;
 
             if (refCode) {
-                // রেফারারকে খুঁজে বের করে কমিশন দেওয়া
-                const { data: referrer, error: refError } = await supabase
+                const { data: referrer } = await supabaseClient
                     .from('profiles')
                     .select('id, balance')
                     .eq('referral_code', refCode)
@@ -48,23 +43,20 @@
                 if (referrer) {
                     referredByUserId = referrer.id;
                     const newBalance = referrer.balance + 10;
-                    await supabase.from('profiles').update({ balance: newBalance }).eq('id', referrer.id);
+                    await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', referrer.id);
                 }
             }
 
-            // Supabase Auth-এ নতুন ইউজার তৈরি করা
-            const { user, error: signUpError } = await supabase.auth.signUp({
+            const { user, error: signUpError } = await supabaseClient.auth.signUp({
                 email: email,
                 password: password,
             });
 
             if (signUpError) return alert('Error signing up: ' + signUpError.message);
             
-            // ইউনিক রেফারেল কোড তৈরি করা
             const referralCode = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-            // `profiles` টেবিলে ইউজারের বাকি তথ্য সেভ করা
-            const { error: profileError } = await supabase
+            const { error: profileError } = await supabaseClient
                 .from('profiles')
                 .insert([{
                     id: user.id,
