@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="style.css">
+    <!-- প্রথমে Supabase লাইব্রেরি লোড হবে -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body onload="checkUser()">
@@ -17,13 +18,14 @@
         <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
     </div>
 
+    <!-- তারপর আমাদের main.js এবং এই পেজের স্ক্রিপ্ট -->
     <script src="main.js"></script>
     <script>
         document.getElementById('loginButton').addEventListener('click', async () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            const { error } = await supabase.auth.signIn({
+            const { error } = await supabaseClient.auth.signIn({
                 email: email,
                 password: password,
             });
