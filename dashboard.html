@@ -102,7 +102,6 @@
 
     let currentUser = null;
 
-    // --- ব্যালেন্স আপডেটের জন্য নতুন ফাংশন ---
     async function checkAndCompleteTasks() {
         if (!currentUser) return false;
 
@@ -111,7 +110,7 @@
             .select('id, user_id, tasks(reward_amount)')
             .eq('user_id', currentUser.id)
             .eq('status', 'pending')
-            .not('completed_at', 'is', null) // Only check tasks that have a completion time
+            .not('completed_at', 'is', null)
             .lt('completed_at', new Date().toISOString());
 
         if (error || !pendingSubmissions || pendingSubmissions.length === 0) {
@@ -129,20 +128,12 @@
         }
         
         if (totalRewardToAdd > 0) {
-            // Update submission statuses to 'completed'
-            await supabaseClient
-                .from('submissions')
-                .update({ status: 'completed' })
-                .in('id', submissionsToUpdate);
-
-            // Update user's balance
+            await supabaseClient.from('submissions').update({ status: 'completed' }).in('id', submissionsToUpdate);
             const { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', currentUser.id).single();
             const newBalance = profile.balance + totalRewardToAdd;
             await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', currentUser.id);
-            
-            return true; // Indicate that balance was updated
+            return true;
         }
-
         return false;
     }
 
@@ -154,19 +145,25 @@
         }
         currentUser = session.user;
         
-        const balanceWasUpdated = await checkAndCompleteTasks();
-        if (balanceWasUpdated) {
-            alert('Your pending rewards have been added to your balance!');
-            window.location.reload(); // Refresh to show the latest data
-            return;
+        // --- রিফ্রেশ লুপ সমাধানের কোড ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const wasReloaded = urlParams.get('reloaded');
+        
+        if (!wasReloaded) {
+            const balanceWasUpdated = await checkAndCompleteTasks();
+            if (balanceWasUpdated) {
+                alert('Your pending rewards have been added to your balance!');
+                window.location.href = window.location.pathname + '?reloaded=true';
+                return;
+            }
         }
+        // --- সমাধান শেষ ---
 
         document.getElementById('main-content').classList.add('loaded');
         
         const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
         if (error || !profile) { logout(); return; }
 
-        // Populate Profile Card & Stats
         document.getElementById('avatar-initial').textContent = profile.full_name.charAt(0).toUpperCase();
         document.getElementById('profile-name').textContent = profile.full_name;
         document.getElementById('profile-email').textContent = profile.email;
