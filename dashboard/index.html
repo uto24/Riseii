@@ -55,14 +55,25 @@
         .status-completed { background-color: var(--success-color); color: white; }
         .status-rejected { background-color: var(--danger-color); color: white; }
         .reward { display: block; font-size: 0.9rem; color: #333; font-weight: 600; margin-top: 5px; }
+        
+.ad {
+    background: #000153;
+    color: #fff;
+    padding: 30px;
+    border-radius: 10px 0 10px 0;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.5);
+    text-align: center;
+}
+
+
     </style>
 </head>
 <body>
 
     <header class="main-header">
-        <div class="header-left"><a href="index.html">Riseii</a></div>
+        <div class="header-left"><a href="/">Riseii</a></div>
         <div class="header-right">
-            <a href="tasks.html" class="tasks-link"><i class="fas fa-tasks"></i> Go to Tasks</a>
+            <a href="/tasks" class="tasks-link"><i class="fas fa-tasks"></i> Go to Tasks</a>
             <button class="logout-btn" id="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </header>
@@ -80,11 +91,34 @@
                 </div>
             </div>
         </div>
+        
+        
         <div class="stats-grid">
             <div class="stat-item"><div class="stat-icon"><i class="fas fa-wallet"></i></div><div class="stat-value" id="stat-balance">৳0.00</div><div class="stat-label">Current Balance</div></div>
             <div class="stat-item"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="stat-tasks-completed">0</div><div class="stat-label">Tasks Completed</div></div>
             <div class="stat-item"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="stat-referrals">0</div><div class="stat-label">Total Referrals</div></div>
         </div>
+        
+        <hr style="bordrr: none; margin: 0 5% 0 5%; background: #8f00ff; color: #8f00ff;">
+        
+        
+        <br>
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-icon"><i class="fas fa-wallet"></i></div><div class="stat-value" >Withdraw Money</div></div>
+            <div class="stat-item"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" >Join as a Modaretor</div></div>
+            <div class="stat-item"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">0</div><div class="stat-label">Top List</div></div>
+        </div>
+        
+        
+        <section class="ad">
+            <h1>মাত্র ৩০ টাকায় ব্যানপ্রুফ সিকিউর ফেসবুক আইডি!</h1>
+            <p>বারবার আইডি ডিজেবল হওয়ার দুশ্চিন্তা থেকে মুক্তি নিন। আমাদের ফোন-ভেরিফাইড, ট্র্যাক-প্রুফ ও সম্পূর্ণ রেডি ফেসবুক আইডি দিয়ে আপনার ব্যবসা ও ব্যক্তিগত কাজকে দিন ১০০% নিরাপত্তা</p>
+            <a href="#"><button class="tasks-link">বিস্তারিত দেখুন!</button></a><br>
+            <br>
+            <em>RiseShop - Ad</em>
+        </section>
+        <br><br>
+        
         <div class="history-section">
             <h3><i class="fas fa-history"></i> Task Submission History</h3>
             <div class="history-list" id="task-history-list"><p>Loading history...</p></div>
@@ -140,7 +174,7 @@
     async function initializeProfile() {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) {
-            window.location.href = 'login.html';
+            window.location.href = '/login';
             return;
         }
         currentUser = session.user;
@@ -210,7 +244,7 @@
 
     async function logout() {
         await supabaseClient.auth.signOut();
-        window.location.href = 'index.html';
+        window.location.href = '/';
     }
 
     document.getElementById('logout-btn').addEventListener('click', logout);
