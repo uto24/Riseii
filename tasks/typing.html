@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Tasks - Riseii</title>
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-bg: #f7f9fc;
+            --secondary-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --accent-color: #4f46e5;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+        }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: var(--primary-bg); color: var(--text-dark); margin: 0; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; }
+        .main-header { background-color: var(--secondary-bg); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .header-left a { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-decoration: none; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .user-profile-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-dark); font-weight: 600; background-color: var(--primary-bg); padding: 8px 15px; border-radius: 20px; }
+        .user-profile-link .balance { color: var(--success-color); }
+        .main-content { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .page-title h1 { font-size: 2.2rem; }
+        .page-title p { color: var(--text-light); }
+        #task-list { margin-top: 30px; }
+        .task-item { background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; padding: 20px; }
+        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .task-id { font-weight: 700; color: var(--accent-color); }
+        .task-reward { font-weight: 600; background-color: var(--success-color); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.9rem; }
+        
+        /* Typing Task Specific Styles */
+        .typing-image-container { width: 100%; max-height: 400px; overflow: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; }
+        .typing-image-container img { width: 100%; display: block; }
+        .typing-input { width: 100%; min-height: 150px; padding: 15px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 8px; resize: vertical; margin-bottom: 15px; }
+        .submit-btn { width: 100%; padding: 12px; background-color: var(--accent-color); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .submit-btn:disabled { background-color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left"><a href="tasks.html">Riseii Tasks</a></div>
+        <div class="header-right">
+            <a href="profile.html" class="user-profile-link">
+                <span id="header-username">User</span> - <span class="balance" id="header-balance">৳0.00</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page-title">
+            <h1><i class="fas fa-keyboard"></i> Typing Tasks</h1>
+            <p class="bengali-text">ছবি দেখে নির্ভুলভাবে টাইপ করুন এবং উপার্জন করুন।</p>
+        </div>
+        <div id="task-list"><p>Loading tasks...</p></div>
+    </main>
+
+<script>
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+
+    async function initializePage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+        currentUser = session.user;
+
+        const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
+        if (profile) {
+            document.getElementById('header-username').textContent = profile.full_name;
+            document.getElementById('header-balance').textContent = `৳${profile.balance.toFixed(2)}`;
+        }
+
+        loadTypingTasks();
+    }
+
+    async function loadTypingTasks() {
+        // Step 1: Get the list of task IDs the user has already submitted.
+        const { data: submittedTasks, error: submittedError } = await supabaseClient
+            .from('submissions')
+            .select('task_id')
+            .eq('user_id', currentUser.id);
+
+        if (submittedError) {
+            console.error("Error fetching submitted tasks:", submittedError);
+            return;
+        }
+        const submittedTaskIds = submittedTasks.map(sub => sub.task_id);
+
+        // Step 2: Fetch typing tasks that are NOT in the submitted list.
+        const taskListDiv = document.getElementById('task-list');
+        const query = supabaseClient
+            .from('tasks')
+            .select('*')
+            .eq('task_type', 'typing_task')
+            .eq('is_active', true);
+        
+        if (submittedTaskIds.length > 0) {
+            query.not('id', 'in', `(${submittedTaskIds.join(',')})`);
+        }
+
+        const { data: tasks, error } = await query.limit(15);
+        
+        if (error || !tasks || tasks.length === 0) {
+            taskListDiv.innerHTML = '<p>No new typing tasks available right now. Please check back later.</p>';
+            return;
+        }
+
+        let taskHTML = '';
+        for (const task of tasks) {
+            taskHTML += `
+                <div class="task-item" id="task-${task.id}">
+                    <div class="task-header">
+                        <span class="task-id">Task ID: #${task.id}</span>
+                        <span class="task-reward">Reward: ৳${task.reward_amount}</span>
+                    </div>
+                    <div class="task-body">
+                        <p><strong>Image to type from:</strong></p>
+                        <div class="typing-image-container">
+                            <img src="${task.image_url}" alt="Typing Task Image">
+                        </div>
+                        <p><strong>Type the text here:</strong></p>
+                        <textarea class="typing-input" placeholder="Start typing here..."></textarea>
+                        <button class="submit-btn" onclick="submitTypingTask(${task.id})">Submit Typed Text</button>
+                    </div>
+                </div>
+            `;
+        }
+        taskListDiv.innerHTML = taskHTML;
+    }
+
+    async function submitTypingTask(taskId) {
+        if (!currentUser) return;
+        const taskDiv = document.getElementById(`task-${taskId}`);
+        const textArea = taskDiv.querySelector('.typing-input');
+        const typedText = textArea.value.trim();
+
+        if (typedText === '') {
+            alert('Please type the text from the image before submitting.');
+            return;
+        }
+
+        const submitBtn = taskDiv.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        // এখানে আমরা submissions টেবিলে একটি নতুন কলাম 'submission_data' ব্যবহার করব।
+        // যদি এই কলামটি না থাকে, তাহলে আপনাকে এটি text টাইপ দিয়ে তৈরি করতে হবে।
+        const { error } = await supabaseClient.from('submissions').insert({
+            user_id: currentUser.id,
+            task_id: taskId,
+            submission_data: typedText, // টাইপ করা টেক্সট submission_data তে সেভ হচ্ছে
+            status: 'pending'
+            // completed_at এখানে தேவையில்லை কারণ এটি ম্যানুয়ালি রিভিউ হবে
+        });
+
+        if (error) {
+            alert('Error submitting task: ' + error.message);
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Submit Typed Text';
+        } else {
+            alert('Task submitted successfully! Your submission will be reviewed by an admin.');
+            taskDiv.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initializePage);
+</script>
+</body>
+</html>
