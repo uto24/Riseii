@@ -156,7 +156,7 @@
         async function redirectIfLoggedIn() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
-                window.location.href = 'profile.html';
+                window.location.href = '/dashboard';
             }
         }
         document.addEventListener('DOMContentLoaded', redirectIfLoggedIn);
@@ -183,7 +183,7 @@
                 loginButton.innerText = 'Log In'; // Reset button text
             } else {
                 // On successful login, redirect to the profile page
-                window.location.href = 'profile.html';
+                window.location.href = '/dashboard';
             }
         });
     </script>
