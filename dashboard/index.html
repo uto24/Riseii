@@ -212,7 +212,7 @@
         document.getElementById('profile-name').textContent = profile.full_name;
         document.getElementById('profile-email').textContent = profile.email;
         const referralLinkInput = document.getElementById('referralLink');
-        referralLinkInput.value = `${window.location.origin}/signup.html?ref=${profile.referral_code}`;
+        referralLinkInput.value = `${window.location.origin}/signup?ref=${profile.referral_code}`;
         referralLinkInput.addEventListener('click', () => {
             referralLinkInput.select(); document.execCommand('copy'); alert('Referral link copied!');
         });
