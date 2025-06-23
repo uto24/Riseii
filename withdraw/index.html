@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riseii - Secure & Transparent Online Earnings</title>
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+    <title>Withdraw Earnings - Riseii</title>
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary-bg: #f7f9fc;
@@ -18,40 +16,183 @@
             --text-dark: #1e293b;
             --text-light: #475569;
             --accent-color: #4f46e5;
-            --accent-hover: #4338ca;
-            --accent-light: #eef2ff;
-            --border-color: #e2e8f0;
-            --shadow-color: rgba(79, 70, 229, 0.1);
             --success-color: #10b981;
-            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Nunito Sans', sans-serif;
-            background-color: #6500ff27;
-            color: var(--text-dark);
-            line-height: 1.7;
-            font-size: 16px;
-            overflow-x: hidden;
+        body { font-family: 'Nunito Sans', sans-serif; background-color: var(--primary-bg); color: var(--text-dark); margin: 0; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; }
+        .main-header { background-color: var(--secondary-bg); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .header-left a { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-decoration: none; }
+        .header-right a { font-weight: 600; color: var(--accent-color); text-decoration: none; }
+        .main-content { max-width: 500px; margin: 40px auto; padding: 0 20px; }
+        
+        .withdraw-card { background-color: var(--secondary-bg); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .withdraw-header { text-align: center; margin-bottom: 25px; }
+        .withdraw-header .icon { font-size: 3rem; color: var(--accent-color); margin-bottom: 10px; }
+        .withdraw-header h2 { font-size: 1.8rem; margin-bottom: 5px; }
+        .balance-display { background-color: var(--primary-bg); padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 25px; }
+        .balance-display p { margin: 0; color: var(--text-light); }
+        .balance-display .amount { font-size: 2rem; font-weight: 700; color: var(--success-color); }
+        
+        .input-group { margin-bottom: 1.2rem; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        h1, h2, h3, h4 { font-weight: 700; color: var(--text-dark); }
-        h1 { font-size: 3.2rem; line-height: 1.2; font-weight: 800; }
-        h2 { font-size: 2.5rem; }
-        h3 { font-size: 1.4rem; }
-        p { margin-bottom: 1em; color: var(--text-light); }
-        .bengali-text { font-family: 'Anek Bangla', sans-serif; font-size: 1.1rem; }
-        a { text-decoration: none; color: var(--accent-color); transition: color 0.3s ease; }
-        a:hover { color: var(--accent-hover); }
+        .info-notice { font-size: 0.9rem; color: var(--text-light); text-align: center; margin-bottom: 20px; }
         
-        </style>
+        .btn { width: 100%; padding: 15px; background-color: var(--accent-color); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: 600; }
+        .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
         
-        </head>
-        <body>
+        .error-message {
+            background-color: #ffe4e6;
+            color: var(--danger-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left"><a href="index.html">Riseii</a></div>
+        <div class="header-right"><a href="profile.html">My Profile</a></div>
+    </header>
+
+    <main class="main-content">
+        <div class="withdraw-card">
+            <div class="withdraw-header">
+                <div class="icon"><i class="fas fa-money-bill-transfer"></i></div>
+                <h2>Withdraw Earnings</h2>
+                <p class="bengali-text">আপনার উপার্জন তুলে নিন</p>
+            </div>
+
+            <div class="balance-display">
+                <p>Your Current Balance</p>
+                <p class="amount" id="current-balance">৳0.00</p>
+            </div>
+
+            <!-- Error message for insufficient balance -->
+            <div class="error-message" id="error-message">
+                <p>আপনার পর্যাপ্ত ব্যালেন্স নেই। সর্বনিম্ন উইথড্র ১৫০৳।</p>
+            </div>
             
-        <section style="displayv flex; justify-content: center; align-item: center;"> <h2 style="margin: 30%; ">আপনার পর্যাপ্ত ব্যালেন্স নেই, সর্বোনিম্ন উইথড্র ১৫০৳<h2></section>
-            
-        </body>
-        </html>
+            <!-- Withdraw Form -->
+            <form id="withdraw-form" style="display: none;"> <!-- Initially hidden -->
+                <div class="input-group">
+                    <label for="amount">Amount to Withdraw (৳)</label>
+                    <input type="number" id="amount" placeholder="e.g., 200" required>
+                </div>
+                <div class="input-group">
+                    <label for="method">Payment Method</label>
+                    <select id="method" required>
+                        <option value="bkash">bKash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="rocket">Rocket</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="accountNumber">Account Number</label>
+                    <input type="text" id="accountNumber" placeholder="e.g., 01712345678" required>
+                </div>
+
+                <p class="info-notice">Withdraw requests are processed within 24-48 hours.</p>
+
+                <button type="submit" class="btn" id="withdraw-btn">Request Withdraw</button>
+            </form>
+        </div>
+    </main>
+
+<script>
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const MIN_WITHDRAW_AMOUNT = 150;
+    let currentUser = null;
+    let userBalance = 0;
+
+    async function initializeWithdrawPage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+        currentUser = session.user;
+        
+        const { data: profile, error } = await supabaseClient
+            .from('profiles')
+            .select('balance')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (error || !profile) {
+            console.error('Could not fetch user profile.');
+            return;
+        }
+
+        userBalance = profile.balance;
+        document.getElementById('current-balance').textContent = `৳${userBalance.toFixed(2)}`;
+
+        // Check if balance is sufficient
+        if (userBalance >= MIN_WITHDRAW_AMOUNT) {
+            document.getElementById('withdraw-form').style.display = 'block';
+        } else {
+            document.getElementById('error-message').style.display = 'block';
+        }
+    }
+
+    document.getElementById('withdraw-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const amount = parseFloat(document.getElementById('amount').value);
+        const method = document.getElementById('method').value;
+        const accountNumber = document.getElementById('accountNumber').value;
+        const withdrawBtn = document.getElementById('withdraw-btn');
+
+        // Validation
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount.');
+            return;
+        }
+        if (amount < MIN_WITHDRAW_AMOUNT) {
+            alert(`Minimum withdrawal amount is ৳${MIN_WITHDRAW_AMOUNT}.`);
+            return;
+        }
+        if (amount > userBalance) {
+            alert('You do not have enough balance to withdraw this amount.');
+            return;
+        }
+        if (accountNumber.trim() === '') {
+            alert('Please enter your account number.');
+            return;
+        }
+
+        withdrawBtn.disabled = true;
+        withdrawBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        // This is a placeholder for creating a withdrawal request.
+        // In a real app, you would save this request to a 'withdrawals' table
+        // and then an admin would process it.
+        // For now, we will just show a success message.
+        
+        // Example: await supabaseClient.from('withdrawals').insert([...])
+
+        setTimeout(() => {
+            alert(`Your withdrawal request of ৳${amount} via ${method} to ${accountNumber} has been submitted successfully. It will be processed soon.`);
+            window.location.href = 'profile.html';
+        }, 1500);
+    });
     
+    document.addEventListener('DOMContentLoaded', initializeWithdrawPage);
+</script>
+</body>
+</html>
