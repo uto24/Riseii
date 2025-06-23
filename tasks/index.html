@@ -1,270 +1,181 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Tasks - Riseii</title>
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Google Fonts -->
+    <title>জরুরী ঘোষণা - প্ল্যাটফর্ম আপগ্রেড</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Supabase JS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-bg: #f7f9fc;
-            --secondary-bg: #ffffff;
-            --text-dark: #1e293b;
-            --text-light: #475569;
-            --accent-color: #4f46e5;
-            --accent-hover: #4338ca;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --border-color: #e2e8f0;
-            --shadow-color: rgba(79, 70, 229, 0.1);
+            --primary-color: #007bff;
+            --secondary-color: #28a745;
+            --background-color: #f4f7f9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --heading-color: #1a2533;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Nunito Sans', sans-serif;
-            background-color: var(--primary-bg);
-            color: var(--text-dark);
-            min-height: 100vh;
-        }
-        .bengali-text { font-family: 'Anek Bangla', sans-serif; }
-        
-        /* --- Header --- */
-        .main-header {
-            background-color: var(--secondary-bg);
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header-left a {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            text-decoration: none;
-        }
-        .header-right { display: flex; align-items: center; gap: 20px; }
-        .user-profile-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 600;
-            background-color: var(--primary-bg);
-            padding: 8px 15px;
-            border-radius: 20px;
-            transition: background-color 0.3s;
-        }
-        .user-profile-link:hover { background-color: #e2e8f0; }
-        .user-profile-link .balance { color: var(--success-color); }
-        .logout-btn {
-            background: none;
-            border: none;
-            color: var(--danger-color);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
         }
 
-        /* --- Main Content --- */
-        .main-content {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-        .page-title { text-align: center; margin-bottom: 40px; }
-        .page-title h1 { font-size: 2.5rem; }
-        .page-title p { font-size: 1.1rem; color: var(--text-light); }
-
-        /* --- Task Grid --- */
-        .task-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-        }
-        .task-card {
-            background-color: var(--secondary-bg);
-            border: 1px solid var(--border-color);
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: var(--card-bg);
             border-radius: 12px;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        .task-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px var(--shadow-color);
+
+        h1, h2, h3 {
+            color: var(--heading-color);
+            font-weight: 700;
         }
-        .task-icon {
-            font-size: 2.5rem;
-            color: var(--accent-color);
+
+        h1 {
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            font-size: 1.4em;
+            color: #333;
+        }
+
+        p {
+            font-size: 1.1em;
             margin-bottom: 15px;
         }
-        .task-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-        }
-        .task-card .task-description {
-            color: var(--text-light);
-            font-size: 1rem;
-            flex-grow: 1; /* Pushes button to the bottom */
-            margin-bottom: 20px;
-        }
-        .task-card .btn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background-color: var(--accent-color);
-            color: #fff;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        .task-card .btn:hover { background-color: var(--accent-hover); }
 
-        /* Special Task Card */
-        .task-card.special-task {
-            background: linear-gradient(135deg, var(--accent-color), #6d28d9);
-            color: #fff;
-            border: none;
+        ul, ol {
+            padding-left: 25px;
+            font-size: 1.1em;
         }
-        .special-task .task-icon, .special-task h3, .special-task .task-description {
-            color: #fff;
+
+        li {
+            margin-bottom: 12px;
         }
-        .special-task .btn {
-            background-color: var(--secondary-bg);
-            color: var(--accent-color);
+
+        .highlight-box {
+            background-color: #e9f5ff;
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
         }
         
+        .highlight-box h2 {
+            margin-top: 0;
+            border-bottom: none;
+            color: #0056b3;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--secondary-color), #218838);
+            color: #ffffff;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .summary-list li {
+            list-style-type: '✅  ';
+            padding-left: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1em;
+            color: #777;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            p, ul, ol { font-size: 1em; }
+            .container { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-left">
-            <a href="index.html">Riseii</a>
-        </div>
-        <div class="header-right">
-            <a href="profile.html" class="user-profile-link">
-                <span id="header-username">User</span>
-                -
-                <span class="balance" id="header-balance">৳0.00</span>
-            </a>
-            <button class="logout-btn" id="logout-btn" title="Logout">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </div>
-    </header>
+    <div class="container">
+        <h1>📢 জরুরী ঘোষণা: প্ল্যাটফর্ম আপগ্রেড এবং আপনার ইনকামের নতুন সুযোগ!</h1>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="page-title">
-            <h1>Available Tasks</h1>
-            <p class="bengali-text">নিচের তালিকা থেকে আপনার পছন্দের কাজ বেছে নিন এবং উপার্জন শুরু করুন।</p>
-        </div>
+        <p><strong>প্রিয় সদস্যবৃন্দ,</strong></p>
+        <p>আমরা আনন্দের সাথে জানাচ্ছি যে, আপনাদের জন্য আরও ভালো এবং বেশি আয়ের সুযোগ তৈরি করতে আমাদের প্ল্যাটফর্ম একটি বড় আপগ্রেডেশনের মধ্য দিয়ে যাচ্ছে। আমরা আপনাদের ইনকামের অভিজ্ঞতাকে পরবর্তী স্তরে নিয়ে যেতে প্রতিশ্রুতিবদ্ধ, আর সেই লক্ষ্যেই <strong>নতুন এবং আকর্ষণীয় টাস্ক</strong> যুক্ত করার কাজ চলছে।</p>
 
-        <div class="task-grid">
-            <!-- Task Card 1: FB Post -->
-            <div class="task-card">
-                <i class="fab fa-facebook-square task-icon"></i>
-                <h3>Facebook Post</h3>
-                <p class="task-description">নির্দিষ্ট গ্রুপ বা আপনার প্রোফাইলে আমাদের দেওয়া কনটেন্ট পোস্ট করুন। প্রতিটি সফল পোস্টের জন্য আকর্ষণীয় পেমেন্ট।</p>
-                <a href="#" class="btn">View Tasks</a>
-            </div>
+        <hr>
 
-            <!-- Task Card 2: Typing Task -->
-            <div class="task-card">
-                <i class="fas fa-keyboard task-icon"></i>
-                <h3>Typing Task</h3>
-                <p class="task-description">ছবি বা পিডিএফ থেকে দেখে নির্ভুলভাবে টেক্সট টাইপ করুন। আপনার টাইপিং স্পিডকে আয়ের উৎসে পরিণত করুন।</p>
-                <a href="#" class="btn">View Tasks</a>
-            </div>
+        <h2>কী পরিবর্তন হচ্ছে এবং কেন?</h2>
+        <p>আমাদের সিস্টেমকে আরও শক্তিশালী এবং কার্যকর করার জন্য, আমরা সাময়িকভাবে দৈনিক টাস্ক থেকে আয় করার প্রক্রিয়াটি বিরতিতে রাখছি।</p>
+        <ul>
+            <li><strong>কেন এই বিরতি?</strong> আমাদের টেকনিক্যাল টিম উচ্চ-মানের এবং বৈচিত্র্যময় নতুন টাস্ক যুক্ত করছে, যা ভবিষ্যতে আপনাদের আরও বেশি এবং স্থিতিশীল আয় করতে সাহায্য করবে। এই আপগ্রেড চলাকালীন সিস্টেমের স্থিতিশীলতা নিশ্চিত করার জন্য, <strong>দৈনিক ১০টি টাস্ক সম্পন্ন করে আয়ের সুবিধাটি সাময়িকভাবে বন্ধ</strong> রাখা হয়েছে।</li>
+            <li><strong>আপনার জন্য এর মানে কী?</strong> আমরা জানি, আপনারা প্রতিদিন টাস্ক সম্পন্ন করে আয় করতে অভ্যস্ত। এই সাময়িক অসুবিধার জন্য আমরা আন্তরিকভাবে ক্ষমাপ্রার্থী। তবে, আমরা নিশ্চিত করছি যে এই পরিবর্তন দীর্ঘমেয়াদে আপনাদের সকলের জন্য লাভজনক হবে।</li>
+        </ul>
 
-            <!-- Task Card 3: Website Visit -->
-            <div class="task-card">
-                <i class="fas fa-mouse-pointer task-icon"></i>
-                <h3>Website Visit</h3>
-                <p class="task-description">বিভিন্ন ওয়েবসাইটে ভিজিট করুন এবং নির্দিষ্ট সময় অবস্থান করুন। সহজ কাজ, দ্রুত পেমেন্ট।</p>
-                <a href="#" class="btn">View Tasks</a>
-            </div>
-
-            <!-- Task Card 4: Special Task -->
-            <div class="task-card special-task">
-                <i class="fas fa-star task-icon"></i>
-                <h3>One-Time Special Task</h3>
-                <p class="task-description">উচ্চ পেমেন্টের বিশেষ কাজ যা সীমিত সময়ের জন্য উপলব্ধ। এখনই সুযোগটি গ্রহণ করুন!</p>
-                <a href="#" class="btn">Claim Task</a>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        const headerUsername = document.getElementById('header-username');
-        const headerBalance = document.getElementById('header-balance');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // 1. Check for active session and load user data
-        async function loadUserData() {
-            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-
-            if (sessionError || !session) {
-                // If no user is logged in, redirect to the login page
-                window.location.href = 'login.html';
-                return;
-            }
-
-            const user = session.user;
-
-            // Fetch user profile from the 'profiles' table
-            const { data: profile, error: profileError } = await supabaseClient
-                .from('profiles')
-                .select('full_name, balance')
-                .eq('id', user.id)
-                .single();
+        <div class="highlight-box">
+            <h2>কিন্তু আপনার ইনকাম বন্ধ হচ্ছে না! ইনকাম চালিয়ে যেতে রেফার করুন!</h2>
+            <p><strong>আপনার ইনকাম বন্ধ নেই, বরং নতুন পথে আয়ের দরজা খোলা আছে!</strong> এই আপগ্রেড চলাকালীন সময়েও আপনার ইনকামের চাকা সচল রাখতে আমরা নিয়ে এসেছি এক দারুণ সুযোগ! আমাদের <strong>রেফারেল প্রোগ্রামের</strong> মাধ্যমে আপনি এখন আনলিমিটেড আয় করতে পারবেন।</p>
             
-            if (profileError || !profile) {
-                console.error('Error fetching profile:', profileError);
-                // If profile doesn't exist, log out the user to prevent issues
-                await supabaseClient.auth.signOut();
-                window.location.href = 'login.html';
-                return;
-            }
-            
-            // Update the header with user's name and balance
-            if (headerUsername) headerUsername.textContent = profile.full_name;
-            if (headerBalance) headerBalance.textContent = `৳${profile.balance.toFixed(2)}`;
-        }
+            <h3>কীভাবে রেফার করে আয় করবেন?</h3>
+            <ol>
+                <li><strong>আপনার রেফারেল লিঙ্ক শেয়ার করুন:</strong> আপনার প্রোফাইল থেকে ইউনিক রেফারেল লিঙ্কটি কপি করুন।</li>
+                <li><strong>বন্ধুদের আমন্ত্রণ জানান:</strong> আপনার বন্ধু, পরিবার এবং সোশ্যাল মিডিয়াতে (ফেসবুক, হোয়াটসঅ্যাপ, টেলিগ্রাম) লিঙ্কটি শেয়ার করুন।</li>
+                <li><strong>বোনাস বুঝে নিন:</strong> যখনই কেউ আপনার লিঙ্কের মাধ্যমে আমাদের প্ল্যাটফর্মে যোগ দেবে এবং তাদের অ্যাকাউন্ট অ্যাক্টিভেট করবে, আপনি সাথে সাথে একটি আকর্ষণীয় রেফারেল বোনাস পাবেন।</li>
+                <li><strong>লাইফটাইম ইনকাম:</strong> শুধু তাই নয়! আপনার রেফার করা সদস্যরা যতদিন আমাদের প্ল্যাটফর্মে কাজ করে আয় করবে, আপনি তাদের আয়ের একটি নির্দিষ্ট অংশ লাইফটাইম কমিশন হিসেবে পেতে থাকবেন।</li>
+            </ol>
+            <a href="#your-referral-link-page" class="cta-button">আপনার রেফারেল লিঙ্ক সংগ্রহ করুন</a>
+        </div>
 
-        // 2. Logout functionality
-        logoutBtn.addEventListener('click', async () => {
-            const { error } = await supabaseClient.auth.signOut();
-            if (error) {
-                console.error('Error logging out:', error.message);
-            } else {
-                // Redirect to homepage after logout
-                window.location.href = 'index.html';
-            }
-        });
-        
-        // Run the loadUserData function when the page loads
-        document.addEventListener('DOMContentLoaded', loadUserData);
+        <h2>কবে থেকে টাস্ক আবার চালু হবে?</h2>
+        <p>আমাদের টিম দ্রুত গতিতে কাজ করছে। আশা করছি, খুব শীঘ্রই নতুন এবং উন্নত টাস্ক সিস্টেম নিয়ে আমরা আপনাদের সামনে হাজির হব। নতুন টাস্ক চালু হওয়ার সাথে সাথেই আপনাদের নোটিফিকেশনের মাধ্যমে জানিয়ে দেওয়া হবে।</p>
 
-    </script>
+        <h3>সংক্ষেপে মূল বিষয়গুলো:</h3>
+        <ul class="summary-list">
+            <li><strong>নতুন টাস্ক আসছে:</strong> আরও বেশি আয়ের সুযোগ নিয়ে প্ল্যাটফর্ম আপগ্রেড হচ্ছে।</li>
+            <li><strong>সাময়িক বিরতি:</strong> দৈনিক টাস্ক থেকে আয় সাময়িকভাবে বন্ধ আছে।</li>
+            <li><strong>ইনকাম চালু রাখুন:</strong> রেফারেল প্রোগ্রামের মাধ্যমে আনলিমিটেড আয় করার সুযোগ রয়েছে।</li>
+            <li><strong>সাথে থাকুন:</strong> পরবর্তী আপডেটের জন্য আমাদের অ্যাপ এবং ওয়েবসাইটে নজর রাখুন।</li>
+        </ul>
+
+        <div class="footer">
+            <p>আপনাদের ধৈর্য এবং সহযোগিতার জন্য আমরা কৃতজ্ঞ। আসুন, এই সময়টাকে কাজে লাগিয়ে আমাদের কমিউনিটিকে আরও বড় এবং শক্তিশালী করে তুলি।</p>
+            <p><strong>শুভেচ্ছান্তে,<br> টিম</strong></p>
+        </div>
+    </div>
+
 </body>
 </html>
