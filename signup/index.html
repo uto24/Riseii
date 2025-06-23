@@ -64,7 +64,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="index.html" class="logo">Riseii</a>
+        <a href="/" class="logo">Riseii</a>
         <h2>Create Your Account</h2>
         <p class="bengali-text">আপনার নতুন একাউন্ট তৈরি করে উপার্জনের জগতে প্রবেশ করুন।</p>
         
@@ -75,7 +75,7 @@
             <button type="submit" id="signupButton" class="btn">Create Account</button>
         </form>
 
-        <p class="login-link">Already have an account? <a href="login.html">Log In</a></p>
+        <p class="login-link">Already have an account? <a href="/login">Log In</a></p>
     </div>
 
     <!-- Popup/Modal for Email Confirmation -->
@@ -106,7 +106,7 @@
             popupOverlay.classList.remove('active');
             setTimeout(() => {
                 popupOverlay.style.display = 'none';
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             }, 300);
         }
         popupCloseBtn.addEventListener('click', hidePopup);
@@ -115,7 +115,7 @@
         // Redirect if user is already logged in
         async function redirectIfLoggedIn() {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) window.location.href = 'profile.html';
+            if (session) window.location.href = '/dashboard';
         }
         document.addEventListener('DOMContentLoaded', redirectIfLoggedIn);
 
