@@ -1,135 +1,275 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>জরুরী সিস্টেম আপডেট</title>
+    <title>Available Tasks - Riseii</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --primary-bg: #f7f9fc;
+            --secondary-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(79, 70, 229, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Hind Siliguri', sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
-            line-height: 1.7;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
             min-height: 100vh;
         }
-        .container {
-            max-width: 650px;
-            width: 100%;
-            margin: 20px auto;
-            padding: 30px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            border-top: 5px solid #007bff;
-        }
-        h1 {
-            font-size: 1.9em;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #0056b3;
-            font-weight: 700;
-        }
-        h1 i {
-            margin-right: 10px;
-        }
-        p {
-            font-size: 1.1em;
-            margin-bottom: 15px;
-        }
-        .maintenance-box {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #856404;
-            padding: 20px;
-            margin: 25px 0;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .maintenance-box h2 {
-            margin: 0 0 10px 0;
-            font-size: 1.5em;
-            font-weight: 700;
-        }
-        .maintenance-box h2 i {
-            margin-right: 8px;
-        }
-        .referral-section {
-            background-color: #e2f0d9;
-            border-left: 5px solid #5cb85c;
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; }
+        
+        /* --- Header --- */
+        .main-header {
+            background-color: var(--secondary-bg);
             padding: 15px 20px;
-            margin-top: 25px;
-            border-radius: 8px;
-        }
-        .referral-section h3 {
-            margin-top: 0;
-            color: #3c763d;
-        }
-        .referral-section h3 i {
-            margin-right: 8px;
-        }
-        .summary-list {
-            list-style: none;
-            padding: 0;
-            font-size: 1.1em;
-        }
-        .summary-list li {
-            padding: 8px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             display: flex;
+            justify-content: space-between;
             align-items: center;
         }
-        .summary-list li i {
-            color: #28a745;
-            margin-right: 12px;
-            font-size: 1.2em;
+        .header-left a {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            text-decoration: none;
         }
-        .footer {
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .user-profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            background-color: var(--primary-bg);
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+        .user-profile-link:hover { background-color: #e2e8f0; }
+        .user-profile-link .balance { color: var(--success-color); }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .page-title { text-align: center; margin-bottom: 40px; }
+        .page-title h1 { font-size: 2.5rem; }
+        .page-title p { font-size: 1.1rem; color: var(--text-light); }
+
+        /* --- Task Grid --- */
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .task-card {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .task-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px var(--shadow-color);
+        }
+        .task-icon {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+        .task-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+        .task-card .task-description {
+            color: var(--text-light);
+            font-size: 1rem;
+            flex-grow: 1; /* Pushes button to the bottom */
+            margin-bottom: 20px;
+        }
+        .task-card .btn {
+            display: block;
+            width: 100%;
             text-align: center;
-            margin-top: 30px;
-            font-size: 0.95em;
-            color: #6c757d;
+            background-color: var(--accent-color);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s;
         }
+        .task-card .btn:hover { background-color: var(--accent-hover); }
+
+        /* Special Task Card */
+        .task-card.special-task {
+            background: linear-gradient(135deg, var(--accent-color), #6d28d9);
+            color: #fff;
+            border: none;
+        }
+        .special-task .task-icon, .special-task h3, .special-task .task-description {
+            color: #fff;
+        }
+        .special-task .btn {
+            background-color: var(--secondary-bg);
+            color: var(--accent-color);
+        }
+        
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1><i class="fas fa-bullhorn"></i>জরুরী সিস্টেম আপডেট নোটিশ</h1>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-left">
+            <a href="index.html">Riseii</a>
+        </div>
+        <div class="header-right">
+            <a href="profile.html" class="user-profile-link">
+                <span id="header-username">User</span>
+                -
+                <span class="balance" id="header-balance">৳0.00</span>
+            </a>
+            <button class="logout-btn" id="logout-btn" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-title">
+            <h1>Available Tasks</h1>
+            <p class="bengali-text">নিচের তালিকা থেকে আপনার পছন্দের কাজ বেছে নিন এবং উপার্জন শুরু করুন।</p>
+        </div>
+
+        <div class="task-grid">
+            
+            
+              <!-- Task Card 4: Special Task -->
+            <div class="task-card special-task">
+                <i class="fas fa-star task-icon"></i>
+                <h3>One-Time Special Task</h3>
+                <p class="task-description">উচ্চ পেমেন্টের বিশেষ কাজ যা সীমিত সময়ের জন্য উপলব্ধ। এখনই সুযোগটি গ্রহণ করুন!</p>
+                <a href="#" onclick="window.alert('Task Adding... Try agin in few hour!')" class="btn">Claim Task</a>
+            </div>
+            
+            <!-- Task Card 1: FB Post -->
+            <div class="task-card">
+                <i class="fab fa-facebook-square task-icon"></i>
+                <h3>Facebook Post</h3>
+                <p class="task-description">নির্দিষ্ট গ্রুপ বা আপনার প্রোফাইলে আমাদের দেওয়া কনটেন্ট পোস্ট করুন। প্রতিটি সফল পোস্টের জন্য আকর্ষণীয় পেমেন্ট।</p>
+                <a href="facebook.html"  class="btn">View Tasks</a>
+            </div>
+
+            <!-- Task Card 2: Typing Task -->
+            <div class="task-card">
+                <i class="fas fa-keyboard task-icon"></i>
+                <h3>Typing Task</h3>
+                <p class="task-description">ছবি বা পিডিএফ থেকে দেখে নির্ভুলভাবে টেক্সট টাইপ করুন। আপনার টাইপিং স্পিডকে আয়ের উৎসে পরিণত করুন।</p>
+                <a href="typing.html" class="btn">View Tasks</a>
+            </div>
+
+            <!-- Task Card 3: Website Visit -->
+            <div class="task-card">
+                <i class="fas fa-mouse-pointer task-icon"></i>
+                <h3>Website Visit</h3>
+                <p class="task-description">বিভিন্ন ওয়েবসাইটে ভিজিট করুন এবং নির্দিষ্ট সময় অবস্থান করুন। সহজ কাজ, দ্রুত পেমেন্ট।</p>
+                <a href="#" onclick="window.alert('Task Adding... Try agin in few hour!')" class="btn">View Tasks</a>
+            </div>
+
+       
+        </div><br><br><br>
+            <p class="bengali-text" style="text-align: center;"> More Task Coming Soonnn, Updating....</p>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const headerUsername = document.getElementById('header-username');
+        const headerBalance = document.getElementById('header-balance');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // 1. Check for active session and load user data
+        async function loadUserData() {
+            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+
+            if (sessionError || !session) {
+                // If no user is logged in, redirect to the login page
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = session.user;
+
+            // Fetch user profile from the 'profiles' table
+            const { data: profile, error: profileError } = await supabaseClient
+                .from('profiles')
+                .select('full_name, balance')
+                .eq('id', user.id)
+                .single();
+            
+            if (profileError || !profile) {
+                console.error('Error fetching profile:', profileError);
+                // If profile doesn't exist, log out the user to prevent issues
+                await supabaseClient.auth.signOut();
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Update the header with user's name and balance
+            if (headerUsername) headerUsername.textContent = profile.full_name;
+            if (headerBalance) headerBalance.textContent = `৳${profile.balance.toFixed(2)}`;
+        }
+
+        // 2. Logout functionality
+        logoutBtn.addEventListener('click', async () => {
+            const { error } = await supabaseClient.auth.signOut();
+            if (error) {
+                console.error('Error logging out:', error.message);
+            } else {
+                // Redirect to homepage after logout
+                window.location.href = 'index.html';
+            }
+        });
         
-        <p><strong>প্রিয় সদস্যবৃন্দ,</strong></p>
-        <p>আমাদের প্ল্যাটফর্মে নতুন এবং উন্নত মানের টাস্ক যুক্ত করার জন্য একটি সিস্টেম আপগ্রেডের কাজ চলছে। এই কারণে, টাস্ক সেকশনটি সাময়িকভাবে বন্ধ থাকবে।</p>
+        // Run the loadUserData function when the page loads
+        document.addEventListener('DOMContentLoaded', loadUserData);
 
-        <div class="maintenance-box">
-            <h2><i class="fas fa-clock"></i>আপডেট সময়সূচী</h2>
-            <p><strong>আজ রাত ১০টার পর</strong> থেকে টাস্ক পুনরায় সকলের জন্য চালু হয়ে যাবে। এই আপগ্রেডের ফলে আপনারা আরও বেশি ও আকর্ষণীয় টাস্ক পাবেন।</p>
-        </div>
-
-        <div class="referral-section">
-            <h3><i class="fas fa-users"></i>ইনকাম চালু রাখুন রেফার করে</h3>
-            <p>সিস্টেম আপগ্রেড চলাকালীন সময়েও আপনার ইনকাম বন্ধ রাখার কোনো প্রয়োজন নেই! আপনার রেফারেল লিঙ্ক ব্যবহার করে নতুন সদস্য জয়েন করান এবং আনলিমিটেড বোনাস ও কমিশন আয় করুন।</p>
-        </div>
-
-        <h3 style="margin-top: 25px;">মূল বিষয়সমূহ:</h3>
-        <ul class="summary-list">
-            <li><i class="fas fa-check-circle"></i>নতুন টাস্ক যুক্ত করার জন্য সিস্টেমটি সাময়িক বিরতিতে থাকবে।</li>
-            <li><i class="fas fa-check-circle"></i><strong>আজ রাত ১০টার পর</strong> থেকে টাস্ক পুনরায় চালু হবে।</li>
-            <li><i class="fas fa-check-circle"></i>এই সময়ে <strong>রেফার করে ইনকাম</strong> করার সুযোগ চালু আছে।</li>
-        </ul>
-
-        <div class="footer">
-            <p>আপনাদের ধৈর্য ও সহযোগিতার জন্য আন্তরিকভাবে ধন্যবাদ।<br><strong></strong></p>
-        </div>
-    </div>
-
+    </script>
 </body>
 </html>
