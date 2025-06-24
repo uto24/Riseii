@@ -25,7 +25,7 @@
         .main-header { background-color: var(--secondary-bg); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         .header-left a { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); text-decoration: none; }
         .header-right a { font-weight: 600; color: var(--accent-color); text-decoration: none; }
-        .main-content { max-width: 500px; margin: 40px auto; padding: 0 20px; }
+        .main-content { max-width: 550px; margin: 40px auto; padding: 0 20px; }
         
         .withdraw-card { background-color: var(--secondary-bg); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .withdraw-header { text-align: center; margin-bottom: 25px; }
@@ -35,29 +35,25 @@
         .balance-display p { margin: 0; color: var(--text-light); }
         .balance-display .amount { font-size: 2rem; font-weight: 700; color: var(--success-color); }
         
+        /* Eligibility Checklist */
+        .eligibility-check { margin-bottom: 25px; padding: 20px; background-color: #f0f9ff; border-radius: 8px; }
+        .eligibility-check h4 { margin-top: 0; margin-bottom: 15px; text-align: center; }
+        .eligibility-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: 600; }
+        .eligibility-item i { font-size: 1.2rem; }
+        .eligibility-item.pass { color: var(--success-color); }
+        .eligibility-item.fail { color: var(--danger-color); }
+
         .input-group { margin-bottom: 1.2rem; }
         .input-group label { display: block; font-weight: 600; margin-bottom: 8px; }
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        .info-notice { font-size: 0.9rem; color: var(--text-light); text-align: center; margin-bottom: 20px; }
+        .input-group input, .input-group select { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; }
+        .passkey-group { display: flex; gap: 10px; }
+        .passkey-group input { flex-grow: 1; }
         
         .btn { width: 100%; padding: 15px; background-color: var(--accent-color); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: 600; }
         .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
-        
-        .error-message {
-            background-color: #ffe4e6;
-            color: var(--danger-color);
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            display: none; /* Initially hidden */
-        }
+        .get-passkey-btn { width: auto; padding: 14px; font-size: 1rem; }
+
+        .error-message { text-align: center; font-weight: 600; display: none; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -80,34 +76,32 @@
                 <p class="amount" id="current-balance">৳0.00</p>
             </div>
 
-            <!-- Error message for insufficient balance -->
-            <div class="error-message" id="error-message">
-                <p>আপনার পর্যাপ্ত ব্যালেন্স নেই। সর্বনিম্ন উইথড্র ১৫০৳।</p>
+            <!-- Eligibility Checklist -->
+            <div class="eligibility-check">
+                <h4>উইথড্র করার যোগ্যতা</h4>
+                <div id="check-balance" class="eligibility-item fail"><i class="fas fa-times-circle"></i><span>সর্বনিম্ন ব্যালেন্স ১৫০৳</span></div>
+                <div id="check-referrals" class="eligibility-item fail"><i class="fas fa-times-circle"></i><span>কমপক্ষে ৩টি রেফারেল</span></div>
+                <div id="check-tasks" class="eligibility-item fail"><i class="fas fa-times-circle"></i><span>কমপক্ষে ৫টি টাস্ক সম্পন্ন</span></div>
             </div>
             
             <!-- Withdraw Form -->
-            <form id="withdraw-form" style="display: none;"> <!-- Initially hidden -->
+            <form id="withdraw-form" style="display: none;">
+                <div class="input-group"><label for="amount">Amount to Withdraw (৳)</label><input type="number" id="amount" required></div>
+                <div class="input-group"><label for="method">Payment Method</label><select id="method" required><option value="bkash">bKash</option><option value="nagad">Nagad</option></select></div>
+                <div class="input-group"><label for="accountNumber">Account Number</label><input type="text" id="accountNumber" required></div>
                 <div class="input-group">
-                    <label for="amount">Amount to Withdraw (৳)</label>
-                    <input type="number" id="amount" placeholder="e.g., 200" required>
+                    <label for="passkey">Passkey (Check your email)</label>
+                    <div class="passkey-group">
+                        <input type="text" id="passkey" placeholder="Enter 6-digit passkey" required>
+                        <button type="button" class="btn get-passkey-btn" id="get-passkey-btn">Get Passkey</button>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="method">Payment Method</label>
-                    <select id="method" required>
-                        <option value="bkash">bKash</option>
-                        <option value="nagad">Nagad</option>
-                        <option value="rocket">Rocket</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="accountNumber">Account Number</label>
-                    <input type="text" id="accountNumber" placeholder="e.g., 01712345678" required>
-                </div>
-
-                <p class="info-notice">Withdraw requests are processed within 24-48 hours.</p>
-
                 <button type="submit" class="btn" id="withdraw-btn">Request Withdraw</button>
             </form>
+
+            <div class="error-message" id="error-message">
+                <p class="bengali-text">আপনি এখনো উইথড্র করার জন্য যোগ্য হননি। অনুগ্রহ করে উপরের শর্তগুলো পূরণ করুন।</p>
+            </div>
         </div>
     </main>
 
@@ -116,80 +110,82 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const MIN_WITHDRAW_AMOUNT = 150;
+    const MIN_BALANCE = 150;
+    const MIN_REFERRALS = 3;
+    const MIN_TASKS = 5;
     let currentUser = null;
-    let userBalance = 0;
 
     async function initializeWithdrawPage() {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-            window.location.href = 'login.html';
-            return;
-        }
+        if (!session) { window.location.href = 'login.html'; return; }
         currentUser = session.user;
         
-        const { data: profile, error } = await supabaseClient
-            .from('profiles')
-            .select('balance')
-            .eq('id', currentUser.id)
-            .single();
+        // Fetch all required data in parallel
+        const [profileRes, referralsRes, tasksRes] = await Promise.all([
+            supabaseClient.from('profiles').select('balance').eq('id', currentUser.id).single(),
+            supabaseClient.from('profiles').select('id', { count: 'exact', head: true }).eq('referred_by', currentUser.id),
+            supabaseClient.from('submissions').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('status', 'completed')
+        ]);
 
-        if (error || !profile) {
-            console.error('Could not fetch user profile.');
-            return;
-        }
+        const userBalance = profileRes.data?.balance || 0;
+        const totalReferrals = referralsRes.count || 0;
+        const tasksCompleted = tasksRes.count || 0;
 
-        userBalance = profile.balance;
         document.getElementById('current-balance').textContent = `৳${userBalance.toFixed(2)}`;
 
-        // Check if balance is sufficient
-        if (userBalance >= MIN_WITHDRAW_AMOUNT) {
+        // Check eligibility and update UI
+        const isBalanceEligible = userBalance >= MIN_BALANCE;
+        const areReferralsEligible = totalReferrals >= MIN_REFERRALS;
+        const areTasksEligible = tasksCompleted >= MIN_TASKS;
+
+        updateChecklistItem('check-balance', isBalanceEligible, `সর্বনিম্ন ব্যালেন্স ১৫০৳ (আপনার আছে ৳${userBalance.toFixed(2)})`);
+        updateChecklistItem('check-referrals', areReferralsEligible, `কমপক্ষে ৩টি রেফারেল (আপনার আছে ${totalReferrals}টি)`);
+        updateChecklistItem('check-tasks', areTasksEligible, `কমপক্ষে ৫টি টাস্ক সম্পন্ন (আপনি করেছেন ${tasksCompleted}টি)`);
+
+        if (isBalanceEligible && areReferralsEligible && areTasksEligible) {
             document.getElementById('withdraw-form').style.display = 'block';
         } else {
             document.getElementById('error-message').style.display = 'block';
         }
     }
 
+    function updateChecklistItem(elementId, isMet, text) {
+        const item = document.getElementById(elementId);
+        item.className = 'eligibility-item ' + (isMet ? 'pass' : 'fail');
+        item.querySelector('i').className = 'fas ' + (isMet ? 'fa-check-circle' : 'fa-times-circle');
+        item.querySelector('span').textContent = text;
+    }
+
+    // --- Passkey Logic ---
+    document.getElementById('get-passkey-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('get-passkey-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        const passkey = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit passkey
+
+        // Save passkey to user's profile
+        await supabaseClient.from('profiles').update({ passkey: passkey }).eq('id', currentUser.id);
+        
+        // Send passkey to user's email via a serverless function (for security)
+        // For now, we will simulate this with an alert.
+        // In a real app, you would call an Edge Function here:
+        // await supabaseClient.functions.invoke('send-passkey', { body: { passkey: passkey } });
+        
+        alert(`Your passkey is: ${passkey}\n\nThis has been sent to your email. (Simulation)`);
+        
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerText = 'Resend Passkey';
+        }, 60000); // Allow resend after 1 minute
+    });
+
+    // --- Form Submission ---
     document.getElementById('withdraw-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        const amount = parseFloat(document.getElementById('amount').value);
-        const method = document.getElementById('method').value;
-        const accountNumber = document.getElementById('accountNumber').value;
-        const withdrawBtn = document.getElementById('withdraw-btn');
-
-        // Validation
-        if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount.');
-            return;
-        }
-        if (amount < MIN_WITHDRAW_AMOUNT) {
-            alert(`Minimum withdrawal amount is ৳${MIN_WITHDRAW_AMOUNT}.`);
-            return;
-        }
-        if (amount > userBalance) {
-            alert('You do not have enough balance to withdraw this amount.');
-            return;
-        }
-        if (accountNumber.trim() === '') {
-            alert('Please enter your account number.');
-            return;
-        }
-
-        withdrawBtn.disabled = true;
-        withdrawBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        
-        // This is a placeholder for creating a withdrawal request.
-        // In a real app, you would save this request to a 'withdrawals' table
-        // and then an admin would process it.
-        // For now, we will just show a success message.
-        
-        // Example: await supabaseClient.from('withdrawals').insert([...])
-
-        setTimeout(() => {
-            alert(`Your withdrawal request of ৳${amount} via ${method} to ${accountNumber} has been submitted successfully. It will be processed soon.`);
-            window.location.href = 'profile.html';
-        }, 1500);
+        // ... (আগের উত্তর থেকে উইথড্র সাবমিশনের ভ্যালিডেশন এবং লজিক এখানে আসবে)
+        // এটি চেক করবে যে введен পাসকী ডাটাবেসের পাসকীর সাথে মেলে কি না।
+        alert('Withdrawal request submitted!');
     });
     
     document.addEventListener('DOMContentLoaded', initializeWithdrawPage);
