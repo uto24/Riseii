@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Fee Payment - Riseii</title>
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-bg: #f7f9fc;
+            --secondary-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --accent-color: #4f46e5;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+        }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: var(--primary-bg); color: var(--text-dark); margin: 0; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; }
+        .main-header { background-color: var(--secondary-bg); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .header-left a, .header-right a { font-weight: 800; color: var(--accent-color); text-decoration: none; font-size: 1.5rem; }
+        .main-content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        
+        .content-card { background-color: var(--secondary-bg); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 30px; }
+        .content-card h2 { font-size: 1.8rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--accent-color); }
+        .content-card p, .content-card li { color: var(--text-light); line-height: 1.8; }
+        .content-card ul { padding-left: 20px; list-style: none; }
+        .content-card ul li { padding-left: 1.5em; position: relative; margin-bottom: 10px; }
+        .content-card ul li::before {
+            content: '\f058'; /* Font Awesome check-circle icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--success-color);
+            position: absolute;
+            left: 0;
+            top: 5px;
+        }
+
+        .payment-section h2 { text-align: center; }
+        .payment-number { background-color: var(--primary-bg); padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .payment-number span { font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; }
+        .copy-btn { background: none; border: 1px solid var(--border-color); color: var(--accent-color); cursor: pointer; padding: 8px 12px; border-radius: 6px; font-weight: 600; }
+        
+        .input-group { margin-bottom: 1.2rem; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+        .input-group input, .input-group select { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; }
+        
+        .btn { width: 100%; padding: 15px; background-color: var(--accent-color); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: 600; }
+        .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        .status-message { text-align: center; margin-top: 15px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left"><a href="index.html">Riseii</a></div>
+        <div class="header-right"><a href="profile.html">My Profile</a></div>
+    </header>
+
+    <main class="main-content">
+        <!-- Gas Fee Info Section -->
+        <div class="content-card">
+            <h2><i class="fas fa-shield-alt"></i> গ্যাস ফি কী এবং কেন প্রয়োজন?</h2>
+            <p class="bengali-text">
+                গ্যাস ফি কোনো রেজিস্ট্রেশন ফি নয়, বরং এটি আপনার অ্যাকাউন্টের জন্য একটি <strong>এককালীন নিরাপত্তা ও অ্যাক্টিভেশন চার্জ</strong>। এই ছোট্ট একটি পেমেন্ট নিশ্চিত করে যে আপনি আমাদের প্ল্যাটফর্মের একজন 진지한 (serious) সদস্য এবং আপনার অ্যাকাউন্টটি সর্বোচ্চ স্তরের সুরক্ষা পাবে।
+            </p>
+        </div>
+
+        <!-- Why Pay Gas Fee Section -->
+        <div class="content-card">
+            <h2><i class="fas fa-gem"></i> গ্যাস ফি দেওয়ার বিশেষ সুবিধা</h2>
+            <p class="bengali-text">
+                এই টাকা দেওয়ার মাধ্যমে আপনার উদার মানসিকতার এবং কাজের প্রতি আগ্রহের একটি পরীক্ষা নেওয়া হবে, যা আপনাকে আমাদের বিশেষ সদস্য হিসেবে পরিচিতি দেবে।
+            </p>
+            <ul>
+                <li>
+                    <strong><i class="fas fa-user-shield"></i> হ্যাকিং থেকে সর্বোচ্চ সুরক্ষা:</strong> গ্যাস ফি দেওয়া মানে আমাদের <strong>VIP লিস্টে</strong> চলে আসা। VIP অ্যাকাউন্টগুলোতে আমরা Passkey ছাড়া লগইন করার অনুমতি দিই না, যা আপনার অ্যাকাউন্টকে হ্যাকার (এমনকি আপনার রেফারার) থেকে সম্পূর্ণ সুরক্ষিত রাখে।
+                </li>
+                <li>
+                    <strong><i class="fas fa-star"></i> প্রিমিয়াম টাস্ক আনলক:</strong> শুধুমাত্র গ্যাস ফি দেওয়া ব্যবহারকারীরাই আমাদের সবচেয়ে বেশি পেমেন্টের এবং স্পেশাল টাস্কগুলো করার সুযোগ পান।
+                </li>
+                <li>
+                    <strong><i class="fas fa-bolt"></i> দ্রুত সাপোর্ট ও পেমেন্ট:</strong> VIP সদস্যরা যেকোনো সমস্যায় অগ্রাধিকারমূলক সাপোর্ট এবং দ্রুত উইথড্রয়াল প্রসেসিং-এর সুবিধা পান।
+                </li>
+                <li>
+                    <strong><i class="fas fa-lock-open"></i> সম্পূর্ণ অ্যাক্সেস:</strong> গ্যাস ফি ছাড়া আপনি আমাদের প্ল্যাটফর্মে কাজ করে উপার্জন শুরু করতে পারবেন না। এটিই আপনার উপার্জনের জগতের চাবিকাঠি।
+                </li>
+            </ul>
+        </div>
+
+        <!-- Payment Section -->
+        <div class="content-card payment-section">
+            <h2><i class="fas fa-money-check-dollar"></i> গ্যাস ফি পেমেন্ট করুন (এককালীন: ২০৳)</h2>
+            <p class="bengali-text">নিচের নম্বরে <strong>২০ টাকা</strong> সেন্ড মানি করুন এবং তারপর আপনার পেমেন্টের তথ্য জমা দিন।</p>
+            
+            <div class="input-group">
+                <label for="method">Select Method</label>
+                <select id="method" required>
+                    <option value="bkash">bKash</option>
+                    <option value="nagad">Nagad</option>
+                </select>
+            </div>
+            
+            <div class="payment-number">
+                <span id="payment-number-display">01912107604 (bKash)</span>
+                <button class="copy-btn" id="copy-btn">Copy</button>
+            </div>
+
+            <form id="gas-fee-form">
+                <div class="input-group">
+                    <label for="senderNumber">আপনার সেন্ডার নম্বর</label>
+                    <input type="text" id="senderNumber" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন" required>
+                </div>
+                <div class="input-group">
+                    <label for="trxId">ট্রানজেকশন আইডি (TrxID)</label>
+                    <input type="text" id="trxId" placeholder="আপনার পেমেন্টের TrxID" required>
+                </div>
+                <button type="submit" class="btn" id="submit-btn">Submit Payment Info</button>
+                <p id="status-message" class="status-message"></p>
+            </form>
+        </div>
+    </main>
+
+<script>
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+    let userProfile = null;
+    const paymentNumbers = {
+        bkash: '01912107604',
+        nagad: '01912107604'
+    };
+
+    async function initializePage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; return; }
+        currentUser = session.user;
+        
+        const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
+        userProfile = profile;
+    }
+
+    document.getElementById('method').addEventListener('change', (e) => {
+        const selectedMethod = e.target.value;
+        document.getElementById('payment-number-display').textContent = `${paymentNumbers[selectedMethod]} (${selectedMethod})`;
+    });
+
+    document.getElementById('copy-btn').addEventListener('click', () => {
+        const selectedMethod = document.getElementById('method').value;
+        const numberToCopy = paymentNumbers[selectedMethod];
+        navigator.clipboard.writeText(numberToCopy).then(() => {
+            alert(`Number ${numberToCopy} copied to clipboard!`);
+        });
+    });
+
+    document.getElementById('gas-fee-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submit-btn');
+        const statusMsg = document.getElementById('status-message');
+        const method = document.getElementById('method').value;
+        const senderNumber = document.getElementById('senderNumber').value.trim();
+        const trxId = document.getElementById('trxId').value.trim().toUpperCase();
+
+        if (!senderNumber || !trxId) {
+            alert('Please fill in all fields.'); return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        
+        const { data: existing } = await supabaseClient
+            .from('gas_fees')
+            .select('id')
+            .eq('trx_id', trxId)
+            .single();
+        
+        if (existing) {
+            alert('This Transaction ID has already been used. Please check and try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Submit Payment Info';
+            return;
+        }
+
+        let attempts = 0;
+        const maxAttempts = Math.floor(Math.random() * 3) + 5;
+
+        const trySubmit = setInterval(async () => {
+            attempts++;
+            statusMsg.textContent = `Verifying payment... Attempt ${attempts}/${maxAttempts}`;
+            
+            if (attempts >= maxAttempts) {
+                clearInterval(trySubmit);
+                statusMsg.textContent = 'Verification successful!';
+                statusMsg.style.color = 'var(--success-color)';
+
+                const { error: insertError } = await supabaseClient
+                    .from('gas_fees')
+                    .insert({
+                        user_id: currentUser.id,
+                        user_name: userProfile.full_name,
+                        user_email: userProfile.email,
+                        payment_method: method,
+                        sender_number: senderNumber,
+                        trx_id: trxId
+                    });
+
+                if (insertError) {
+                    statusMsg.textContent = 'Error saving data. Please try again.';
+                    statusMsg.style.color = 'var(--danger-color)';
+                } else {
+                    alert('Your Gas Fee payment information has been submitted successfully! It will be verified by an admin soon.');
+                    window.location.href = 'profile.html';
+                }
+
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Submit Payment Info';
+            }
+        }, 800);
+    });
+
+    document.addEventListener('DOMContentLoaded', initializePage);
+</script>
+</body>
+</html>
