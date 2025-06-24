@@ -79,6 +79,38 @@
 }
 
 
+/* ... আগের CSS এর শেষে যোগ করুন ... */
+.notice-section {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.notice-card {
+    background-color: var(--secondary-bg);
+    border-left: 5px solid;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.notice-card.public { border-color: var(--accent-color); }
+.notice-card.personal { border-color: var(--success-color); }
+
+.notice-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.notice-header .icon { font-size: 1.2rem; }
+.notice-header h4 { margin: 0; font-size: 1.2rem; }
+.notice-card.public .icon { color: var(--accent-color); }
+.notice-card.personal .icon { color: var(--success-color); }
+
+.notice-content p {
+    margin: 0;
+    color: var(--text-light);
+}
+
 
     </style>
 </head>
@@ -105,6 +137,12 @@
                 </div>
             </div>
         </div>
+        
+        
+        <!-- .stats-grid div এর পরে এই অংশটি যোগ করুন -->
+<div class="notice-section" id="notice-section" style="display: none;">
+    <!-- Notices will be dynamically inserted here by JavaScript -->
+</div>
         
         
         <div class="stats-grid">
@@ -217,8 +255,14 @@
             referralLinkInput.select(); document.execCommand('copy'); alert('Referral link copied!');
         });
         document.getElementById('stat-balance').textContent = `৳${profile.balance.toFixed(2)}`;
-        
-        await Promise.all([loadTaskHistory(), loadReferralHistory(), loadCompletedTaskCount()]);
+      
+      
+await Promise.all([
+    loadTaskHistory(),
+    loadReferralHistory(),
+    loadCompletedTaskCount(),
+    loadNotices() // নতুন ফাংশন কল
+]);
     }
 
     async function loadTaskHistory() {
@@ -263,6 +307,45 @@
 
     document.getElementById('logout-btn').addEventListener('click', logout);
     document.addEventListener('DOMContentLoaded', initializeProfile);
+    
+    
+    
+    // profile.html এর script ট্যাগের ভেতরে যোগ করুন
+async function loadNotices() {
+    if (!currentUser) return;
+    const noticeSection = document.getElementById('notice-section');
+
+    // Fetch both public and personal notices for the user
+    const { data: notices, error } = await supabaseClient
+        .from('notices')
+        .select('*')
+        .eq('is_active', true)
+        .or(`notice_type.eq.public,and(notice_type.eq.personal,user_id.eq.${currentUser.id})`)
+        .order('created_at', { ascending: false });
+
+    if (error || !notices || notices.length === 0) {
+        noticeSection.style.display = 'none'; // কোনো নোটিশ না থাকলে সেকশনটি হাইড করুন
+        return;
+    }
+
+    noticeSection.style.display = 'grid'; // নোটিশ থাকলে সেকশনটি দেখান
+    let html = '';
+    notices.forEach(notice => {
+        const iconClass = notice.notice_type === 'public' ? 'fas fa-bullhorn' : 'fas fa-user-check';
+        html += `
+            <div class="notice-card ${notice.notice_type}">
+                <div class="notice-header">
+                    <i class="${iconClass} icon"></i>
+                    <h4>${notice.title}</h4>
+                </div>
+                <div class="notice-content">
+                    <p>${notice.content}</p>
+                </div>
+            </div>
+        `;
+    });
+    noticeSection.innerHTML = html;
+}
 </script>
 </body>
 </html>
