@@ -191,7 +191,7 @@
                 <i class="fab fa-facebook-square task-icon"></i>
                 <h3>Facebook Post</h3>
                 <p class="task-description">নির্দিষ্ট গ্রুপ বা আপনার প্রোফাইলে আমাদের দেওয়া কনটেন্ট পোস্ট করুন। প্রতিটি সফল পোস্টের জন্য আকর্ষণীয় পেমেন্ট।</p>
-                <a href="facebook.html"  class="btn">View Tasks</a>
+                <a href="/tasks/facebook.html"  class="btn">View Tasks</a>
             </div>
 
             <!-- Task Card 2: Typing Task -->
@@ -199,7 +199,7 @@
                 <i class="fas fa-keyboard task-icon"></i>
                 <h3>Typing Task</h3>
                 <p class="task-description">ছবি বা পিডিএফ থেকে দেখে নির্ভুলভাবে টেক্সট টাইপ করুন। আপনার টাইপিং স্পিডকে আয়ের উৎসে পরিণত করুন।</p>
-                <a href="typing.html" class="btn">View Tasks</a>
+                <a href="/tasks/typing.html" class="btn">View Tasks</a>
             </div>
 
             <!-- Task Card 3: Website Visit -->
@@ -230,7 +230,7 @@
 
             if (sessionError || !session) {
                 // If no user is logged in, redirect to the login page
-                window.location.href = 'login.html';
+                window.location.href = '/login';
                 return;
             }
 
@@ -247,7 +247,7 @@
                 console.error('Error fetching profile:', profileError);
                 // If profile doesn't exist, log out the user to prevent issues
                 await supabaseClient.auth.signOut();
-                window.location.href = 'login.html';
+                window.location.href = '/login';
                 return;
             }
             
