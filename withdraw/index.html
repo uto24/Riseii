@@ -93,7 +93,8 @@
                     <label for="passkey">Passkey (Check your email)</label>
                     <div class="passkey-group">
                         <input type="text" id="passkey" placeholder="Enter 6-digit passkey" required>
-                        <button type="button" class="btn get-passkey-btn" id="get-passkey-btn">Get Passkey</button>
+                        <button type="button" class="btn get-passkey-btn" id="get-passkey-btn" style="display: none;">Get Passkey</button>
+                         <a href="/gase" ><button type="button" class="btn get-passkey-btn">Get Passkey</button></a>
                     </div>
                 </div>
                 <button type="submit" class="btn" id="withdraw-btn">Request Withdraw</button>
@@ -163,7 +164,7 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         const passkey = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit passkey
-
+    
         // Save passkey to user's profile
         await supabaseClient.from('profiles').update({ passkey: passkey }).eq('id', currentUser.id);
         
