@@ -71,6 +71,8 @@
         <form id="signup-form" class="signup-form">
             <div class="input-group"><input type="text" id="fullName" placeholder="Full Name" required></div>
             <div class="input-group"><input type="email" id="email" placeholder="Email" required></div>
+            <!-- NEW: Confirm Email Field -->
+            <div class="input-group"><input type="email" id="confirmEmail" placeholder="Confirm Email" required></div>
             <div class="input-group"><input type="password" id="password" placeholder="Password (min. 6 characters)" required></div>
             <button type="submit" id="signupButton" class="btn">Create Account</button>
         </form>
@@ -112,7 +114,6 @@
         popupCloseBtn.addEventListener('click', hidePopup);
         popupOverlay.addEventListener('click', (e) => { if (e.target === popupOverlay) hidePopup(); });
 
-        // Redirect if user is already logged in
         async function redirectIfLoggedIn() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) window.location.href = '/dashboard';
@@ -125,7 +126,28 @@
 
             const fullName = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
+            const confirmEmail = document.getElementById('confirmEmail').value; // Get confirm email value
             const password = document.getElementById('password').value;
+
+            // --- VALIDATION START ---
+
+            // 1. Check if passwords match
+            if (email !== confirmEmail) {
+                alert('দুঃখিত, আপনার দেওয়া ইমেইল দুটি মিলছে না। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                return;
+            }
+
+            // 2. Check for allowed email domains
+            const allowedDomains = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com'];
+            const emailDomain = email.split('@')[1];
+
+            if (!allowedDomains.includes(emailDomain)) {
+                alert('দুঃখিত, শুধুমাত্র Gmail, Hotmail, Outlook, এবং Yahoo ইমেইল ব্যবহার করে একাউন্ট খোলা যাবে।');
+                return;
+            }
+            
+            // --- VALIDATION END ---
+
 
             signupButton.disabled = true;
             signupButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
@@ -133,7 +155,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
 
-            // Sign up the user. The database trigger will handle profile creation and referral logic.
             const { error } = await supabaseClient.auth.signUp({
                 email: email,
                 password: password,
@@ -152,6 +173,8 @@
             } else {
                 showPopup();
                 signupForm.reset();
+                 signupButton.disabled = false; // Re-enable button after success
+                signupButton.innerText = 'Create Account';
             }
         });
     </script>
