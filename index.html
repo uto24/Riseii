@@ -91,12 +91,18 @@
         .feature-card p { font-family: 'Anek Bangla', sans-serif; }
         #why-us { background-color: var(--secondary-bg); }
         .why-us-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        
+       #our-works{
+            background: #5c4ce520;
+            background-size: cover;
+        }
         .why-us-image img { border-radius: 12px; box-shadow: 0 15px 30px var(--shadow-color); }
         .benefit-item { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 25px; }
         .benefit-icon { font-size: 1.5rem; color: #fff; background-color: var(--accent-color); width: 50px; height: 50px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .benefit-item h4 { margin-bottom: 5px; }
         .benefit-item p { margin: 0; }
-        .ohs-section { background-color: var(--primary-bg); }
+        .ohs-section { background: #5fe5dc11;
+        background-size: cover; }
         .ohs-category { margin-bottom: 80px; }
         .ohs-category-title { font-family: 'Anek Bangla', sans-serif; font-weight: 700; font-size: 2.2rem; color: var(--text-dark); margin-bottom: 50px; text-align: center; position: relative; }
         .ohs-category-title::after { content: ''; display: block; width: 80px; height: 4px; background-color: var(--accent-color); margin: 10px auto 0; border-radius: 2px; }
@@ -418,7 +424,7 @@
                 <div class="footer-col"><h4>Legal</h4><ul><li><a href="/coming">Privacy Policy</a></li><li><a href="/coming">Terms of Service</a></li><li><a href="/coming">Earning Disclaimer</a></li></ul></div>
                 <div class="footer-col"><h4>Stay Updated</h4><p>Subscribe to our newsletter to get the latest updates and new task alerts.</p><form><input type="email" placeholder="Enter your email" style="width: 100%; padding: 10px; border-radius: 6px; border: none; margin-bottom: 10px;"><button type="submit" class="btn" style="width:100%;">Subscribe</button></form></div>
             </div>
-            <div class="footer-bottom">© 2025 Riseii. All Rights Reserved. v2.3</div>
+            <div class="footer-bottom">© 2022-2025 Riseii. All Rights Reserved. v2.3</div>
         </div>
     </footer>
 
@@ -508,7 +514,7 @@
                 placeholder.innerHTML = `
                     <div class="user-info" style="display: flex;">
                         <span class="user-balance">Balance: ৳${balance.toFixed(2)}</span>
-                        <a href="/profile" class="profile-link">Profile</a>
+                        <a href="/dashboard" class="profile-link">Profile</a>
                     </div>
                 `;
             } else {
