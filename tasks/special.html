@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One-Time Special Task - Riseii</title>
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { /* ... আপনার CSS ভ্যারিয়েবলগুলো ... */ }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: #f7f9fc; margin: 0; }
+        .main-header { /* ... আগের মতো ... */ }
+        .main-content { max-width: 700px; margin: 40px auto; padding: 0 20px; }
+        .task-card { background-color: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .task-header { text-align: center; margin-bottom: 25px; }
+        .task-header h1 { font-size: 2rem; color: #4f46e5; }
+        .task-header p { font-size: 1.1rem; }
+        
+        .step { border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+        .step.completed { background-color: #f0fff4; border-color: #10b981; }
+        .step-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .step-number { background-color: #4f46e5; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 1.2rem; }
+        .step h3 { margin: 0; font-size: 1.3rem; }
+        .btn { padding: 12px 20px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block; }
+        input[type="file"] { margin-top: 15px; width: 100%; }
+        .submit-btn { width: 100%; padding: 15px; background-color: #4f46e5; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: 600; margin-top: 20px; }
+        .submit-btn:disabled { background-color: #9ca3af; }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-left"><a href="tasks.html">Riseii Tasks</a></div>
+        <div class="header-right"><a href="profile.html" id="profile-link">My Profile</a></div>
+    </header>
+
+    <main class="main-content" id="task-container">
+        <div class="task-card">
+            <div class="task-header">
+                <h1><i class="fas fa-star"></i> One-Time Special Task</h1>
+                <p>এই বিশেষ কাজটি সম্পন্ন করে <strong>৫০৳</strong> বোনাস জিতুন! এই সুযোগ শুধুমাত্র একবার।</p>
+            </div>)
+
+            <!-- Step 1 -->
+            <div class="step" id="step1">
+                <div class="step-header"><div class="step-number">1</div><h3>প্রথম বট চালু করুন</h3></div>
+                <p>নিচের বাটনে ক্লিক করে টেলিগ্রাম বটটি চালু করুন, "/start" কমান্ড দিন এবং একটি স্ক্রিনশট নিন।</p>
+                <a href="https://t.me/riseii_bot" target="_blank" class="btn">Start Bot 1</a>
+                <input type="file" id="screenshot1" accept="image/*">
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step" id="step2" style="display: none;">
+                <div class="step-header"><div class="step-number">2</div><h3>দ্বিতীয় বটে কাজ করুন</h3></div>
+                <p>এখন এই দ্বিতীয় বটটি চালু করুন। এর মিনি অ্যাপে প্রবেশ করে ২ মিনিট ধরে কিছু কাজ করুন এবং শেষে একটি স্ক্রিনশট নিন।</p>
+                <a href="https://t.me/DropeeBot/play?startapp=ref_YWhARSxns8k" target="_blank" class="btn">Start Bot 2 & Work</a>
+                <input type="file" id="screenshot2" accept="image/*">
+            </div>
+
+            <!-- Submission Button -->
+            <button class="submit-btn" id="final-submit-btn" disabled>Submit Both Screenshots</button>
+        </div>
+    </main>
+
+<script>
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+    const SPECIAL_TASK_ID = 101; // ডাটাবেসে তৈরি করা স্পেশাল টাস্কের আইডি
+
+    async function initializePage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; return; }
+        currentUser = session.user;
+        
+        // Check if user has already completed this task
+        const { data: profile, error } = await supabaseClient
+            .from('profiles')
+            .select('has_completed_special_task')
+            .eq('id', currentUser.id)
+            .single();
+
+if (error) {
+    console.error("Error fetching profile:", error.message, error.details);
+    alert("Error: Could not load your profile data. Please try again later.");
+    return;
+}
+        if (profile.has_completed_special_task) {
+            document.getElementById('task-container').innerHTML = `
+                <div class="task-card" style="text-align: center;">
+                    <h1><i class="fas fa-check-circle" style="color:#10b981;"></i> Task Already Completed</h1>
+                    <p>আপনি ইতোমধ্যে এই বিশেষ কাজটি সম্পন্ন করেছেন।</p>
+                    <a href="/tasks" class="btn">Back to Tasks</a>
+                </div>`;
+        }
+    }
+
+    const screenshot1Input = document.getElementById('screenshot1');
+    const screenshot2Input = document.getElementById('screenshot2');
+    const finalSubmitBtn = document.getElementById('final-submit-btn');
+
+    screenshot1Input.addEventListener('change', () => {
+        if (screenshot1Input.files.length > 0) {
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').style.display = 'block';
+            checkIfReadyToSubmit();
+        }
+    });
+    
+    screenshot2Input.addEventListener('change', () => {
+        if (screenshot2Input.files.length > 0) {
+            document.getElementById('step2').classList.add('completed');
+            checkIfReadyToSubmit();
+        }
+    });
+
+    function checkIfReadyToSubmit() {
+        if (screenshot1Input.files.length > 0 && screenshot2Input.files.length > 0) {
+            finalSubmitBtn.disabled = false;
+        }
+    }
+
+    finalSubmitBtn.addEventListener('click', async () => {
+        finalSubmitBtn.disabled = true;
+        finalSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        const file1 = screenshot1Input.files[0];
+        const file2 = screenshot2Input.files[0];
+
+        try {
+            // Upload screenshots
+            const fileName1 = `${currentUser.id}/special-task-1-${Date.now()}`;
+            const fileName2 = `${currentUser.id}/special-task-2-${Date.now()}`;
+            
+            const [upload1, upload2] = await Promise.all([
+                supabaseClient.storage.from('screenshots').upload(fileName1, file1),
+                supabaseClient.storage.from('screenshots').upload(fileName2, file2)
+            ]);
+
+            if (upload1.error || upload2.error) {
+                throw new Error('Screenshot upload failed.');
+            }
+
+            const url1 = supabaseClient.storage.from('screenshots').getPublicUrl(fileName1).data.publicUrl;
+            const url2 = supabaseClient.storage.from('screenshots').getPublicUrl(fileName2).data.publicUrl;
+
+            // Create a submission record
+            const { error: insertError } = await supabaseClient.from('submissions').insert({
+                user_id: currentUser.id,
+                task_id: SPECIAL_TASK_ID,
+                // আমরা দুটি স্ক্রিনশট একটি টেক্সট ফিল্ডে সেভ করছি
+                submission_data: `Screenshot 1: ${url1}\nScreenshot 2: ${url2}`,
+                status: 'pending'
+            });
+
+            if (insertError) throw insertError;
+
+            // Mark that the user has attempted this task
+            await supabaseClient
+                .from('profiles')
+                .update({ has_completed_special_task: true })
+                .eq('id', currentUser.id);
+
+            alert('Special task submitted successfully! It will be reviewed by an admin.');
+            window.location.href = 'tasks.html';
+
+        } catch (error) {
+            alert('Error: ' + error.message);
+            finalSubmitBtn.disabled = false;
+            finalSubmitBtn.innerText = 'Submit Both Screenshots';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', initializePage);
+</script>
+</body>
+</html>
