@@ -32,6 +32,31 @@
             justify-content: space-between;
             align-items: center; 
             }
+            
+            .header-left a {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        
+       
+       .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            background-color: var(--primary-bg);
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+        .user-profile-link:hover { background-color: #e2e8f0; }
+        
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        
         .main-content { max-width: 700px; margin: 40px auto; padding: 0 20px; }
         .task-card { background-color: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .task-header { text-align: center; margin-bottom: 25px; }
