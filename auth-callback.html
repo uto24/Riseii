@@ -1,0 +1,43 @@
+<!-- auth-callback.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authenticating...</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+    <h2>Please wait, authenticating...</h2>
+
+<script>
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co'; // আপনার URL দিন
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4'; // আপনার anon key দিন
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        // We only care about the SIGNED_IN event on this page
+        if (event === 'SIGNED_IN' && session) {
+            
+            const refCode = sessionStorage.getItem('referral_code_used');
+            
+            if (refCode) {
+                // Update the user's metadata with the referral code
+                await supabaseClient.auth.updateUser({
+                    data: {
+                        referral_code_used: refCode
+                    }
+                });
+                // Clear the code from storage
+                sessionStorage.removeItem('referral_code_used');
+            }
+            
+            // Now, redirect to the final profile page
+            window.location.href = '/dashboard';
+        }
+    });
+</script>
+</body>
+</html>
