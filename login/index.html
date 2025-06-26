@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Riseii</title>
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+    <title>Join Riseii</title>
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,9 +17,6 @@
             --text-dark: #1e293b;
             --text-light: #475569;
             --accent-color: #4f46e5;
-            --accent-hover: #4338ca;
-            --success-color: #10b981;
-            --border-color: #e2e8f0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -33,164 +27,122 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 2rem 0;
         }
         .container {
             background-color: var(--secondary-bg);
-            padding: 2.5rem;
+            padding: 3rem;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             width: 90%;
             max-width: 420px;
             text-align: center;
         }
-        .logo {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            text-decoration: none;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-        h2 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-        .bengali-text {
-            font-family: 'Anek Bangla', sans-serif;
-            color: var(--text-light);
-            margin-bottom: 2rem;
-        }
-        .login-form { text-align: left; }
-        .input-group { margin-bottom: 1.2rem; }
-        .input-group input {
+        .logo { font-size: 2rem; font-weight: 800; color: var(--accent-color); text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+        h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; color: var(--text-light); margin-bottom: 2.5rem; }
+        
+        .google-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             width: 100%;
             padding: 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-        }
-        .security-notice {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-top: -10px;
-            margin-bottom: 15px;
-        }
-        .security-notice i { color: var(--success-color); }
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--accent-color);
-            color: #fff;
-            border: none;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
             border-radius: 8px;
             cursor: pointer;
             font-size: 1.1rem;
             font-weight: 600;
-            transition: background-color 0.3s, transform 0.2s;
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
-        .btn:hover:not(:disabled) {
-            background-color: var(--accent-hover);
-            transform: translateY(-2px);
+        .google-btn:hover {
+            background-color: #f8f8f8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .btn:disabled {
-            background-color: #9ca3af;
-            cursor: not-allowed;
-        }
-        .signup-link {
-            margin-top: 1.5rem;
-            color: var(--text-light);
-        }
-        .signup-link a {
-            color: var(--accent-color);
-            font-weight: 600;
-            text-decoration: none;
-        }
+        .google-btn i { font-size: 1.5rem; margin-right: 15px; color: #DB4437; }
+        .google-btn.disabled { cursor: not-allowed; background-color: #f5f5f5; }
+        
+        .terms-text { margin-top: 1.5rem; color: var(--text-light); font-size: 0.85rem; }
+        .terms-text a { color: var(--accent-color); font-weight: 600; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <a href="/" class="logo">Riseii</a>
-        <h2>Welcome Back!</h2>
-        <p class="bengali-text">আপনার একাউন্টে লগইন করে কাজ শুরু করুন।</p>
+        <h2>Join or Sign In</h2>
+        <p class="bengali-text">এক ক্লিকেই আপনার যাত্রা শুরু করুন!</p>
         
-        <form id="login-form" class="login-form">
-            <div class="input-group">
-                <input type="email" id="email" placeholder="Email Address" required>
-            </div>
-            <div class="input-group">
-                <input type="password" id="password" placeholder="Password" required>
-            </div>
-            
-            <!-- Security Notice -->
-            <div class="security-notice">
-                <i class="fas fa-lock"></i>
-                <span>Your information is always private and secure.</span>
-            </div>
+        <button id="google-signin-btn" class="google-btn">
+            <i class="fab fa-google"></i>
+            Continue with Google
+        </button>
 
-            <button type="submit" id="loginButton" class="btn">Log In</button>
-        </form>
-
-        <p class="signup-link">Don't have an account? <a href="/signup">Create One</a></p>
-        <br>
-        
-        
-        <p>যদি সাইনআপ করার পরেও লগইন করতে পারছেন না, তাহলে ইমেইলে পাওয়া অথোনিকেশন মেইলে কনফার্ম লিংকে ক্লিক করে,  আইডি কনফার্ম করে লগইন করুন! </p>
+        <p class="terms-text">
+            By continuing, you agree to Riseii's 
+            <a href="/terms">Terms of Service</a> and 
+            <a href="/privacy">Privacy Policy</a>.
+        </p>
     </div>
 
-    <script>
-        const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<script>
+    // আপনার নতুন Supabase প্রজেক্টের URL এবং Key
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const loginForm = document.getElementById('login-form');
-        const loginButton = document.getElementById('loginButton');
+    const googleBtn = document.getElementById('google-signin-btn');
 
-        // 1. Redirect if user is already logged in
-        async function redirectIfLoggedIn() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                window.location.href = '/dashboard';
+    // Redirect if user is already logged in
+    async function redirectIfLoggedIn() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            window.location.href = '/profile.html'; // প্রোফাইল পেজের সঠিক লিঙ্ক
+        }
+    }
+    document.addEventListener('DOMContentLoaded', redirectIfLoggedIn);
+
+    // Google Sign-In Function
+    async function signInWithGoogle() {
+        googleBtn.disabled = true;
+        googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        
+        // This is a workaround to pass referral data through OAuth
+        // The trigger will check for 'referral_code_used' in user_metadata
+        let options = {};
+        if (refCode) {
+            options.data = {
+                referral_code_used: refCode
             }
         }
-        document.addEventListener('DOMContentLoaded', redirectIfLoggedIn);
-
-        // 2. Handle the form submission
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent default form submission
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // Disable button and show loader
-            loginButton.disabled = true;
-            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging In...';
-
-            const { error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                alert('Error: ' + error.message);
-                loginButton.disabled = false;
-                loginButton.innerText = 'Log In'; // Reset button text
-            } else {
-                // On successful login, redirect to the profile page
-                window.location.href = '/dashboard';
+        
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                ...options,
+                redirectTo: `${window.location.origin}/profile.html` // নিশ্চিত করুন এটি আপনার প্রোফাইল পেজের সঠিক URL
             }
         });
-    </script>
 
+        if (error) {
+            alert('Error: ' + error.message);
+            googleBtn.disabled = false;
+            googleBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+        }
+    }
+
+    googleBtn.addEventListener('click', signInWithGoogle);
+
+    // This part handles the session after redirecting back from Google
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+            // User has signed in. Redirect to profile page.
+            window.location.href = '/profile.html';
+        }
+    });
+</script>
 </body>
 </html>
