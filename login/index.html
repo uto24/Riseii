@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Riseii</title>
+    <title>Join Riseii - Start Your Earning Journey</title>
     <!-- Dependencies -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
             --text-dark: #1e293b;
             --text-light: #475569;
             --accent-color: #4f46e5;
+            --success-color: #10b981;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -27,68 +28,97 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 20px;
+        }
+        .login-wrapper {
+            width: 100%;
+            max-width: 450px;
         }
         .container {
             background-color: var(--secondary-bg);
             padding: 3rem;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            width: 90%;
-            max-width: 420px;
             text-align: center;
+            animation: fadeIn 0.5s ease-out;
         }
-        .logo { font-size: 2rem; font-weight: 800; color: var(--accent-color); text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+        .logo { font-size: 2.2rem; font-weight: 800; color: var(--accent-color); text-decoration: none; margin-bottom: 1rem; display: inline-block; }
         h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
         .bengali-text { font-family: 'Anek Bangla', sans-serif; color: var(--text-light); margin-bottom: 2.5rem; }
         
         .google-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 14px;
-            background-color: #fff;
-            color: #333;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: background-color 0.3s, box-shadow 0.3s;
+            display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 14px;
+            background-color: #fff; color: #333; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;
+            font-size: 1.1rem; font-weight: 600; transition: all 0.3s ease;
         }
-        .google-btn:hover {
-            background-color: #f8f8f8;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+        .google-btn:hover { background-color: #f8f8f8; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); }
         .google-btn i { font-size: 1.5rem; margin-right: 15px; color: #DB4437; }
         .google-btn.disabled { cursor: not-allowed; background-color: #f5f5f5; }
         
-        .terms-text { margin-top: 1.5rem; color: var(--text-light); font-size: 0.85rem; }
-        .terms-text a { color: var(--accent-color); font-weight: 600; }
+        .divider { display: flex; align-items: center; text-align: center; color: #ccc; margin: 2rem 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
+        .divider:not(:empty)::before { margin-right: .25em; }
+        .divider:not(:empty)::after { margin-left: .25em; }
+
+        .features { display: flex; justify-content: space-around; text-align: center; }
+        .feature-item { color: var(--text-light); font-weight: 600; font-size: 0.9rem; }
+        .feature-item i { display: block; color: var(--accent-color); font-size: 1.5rem; margin-bottom: 8px; }
+
+        .notice-section {
+            background-color: #eef2ff;
+            border: 1px solid #c7d2fe;
+            color: #4338ca;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 2rem;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+        .notice-section strong { display: block; margin-bottom: 5px; }
+        
+        .footer { margin-top: 2rem; color: var(--text-light); font-size: 0.85rem; }
+        .footer a { color: var(--accent-color); font-weight: 600; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="/" class="logo">Riseii</a>
-        <h2>Join or Sign In</h2>
-        <p class="bengali-text">এক ক্লিকেই আপনার যাত্রা শুরু করুন!</p>
-        
-        <button id="google-signin-btn" class="google-btn">
-            <i class="fab fa-google"></i>
-            Continue with Google
-        </button>
+    <div class="login-wrapper">
+        <div class="container">
+            <a href="/" class="logo">Riseii</a>
+            <h2>Welcome Back!</h2>
+            <p class="bengali-text">এক ক্লিকেই আপনার যাত্রা শুরু করুন অথবা লগইন করুন।</p>
+            
+            <button id="google-signin-btn" class="google-btn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
 
-        <p class="terms-text">
+            <div class="notice-section">
+                <strong><i class="fas fa-bell"></i> বিশেষ ঘোষণা:</strong>
+                <p>আমাদের সিস্টেম আপগ্রেড করা হয়েছে! এখন শুধুমাত্র Google অ্যাকাউন্ট ব্যবহার করে লগইন করা যাবে, যা আপনার অ্যাকাউন্টকে আরও সুরক্ষিত করবে।</p>
+            </div>
+        </div>
+
+        <div class="features-wrapper" style="margin-top: 30px; text-align: center;">
+            <div class="features">
+                <div class="feature-item"><i class="fas fa-tasks"></i> সহজ কাজ</div>
+                <div class="feature-item"><i class="fas fa-bolt"></i> দ্রুত পেমেন্ট</div>
+                <div class="feature-item"><i class="fas fa-shield-alt"></i> নিরাপদ প্ল্যাটফর্ম</div>
+            </div>
+        </div>
+
+        <p class="footer">
             By continuing, you agree to Riseii's 
-            <a href="/terms">Terms of Service</a> and 
+            <a href="/terms">Terms of Service</a> & 
             <a href="/privacy">Privacy Policy</a>.
         </p>
     </div>
 
 <script>
     // আপনার নতুন Supabase প্রজেক্টের URL এবং Key
-    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
+    const SUPABASE_URL = 'https://wmwwdqakvzfiebgmavtv.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indtd3dkcWFrdnpmaWViZ21hdnR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NjY3NTAsImV4cCI6MjA2NjQ0Mjc1MH0.eRSvEf-ixq4VXa_nsZfKqhi1Ny0EFMvcnneG-Zco5qU';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const googleBtn = document.getElementById('google-signin-btn');
@@ -97,7 +127,7 @@
     async function redirectIfLoggedIn() {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
-            window.location.href = '/profile.html'; // প্রোফাইল পেজের সঠিক লিঙ্ক
+            window.location.href = '/dashboard'; // প্রোফাইল পেজের সঠিক লিঙ্ক
         }
     }
     document.addEventListener('DOMContentLoaded', redirectIfLoggedIn);
@@ -110,8 +140,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         
-        // This is a workaround to pass referral data through OAuth
-        // The trigger will check for 'referral_code_used' in user_metadata
         let options = {};
         if (refCode) {
             options.data = {
@@ -123,7 +151,7 @@
             provider: 'google',
             options: {
                 ...options,
-                redirectTo: `${window.location.origin}/profile.html` // নিশ্চিত করুন এটি আপনার প্রোফাইল পেজের সঠিক URL
+                redirectTo: `${window.location.origin}/dashboard`
             }
         });
 
@@ -136,11 +164,10 @@
 
     googleBtn.addEventListener('click', signInWithGoogle);
 
-    // This part handles the session after redirecting back from Google
+    // Handles the session after redirecting back from Google
     supabaseClient.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN' && session) {
-            // User has signed in. Redirect to profile page.
-            window.location.href = '/profile.html';
+            window.location.href = '/dashboard';
         }
     });
 </script>
