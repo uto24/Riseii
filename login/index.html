@@ -117,7 +117,7 @@
             <div class="notice-section">
                 <strong><i class="fas fa-info-circle"></i> পুরোনো ব্যবহারকারীদের জন্য:</strong>
                 <p>
-                    যদি আপনার আগে থেকেই ইমেইল এবং পাসওয়ার্ড দিয়ে তৈরি করা কোনো অ্যাকাউন্ট থাকে, অনুগ্রহ করে আমাদের সাথে <a href="https://t.me/YOUR_TELEGRAM_BOT_USERNAME" target="_blank">টেলিগ্রাম বটে</a> যোগাযোগ করুন। আমরা আপনাকে আপনার পুরোনো অ্যাকাউন্টটি Google-এর সাথে লিঙ্ক করতে সাহায্য করব।
+                    যদি আপনার আগে থেকেই ইমেইল এবং পাসওয়ার্ড দিয়ে তৈরি করা কোনো অ্যাকাউন্ট থাকে, অনুগ্রহ করে আমাদের সাথে <a href="https://t.me/riseii_bot" target="_blank">টেলিগ্রাম বটে</a> যোগাযোগ করুন। আমরা আপনাকে আপনার পুরোনো অ্যাকাউন্টটি Google-এর সাথে লিঙ্ক করতে সাহায্য করব।
                 </p>
             </div>
         </div>
@@ -131,8 +131,8 @@
 
 <script>
     // JavaScript কোড আগের মতোই থাকবে, কোনো পরিবর্তন নেই
-    const SUPABASE_URL = 'https://wmwwdqakvzfiebgmavtv.supabase.co';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // আপনার আসল Key ব্যবহার করুন
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4'; // আপনার আসল Key ব্যবহার করুন
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const googleBtn = document.getElementById('google-signin-btn');
@@ -140,7 +140,7 @@
     async function redirectIfLoggedIn() {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
-            window.location.href = '/profile.html';
+            window.location.href = '/dashboard';
         }
     }
     document.addEventListener('DOMContentLoaded', redirectIfLoggedIn);
