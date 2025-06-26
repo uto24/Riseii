@@ -17,7 +17,6 @@
             --text-dark: #1e293b;
             --text-light: #475569;
             --accent-color: #4f46e5;
-            --success-color: #10b981;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -86,7 +85,7 @@
     <div class="login-wrapper">
         <div class="container">
             <a href="/" class="logo">Riseii</a>
-            <h2>Welcome Back!</h2>
+            <h2>Welcome to Riseii!</h2>
             <p class="bengali-text">এক ক্লিকেই আপনার যাত্রা শুরু করুন অথবা লগইন করুন।</p>
             
             <button id="google-signin-btn" class="google-btn">
@@ -95,8 +94,8 @@
             </button>
 
             <div class="notice-section">
-                <strong><i class="fas fa-bell"></i> বিশেষ ঘোষণা:</strong>
-                <p>আমাদের সিস্টেম আপগ্রেড করা হয়েছে! এখন শুধুমাত্র Google অ্যাকাউন্ট ব্যবহার করে লগইন করা যাবে, যা আপনার অ্যাকাউন্টকে আরও সুরক্ষিত করবে।</p>
+                <strong><i class="fas fa-bell"></i> সিস্টেম আপডেট:</strong>
+                <p>আমাদের প্ল্যাটফর্ম এখন আরও সুরক্ষিত! শুধুমাত্র Google অ্যাকাউন্ট ব্যবহার করে দ্রুত এবং নিরাপদে লগইন করুন।</p>
             </div>
         </div>
 
@@ -110,13 +109,12 @@
 
         <p class="footer">
             By continuing, you agree to Riseii's 
-            <a href="/terms">Terms of Service</a> & 
-            <a href="/privacy">Privacy Policy</a>.
+            <a href="/terms.html">Terms of Service</a> & 
+            <a href="/privacy.html">Privacy Policy</a>.
         </p>
     </div>
 
 <script>
-    // আপনার নতুন Supabase প্রজেক্টের URL এবং Key
     const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -127,7 +125,7 @@
     async function redirectIfLoggedIn() {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
-            window.location.href = '/dashboard'; // প্রোফাইল পেজের সঠিক লিঙ্ক
+            window.location.href = '/dashboard';
         }
     }
     document.addEventListener('DOMContentLoaded', redirectIfLoggedIn);
@@ -135,41 +133,33 @@
     // Google Sign-In Function
     async function signInWithGoogle() {
         googleBtn.disabled = true;
-        googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
+        googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to Google...';
 
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         
-        let options = {};
+        // Save the referral code to sessionStorage to survive the OAuth redirect
         if (refCode) {
-            options.data = {
-                referral_code_used: refCode
-            }
+            sessionStorage.setItem('referral_code_used', refCode);
         }
         
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                ...options,
-                redirectTo: `${window.location.origin}/dashboard`
+                // Redirect to our new, intermediate callback page
+                redirectTo: `${window.location.origin}/auth-callback.html`
             }
         });
 
         if (error) {
-            alert('Error: ' + error.message);
+            alert('Error signing in with Google: ' + error.message);
             googleBtn.disabled = false;
             googleBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
         }
     }
 
     googleBtn.addEventListener('click', signInWithGoogle);
-
-    // Handles the session after redirecting back from Google
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-            window.location.href = '/dashboard';
-        }
-    });
+    
 </script>
 </body>
 </html>
