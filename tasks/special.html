@@ -10,9 +10,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { /* ... আপনার CSS ভ্যারিয়েবলগুলো ... */ }
+        :root { 
+            --primary-bg: #f7f9fc;
+            --secondary-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --accent-color: #4f46e5;
+            --accent-hover: #4338ca;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(79, 70, 229, 0.1);
+             }
         body { font-family: 'Nunito Sans', sans-serif; background-color: #f7f9fc; margin: 0; }
-        .main-header { /* ... আগের মতো ... */ }
+        .main-header { 
+            background-color: var(--secondary-bg);
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center; 
+            }
         .main-content { max-width: 700px; margin: 40px auto; padding: 0 20px; }
         .task-card { background-color: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .task-header { text-align: center; margin-bottom: 25px; }
@@ -32,8 +51,8 @@
 </head>
 <body>
     <header class="main-header">
-        <div class="header-left"><a href="tasks.html">Riseii Tasks</a></div>
-        <div class="header-right"><a href="profile.html" id="profile-link">My Profile</a></div>
+        <div class="header-left"><a href="/tasks">Riseii Tasks</a></div>
+        <div class="header-right"><a href="/dashboard" id="profile-link">My Profile</a></div>
     </header>
 
     <main class="main-content" id="task-container">
@@ -41,7 +60,7 @@
             <div class="task-header">
                 <h1><i class="fas fa-star"></i> One-Time Special Task</h1>
                 <p>এই বিশেষ কাজটি সম্পন্ন করে <strong>৫০৳</strong> বোনাস জিতুন! এই সুযোগ শুধুমাত্র একবার।</p>
-            </div>)
+            </div>
 
             <!-- Step 1 -->
             <div class="step" id="step1">
@@ -49,7 +68,7 @@
                 <p>নিচের বাটনে ক্লিক করে টেলিগ্রাম বটটি চালু করুন, "/start" কমান্ড দিন এবং একটি স্ক্রিনশট নিন।</p>
                 <a href="https://t.me/riseii_bot" target="_blank" class="btn">Start Bot 1</a>
                 <input type="file" id="screenshot1" accept="image/*">
-            </div>
+            </div> 
 
             <!-- Step 2 -->
             <div class="step" id="step2" style="display: none;">
@@ -63,7 +82,6 @@
             <button class="submit-btn" id="final-submit-btn" disabled>Submit Both Screenshots</button>
         </div>
     </main>
-    
 
 <script>
     const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
