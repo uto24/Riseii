@@ -1,72 +1,150 @@
-<!-- claim-reward.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Claim Your Reward - Riseii</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertisement Tasks - Riseii</title>
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* ... সাধারণ স্টাইল ... */
-        body { font-family: 'Nunito Sans', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f7f9fc; }
-        .container { text-align: center; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .icon { font-size: 4rem; color: #10b981; }
-        h1 { color: #1e293b; }
-        .btn { padding: 15px 40px; background-color: #10b981; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1.2rem; font-weight: 700; }
-        .btn:disabled { background-color: #9ca3af; }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: #f7f9fc; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .task-header { text-align: center; margin-bottom: 25px; }
+        .task-header h1 { font-size: 2rem; color: #4f46e5; }
+        #task-list { display: flex; flex-direction: column; gap: 15px; }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: #f8fafc;
+        }
+        .task-info strong { font-size: 1.1rem; color: #1e293b; }
+        .task-info span { font-size: 1rem; color: #10b981; font-weight: 700; }
+        .visit-btn {
+            padding: 12px 25px;
+            background-color: #4f46e5;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .visit-btn:hover { background-color: #4338ca; transform: translateY(-2px); }
+        .visit-btn.disabled { background-color: #9ca3af; cursor: not-allowed; color: #e2e8f0; }
+        .visit-btn.disabled:hover { transform: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <i class="fas fa-trophy icon"></i>
-        <h1>Task Completed!</h1>
-        <p>You have successfully viewed the ad. Click the button below to claim your reward.</p>
-        <button id="claim-btn" class="btn">Claim Reward</button>
+        <div class="task-header">
+            <h1><i class="fas fa-hand-pointer"></i> Visit & Earn Tasks</h1>
+            <p>Click on the ads below to earn. Your reward will be added to your balance in 30 minutes.</p>
+        </div>
+        <div id="task-list">
+            <p>Loading advertisement tasks...</p>
+        </div>
     </div>
 
 <script>
-    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co'; // আপনার URL
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4'; // আপনার Key
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co'; // আপনার URL দিন
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4'; // আপনার anon key দিন
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    let currentUser = null;
 
-    const claimBtn = document.getElementById('claim-btn');
+    async function initializePage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; return; }
+        currentUser = session.user;
+        loadAdClickTasks();
+    }
 
-    claimBtn.addEventListener('click', async () => {
-        claimBtn.disabled = true;
-        claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Claiming...';
+    async function loadAdClickTasks() {
+        const taskListDiv = document.getElementById('task-list');
+
+        // Get all ad_click tasks and user's submissions in parallel
+        const [tasksRes, submissionsRes] = await Promise.all([
+            supabaseClient.from('tasks').select('*').eq('task_type', 'ad_click').eq('is_active', true),
+            supabaseClient.from('submissions').select('task_id').eq('user_id', currentUser.id)
+        ]);
+
+        if (tasksRes.error || submissionsRes.error) {
+            taskListDiv.innerHTML = '<p>Error loading tasks. Please try again.</p>';
+            console.error(tasksRes.error || submissionsRes.error);
+            return;
+        }
+
+        const allTasks = tasksRes.data;
+        const submittedTaskIds = new Set(submissionsRes.data.map(sub => sub.task_id));
+
+        if (!allTasks || allTasks.length === 0) {
+            taskListDiv.innerHTML = '<h3>No new ad tasks available right now.</h3>';
+            return;
+        }
+
+        let taskHTML = '';
+        allTasks.forEach(task => {
+            const isCompleted = submittedTaskIds.has(task.id);
+            taskHTML += `
+                <div class="task-item">
+                    <div class="task-info">
+                        <strong>${task.caption}</strong><br>
+                        <span>Reward: ৳${task.reward_amount}</span>
+                    </div>
+                    <a href="${task.image_url}" 
+                       id="task-btn-${task.id}" 
+                       class="visit-btn ${isCompleted ? 'disabled' : ''}" 
+                       target="_blank" 
+                       onclick="handleAdClick(event, ${task.id})">
+                       ${isCompleted ? 'Visited' : 'Visit Ad'} <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            `;
+        });
+        taskListDiv.innerHTML = taskHTML;
+    }
+
+    async function handleAdClick(event, taskId) {
+        const button = event.currentTarget;
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const taskId = urlParams.get('taskId');
-
-        if (!taskId) {
-            alert('Error: Task ID not found.');
+        // Prevent multiple clicks
+        if (button.classList.contains('disabled')) {
+            event.preventDefault();
+            alert('You have already completed this task.');
             return;
         }
 
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) {
-            alert('You must be logged in to claim a reward.');
-            window.location.href = '/login.html';
-            return;
-        }
-
+        button.classList.add('disabled');
+        button.innerHTML = 'Visited <i class="fas fa-check-circle"></i>';
+        
+        // Submit the claim in the background
         const thirtyMinutesFromNow = new Date(Date.now() + 30 * 60 * 1000).toISOString();
         const { error } = await supabaseClient.from('submissions').insert({
-            user_id: user.id,
+            user_id: currentUser.id,
             task_id: taskId,
             status: 'pending',
             completed_at: thirtyMinutesFromNow,
-            submission_data: 'Ad view task claimed'
+            submission_data: 'Ad click task'
         });
 
         if (error) {
-            alert('Error submitting your claim: ' + error.message);
-            claimBtn.disabled = false;
-            claimBtn.textContent = 'Claim Reward';
-        } else {
-            alert('Your reward claim has been submitted! It will be added to your balance in 30 minutes.');
-            window.location.href = '/tasks.html'; // টাস্ক পেজে ফেরত পাঠান
+            // If submission fails, revert the button state (optional)
+            console.error('Submission Error:', error.message);
+            button.classList.remove('disabled');
+            button.innerHTML = 'Visit Ad <i class="fas fa-external-link-alt"></i>';
+            // Don't prevent the link from opening
         }
-    });
+    }
+    
+    document.addEventListener('DOMContentLoaded', initializePage);
 </script>
 </body>
 </html>
