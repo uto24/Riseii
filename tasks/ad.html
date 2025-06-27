@@ -48,6 +48,81 @@
             <h1><i class="fas fa-hand-pointer"></i> Visit & Earn Tasks</h1>
             <p>Click on the ads below to earn. Your reward will be added to your balance in 30 minutes.</p>
         </div>
+        
+        
+      
+        
+        <style>
+       .server{
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+           height: auto;
+            padding: 20px;
+        }
+        
+        .serverx {
+            max-width: 800px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+      .serverx h2 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 8px;
+        }
+        
+       .serverx ul {
+            list-style-type: none; /* Remove default list styling */
+            padding-left: 0; /* Remove default padding */
+            margin-bottom: 20px;
+        }
+        
+      .serverx li {
+            background: var(--primary-bg);
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+     .serverx li:hover {
+            background: var(--accent-hover);
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .serverx {
+                padding: 20px;
+            }
+         .serverx  h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>    
+    <div class="server">
+    <div class="serverx">
+        <h2>কীভাবে করবেন?</h2>
+        <ul>
+            <li>Step 1: View Ad এ ক্লিক করে, একটি পেজে নিয়ে যাবে, সেকানে Im Not Robot এ ক্লিক করে, ৩ সেকেন্ড অপেক্ষা করতে হবে । 
+            
+               </li>
+            <li>Step 2: তারপর  ৪০ সেকেন্ড অপেক্ষা করে, যা হবে হতে দিবেন, তারপর বেক আসবেন । </li>
+          
+            
+           
+        </ul>
+        
+    
+    </div>
         <div id="task-list">
             <p>Loading advertisement tasks...</p>
         </div>
@@ -62,7 +137,7 @@
 
     async function initializePage() {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) { window.location.href = 'login.html'; return; }
+        if (!session) { window.location.href = '/login'; return; }
         currentUser = session.user;
         loadAdClickTasks();
     }
