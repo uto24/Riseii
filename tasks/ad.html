@@ -1,0 +1,72 @@
+<!-- claim-reward.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Claim Your Reward - Riseii</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* ... সাধারণ স্টাইল ... */
+        body { font-family: 'Nunito Sans', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f7f9fc; }
+        .container { text-align: center; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .icon { font-size: 4rem; color: #10b981; }
+        h1 { color: #1e293b; }
+        .btn { padding: 15px 40px; background-color: #10b981; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1.2rem; font-weight: 700; }
+        .btn:disabled { background-color: #9ca3af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="fas fa-trophy icon"></i>
+        <h1>Task Completed!</h1>
+        <p>You have successfully viewed the ad. Click the button below to claim your reward.</p>
+        <button id="claim-btn" class="btn">Claim Reward</button>
+    </div>
+
+<script>
+    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co'; // আপনার URL
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4'; // আপনার Key
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const claimBtn = document.getElementById('claim-btn');
+
+    claimBtn.addEventListener('click', async () => {
+        claimBtn.disabled = true;
+        claimBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Claiming...';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskId = urlParams.get('taskId');
+
+        if (!taskId) {
+            alert('Error: Task ID not found.');
+            return;
+        }
+
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+            alert('You must be logged in to claim a reward.');
+            window.location.href = '/login.html';
+            return;
+        }
+
+        const thirtyMinutesFromNow = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+        const { error } = await supabaseClient.from('submissions').insert({
+            user_id: user.id,
+            task_id: taskId,
+            status: 'pending',
+            completed_at: thirtyMinutesFromNow,
+            submission_data: 'Ad view task claimed'
+        });
+
+        if (error) {
+            alert('Error submitting your claim: ' + error.message);
+            claimBtn.disabled = false;
+            claimBtn.textContent = 'Claim Reward';
+        } else {
+            alert('Your reward claim has been submitted! It will be added to your balance in 30 minutes.');
+            window.location.href = '/tasks.html'; // টাস্ক পেজে ফেরত পাঠান
+        }
+    });
+</script>
+</body>
+</html>
