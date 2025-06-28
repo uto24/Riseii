@@ -111,6 +111,73 @@
     color: var(--text-light);
 }
 
+        .main-titlex {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+        
+        /* --- ছোট অ্যাপ গ্রিড স্টাইল (রেসপন্সিভ) --- */
+        .app-grid {
+            display: grid;
+            /* মোবাইল ভিউতে ডিফল্টভাবে ৩টি কলাম */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px; /* গ্যাপ কমানো হয়েছে */
+        }
+        
+        /* --- প্রতিটি ছোট অ্যাপ কার্ডের স্টাইল --- */
+        .app-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px; /* বর্ডার রেডিয়াস কমানো হয়েছে */
+            padding: 16px; /* প্যাডিং কমানো হয়েছে */
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            aspect-ratio: 1 / 1;
+        }
+
+        .app-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+            border-color: var(--accent-color);
+        }
+        
+        /* --- ছোট আইকনের স্টাইল --- */
+        .app-card .fa-icon {
+            font-size: 2.25rem; /* 36px - আইকনের আকার কমানো হয়েছে */
+            color: var(--accent-color);
+            margin-bottom: 12px; /* মার্জিন কমানো হয়েছে */
+        }
+        
+        /* --- ছোট শিরোনামের স্টাইল --- */
+        .app-card .app-title {
+            font-weight: 600;
+            font-size: 0.875rem; /* 14px - ফন্টের আকার কমানো হয়েছে */
+            line-height: 1.3;
+        }
+        
+        /* --- মিডিয়া কোয়েরি ফর রেসপন্সিভনেস --- */
+
+        /* ট্যাবলেট ভিউ (≥ 768px): ৪টি কলাম */
+        @media (min-width: 480px) {
+            .app-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        /* ডেস্কটপ ভিউ (≥ 1024px): ৫টি কলাম */
+        @media (min-width: 1024px) {
+            .app-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
 
     </style>
 </head>
@@ -157,6 +224,22 @@
         
         <hr style="border: none; margin: 0 5% 0 5%; background: #8f00ff; color: #8f00ff; height: 2px; box-shadow: 0 0 15px #8f00ff;">
         
+        
+       
+        <h1 class="main-titlex">Our Applications</h1>
+        
+        <div class="app-grid">
+            <a href="#" class="app-card"><i class="fa-solid fa-chart-pie fa-icon"></i><span class="app-title">Dashboard</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-envelope fa-icon"></i><span class="app-title">Mail</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-calendar-days fa-icon"></i><span class="app-title">Calendar</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-users fa-icon"></i><span class="app-title">Users</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-gear fa-icon"></i><span class="app-title">Settings</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-file-invoice fa-icon"></i><span class="app-title">Reports</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-cloud-arrow-up fa-icon"></i><span class="app-title">Storage</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-shield-halved fa-icon"></i><span class="app-title">Security</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-bell fa-icon"></i><span class="app-title">Notify</span></a>
+            <a href="#" class="app-card"><i class="fa-solid fa-briefcase fa-icon"></i><span class="app-title">Projects</span></a>
+        </div>
         
         <br>
         <div class="stats-grid">
