@@ -1,43 +1,106 @@
-<!-- auth-callback.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Authenticating...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Step - Riseii</title>
+    <!-- Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
+        :root {
+            --primary-bg: #f7f9fc;
+            --secondary-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #475569;
+            --accent-color: #4f46e5;
+        }
+        body { font-family: 'Nunito Sans', sans-serif; background-color: var(--primary-bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container {
+            background-color: var(--secondary-bg); padding: 3rem; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); width: 90%; max-width: 480px; text-align: center;
+        }
+        h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; color: var(--text-light); margin-bottom: 2rem; }
+        .input-group { margin: 2rem 0; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 8px; text-align: left; }
+        .input-group input { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center; letter-spacing: 2px; }
+        .btn { width: 100%; padding: 15px; background-color: var(--accent-color); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: 600; }
+        .btn:disabled { background-color: #9ca3af; }
+        .skip-link { display: block; margin-top: 1rem; color: var(--text-light); text-decoration: none; font-size: 0.9rem; }
     </style>
 </head>
 <body>
-    <h2>Please wait, authenticating...</h2>
+    <div class="container">
+        <h2>Welcome to Riseii!</h2>
+        <p class="bengali-text">আপনার অ্যাকাউন্ট প্রায় তৈরি। আপনার কি কোনো রেফারেল কোড আছে?</p>
+        
+        <div id="referral-section">
+            <div class="input-group">
+                <label for="refCodeInput">Referral Code (Optional)</label>
+                <input type="text" id="refCodeInput" placeholder="Enter referral code here">
+            </div>
+            <button id="continue-btn" class="btn">Continue to Dashboard</button>
+        </div>
+        <a href="#" id="skip-link" class="skip-link">I don't have a code, skip</a>
+    </div>
 
 <script>
-    const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co'; // আপনার URL দিন
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4'; // আপনার anon key দিন
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // আপনার URL দিন
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // আপনার anon key দিন
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-        // We only care about the SIGNED_IN event on this page
-        if (event === 'SIGNED_IN' && session) {
-            
-            const refCode = sessionStorage.getItem('referral_code_used');
-            
-            if (refCode) {
-                // Update the user's metadata with the referral code
-                await supabaseClient.auth.updateUser({
-                    data: {
-                        referral_code_used: refCode
-                    }
-                });
-                // Clear the code from storage
-                sessionStorage.removeItem('referral_code_used');
-            }
-            
-            // Now, redirect to the final profile page
+    const continueBtn = document.getElementById('continue-btn');
+    const skipLink = document.getElementById('skip-link');
+
+    async function handleAuthRedirect() {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        
+        if (error || !session) {
+            // If there's no session, redirect to login
+            window.location.href = '/login';
+            return;
+        }
+
+        // Check if referral code is already in sessionStorage (from the initial URL)
+        const refCodeFromUrl = sessionStorage.getItem('referral_code_used');
+        if (refCodeFromUrl) {
+            // If code exists from URL, process it and redirect immediately
+            await updateUserMetadata(refCodeFromUrl);
+            sessionStorage.removeItem('referral_code_used'); // Clean up
             window.location.href = '/dashboard';
         }
+        // If no code from URL, the page will remain visible for manual input.
+    }
+    
+    async function updateUserMetadata(refCode) {
+        if (!refCode) return;
+        
+        await supabaseClient.auth.updateUser({
+            data: {
+                referral_code_used: refCode
+            }
+        });
+    }
+
+    continueBtn.addEventListener('click', async () => {
+        continueBtn.disabled = true;
+        continueBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        const refCode = document.getElementById('refCodeInput').value.trim();
+        await updateUserMetadata(refCode);
+        
+        window.location.href = '/profile.html';
     });
+    
+    skipLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = '/profile.html';
+    });
+
+    document.addEventListener('DOMContentLoaded', handleAuthRedirect);
 </script>
 </body>
 </html>
