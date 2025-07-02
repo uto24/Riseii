@@ -10,13 +10,16 @@
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f2f5; margin: 0; }
         .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
+        .logo { font-size: 2rem; font-weight: 800; color: #4f46e5; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+        h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .bengali-text { font-family: 'Anek Bangla', sans-serif; color: #475569; margin-bottom: 1.5rem; }
         .divider { display: flex; align-items: center; text-align: center; color: #ccc; margin: 1.5rem 0; font-weight: 600; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
         .divider:not(:empty)::before { margin-right: .5em; }
         .divider:not(:empty)::after { margin-left: .5em; }
         .input-group { margin-bottom: 1rem; }
         input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-        .btn, .google-btn { width: 100%; padding: 14px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; border: 1px solid transparent; }
+        .btn, .google-btn { width: 100%; padding: 14px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; border: 1px solid transparent; transition: background-color 0.2s; }
         .btn { background-color: #4f46e5; color: white; }
         .google-btn { background-color: #fff; color: #333; border-color: #ccc; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
         button:disabled { background-color: #9ca3af; cursor: not-allowed; }
@@ -25,7 +28,9 @@
 </head>
 <body>
     <div class="container">
+        <a href="/" class="logo">Riseii</a>
         <h2>Join or Sign In</h2>
+        <p class="bengali-text">আপনার যাত্রা শুরু করুন</p>
         
         <!-- Google Sign-in -->
         <button id="google-signin-btn" class="google-btn"><i class="fab fa-google"></i> Continue with Google</button>
@@ -50,9 +55,11 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- Google Sign-in Logic ---
+    // --- Google Sign-in Logic (No changes needed here) ---
     document.getElementById('google-signin-btn').addEventListener('click', async () => {
         // ... (আগের উত্তর থেকে Google সাইন-ইনের কোড এখানে থাকবে)
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
+        if(error) alert('Google Sign-in Error: ' + error.message);
     });
 
     // --- Custom Login/Signup with Email and Password ---
@@ -63,28 +70,30 @@
         const errorMsg = document.getElementById('error-msg');
         errorMsg.style.display = 'none';
 
-        if (password.length < 6) {
-            errorMsg.textContent = 'Password must be at least 6 characters.';
+        if (!email || password.length < 6) {
+            errorMsg.textContent = 'Please enter a valid email and a password of at least 6 characters.';
             errorMsg.style.display = 'block';
             return;
         }
 
         const btn = document.getElementById('custom-login-btn');
         btn.disabled = true;
-        btn.innerHTML = 'Processing...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
         try {
-            // Step 1: Check if the email already exists
+            // Step 1: Check if the user exists to log them in
             let { data: user, error: fetchError } = await supabaseClient
                 .from('profiles')
                 .select('id, password')
                 .eq('email', email)
                 .single();
 
-            if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+            if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows found
+                throw fetchError;
+            }
 
             if (user) {
-                // --- USER EXISTS - TRY TO LOG IN ---
+                // --- USER EXISTS - ATTEMPT TO LOG IN ---
                 if (user.password === password) {
                     localStorage.setItem('loggedInUserId', user.id);
                     window.location.href = '/profile.html';
@@ -93,27 +102,21 @@
                     errorMsg.style.display = 'block';
                 }
             } else {
-                // --- USER DOES NOT EXIST - CREATE NEW ACCOUNT ---
-                const { data: newUser, error: insertError } = await supabaseClient
-                    .from('profiles')
-                    .insert([{ 
-                        email: email, 
-                        password: password, // WARNING: Storing plain text password
-                        full_name: email.split('@')[0], // Use part of email as name
-                        referral_code: 'REF' + Math.random().toString(36).substring(2, 9).toUpperCase()
-                    }])
-                    .select('id')
-                    .single();
-
-                if (insertError) {
-                    if (insertError.code === '23505') { // Unique constraint violation on email
-                        errorMsg.textContent = 'This email is already registered.';
-                        errorMsg.style.display = 'block';
-                    } else {
-                        throw insertError;
-                    }
+                // --- USER DOES NOT EXIST - ATTEMPT TO CREATE ACCOUNT VIA RPC ---
+                const { data: result, error: rpcError } = await supabaseClient
+                    .rpc('create_custom_user', {
+                        p_email: email,
+                        p_password: password
+                    });
+                
+                if (rpcError) throw rpcError;
+                
+                if (result.error) {
+                    // Handle errors returned from the function, e.g., "email already exists"
+                    errorMsg.textContent = result.error;
+                    errorMsg.style.display = 'block';
                 } else {
-                    alert('Account created successfully! Please log in with your new credentials.');
+                    alert('Account created successfully! Please log in now with your new credentials.');
                 }
             }
         } catch (error) {
@@ -126,4 +129,4 @@
     });
 </script>
 </body>
-    </html>
+</html>
