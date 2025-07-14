@@ -52,7 +52,6 @@
             
             <p id="error-msg" class="error-msg"></p>
         </form>
-    </div>
 
 <script>
     const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
@@ -81,7 +80,7 @@
         if(error) alert('Google Sign-in Error: ' + error.message);
     });
 
-    // --- LOGIN LOGIC ---
+    // --- LOGIN LOGIC (সংশোধিত) ---
     loginBtn.addEventListener('click', async () => {
         hideError();
         const email = emailInput.value.trim().toLowerCase();
@@ -96,27 +95,29 @@
         loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
         try {
-            // Check if user exists
             let { data: user, error } = await supabaseClient
                 .from('profiles')
-                .select('id, password') // IMPORTANT: See security note below
+                .select('id, password')
                 .eq('email', email)
                 .single();
 
-            if (error || !user) {
+            // এখানে মূল পরিবর্তন: শুধুমাত্র 'PGRST116' (not found) error ছাড়া অন্য কোনো error হলে সেটি দেখাবে
+            if (error && error.code !== 'PGRST116') {
+                throw error;
+            }
+
+            // যদি user না পাওয়া যায় (অর্থাৎ, error.code === 'PGRST116')
+            if (!user) {
                 showError('No account found with this email. Please create an account.');
                 return;
             }
 
-            // --- USER EXISTS - ATTEMPT TO LOG IN ---
-            // WARNING: Storing and comparing plaintext passwords is very insecure.
+            // যদি user পাওয়া যায়, তাহলে পাসওয়ার্ড চেক করুন
             if (user.password === password) {
-                // Login successful
                 alert('Login Successful!');
                 localStorage.setItem('loggedInUserId', user.id);
-                window.location.href = '/profile.html'; // Redirect to a profile page
+                window.location.href = '/profile.html';
             } else {
-                // Incorrect password
                 showError('Incorrect password. Please try again.');
             }
 
@@ -129,7 +130,7 @@
     });
 
 
-    // --- SIGN UP LOGIC ---
+    // --- SIGN UP LOGIC (সংশোধিত) ---
     signupBtn.addEventListener('click', async () => {
         hideError();
         const email = emailInput.value.trim().toLowerCase();
@@ -151,6 +152,12 @@
                 .eq('email', email)
                 .single();
             
+            // এখানেও মূল পরিবর্তন: শুধুমাত্র 'PGRST116' (not found) error ছাড়া অন্য কোনো error হলে সেটি দেখাবে
+            if (checkError && checkError.code !== 'PGRST116') {
+                throw checkError;
+            }
+
+            // যদি existingUser পাওয়া যায় (অর্থাৎ, কোনো error হয়নি এবং ডেটা আছে)
             if (existingUser) {
                 showError('An account with this email already exists. Please log in.');
                 return;
@@ -160,17 +167,15 @@
             const { data: result, error: rpcError } = await supabaseClient
                 .rpc('create_custom_user', {
                     p_email: email,
-                    p_password: password // Sending plaintext password
+                    p_password: password
                 });
             
             if (rpcError) throw rpcError;
             
             if (result && result.error) {
-                // Handle errors returned from the function
                 showError(result.error);
             } else {
                 alert('Account created successfully! Please log in now with your new credentials.');
-                // Optionally clear the password field
                 passwordInput.value = '';
             }
 
@@ -181,7 +186,4 @@
             signupBtn.innerText = 'Create Account';
         }
     });
-
 </script>
-</body>
-</html>
