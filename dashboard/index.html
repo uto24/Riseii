@@ -341,93 +341,92 @@
 <!-- Paste this line in the <head> section of your HTML file -->
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> -->
 
+<!-- profile.html এর সম্পূর্ণ <script> ট্যাগ -->
 <script>
     const SUPABASE_URL = 'https://gsfgrycmlngptzirwicl.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentUser = null;
+    let currentUserId = null; // This will store the logged-in user's ID
 
-    async function checkAndCompleteTasks() {
-        if (!currentUser) return false;
-
-        const { data: pendingSubmissions, error } = await supabaseClient
-            .from('submissions')
-            .select('id, user_id, tasks(reward_amount)')
-            .eq('user_id', currentUser.id)
-            .eq('status', 'pending')
-            .not('completed_at', 'is', null)
-            .lt('completed_at', new Date().toISOString());
-
-        if (error || !pendingSubmissions || pendingSubmissions.length === 0) {
-            return false;
+    /**
+     * Checks for a login session from both Google Auth and our custom localStorage system.
+     * Returns the user ID if found, otherwise redirects to the login page.
+     */
+    async function checkAuthentication() {
+        // 1. Check for a Supabase Auth session (for Google users)
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session && session.user) {
+            console.log("Authentication successful: Google User session found.");
+            return session.user.id;
         }
-
-        let tasksWereProcessed = false;
         
-        for (const sub of pendingSubmissions) {
-            if (sub.tasks && sub.tasks.reward_amount) {
-                // Call the safe RPC function
-                const { error: rpcError } = await supabaseClient.rpc('complete_submission_and_update_balance', {
-                    submission_id_to_update: sub.id,
-                    user_id_to_update: sub.user_id,
-                    reward_amount_to_add: sub.tasks.reward_amount
-                });
-                if (!rpcError) {
-                    tasksWereProcessed = true;
-                } else {
-                    console.error(`Error processing submission #${sub.id} via RPC:`, rpcError.message);
-                }
-            }
+        // 2. If no Auth session, check for our custom session in localStorage
+        const customUserId = localStorage.getItem('loggedInUserId');
+        if (customUserId) {
+            console.log("Authentication successful: Custom User session found.");
+            return customUserId;
         }
-        return tasksWereProcessed;
+
+        // 3. If neither is found, redirect to login
+        console.log("No session found. Redirecting to login page.");
+        window.location.href = '/login.html';
+        return null;
     }
 
-    async function initializeProfile() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-            window.location.href = '/login';
+    /**
+     * Loads all profile data, stats, and histories based on the provided user ID.
+     */
+    async function loadProfileData(userId) {
+        currentUserId = userId; // Set the global variable for other functions
+
+        const { data: profile, error } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+        
+        if (error || !profile) {
+            console.error("Fatal Error: Could not load profile for user:", userId, error);
+            logout(); // If profile is missing, something is wrong. Force logout.
             return;
         }
-        currentUser = session.user;
+
+        // Populate Profile Card
+        document.getElementById('avatar-initial').textContent = (profile.full_name || 'U').charAt(0).toUpperCase();
+        document.getElementById('profile-name').textContent = profile.full_name || 'User';
+        document.getElementById('profile-email').textContent = profile.email || 'No email provided';
         
-        const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.get('reloaded')) {
-            const balanceWasUpdated = await checkAndCompleteTasks();
-            if (balanceWasUpdated) {
-                alert('Your pending rewards have been added to your balance!');
-                window.location.href = window.location.pathname + '?reloaded=true';
-                return;
-            }
+        const referralLinkInput = document.getElementById('referralLink');
+        if(profile.referral_code) {
+            referralLinkInput.value = `${window.location.origin}/login.html?ref=${profile.referral_code}`;
+            referralLinkInput.addEventListener('click', () => {
+                referralLinkInput.select();
+                document.execCommand('copy');
+                alert('Referral link copied!');
+            });
         }
+
+        // Populate Stats
+        document.getElementById('stat-balance').textContent = `৳${(profile.balance || 0).toFixed(2)}`;
         
         document.getElementById('main-content').classList.add('loaded');
-        
-        const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
-        if (error || !profile) { logout(); return; }
 
-        document.getElementById('avatar-initial').textContent = profile.full_name.charAt(0).toUpperCase();
-        document.getElementById('profile-name').textContent = profile.full_name;
-        document.getElementById('profile-email').textContent = profile.email;
-        const referralLinkInput = document.getElementById('referralLink');
-        referralLinkInput.value = `${window.location.origin}/signup?ref=${profile.referral_code}`;
-        referralLinkInput.addEventListener('click', () => {
-            referralLinkInput.select(); document.execCommand('copy'); alert('Referral link copied!');
-        });
-        document.getElementById('stat-balance').textContent = `৳${profile.balance.toFixed(2)}`;
-      
-      
-await Promise.all([
-    loadTaskHistory(),
-    loadReferralHistory(),
-    loadCompletedTaskCount(),
-    loadNotices() // নতুন ফাংশন কল
-]);
+        // Load all other data in parallel for speed
+        await Promise.all([
+            loadTaskHistory(userId),
+            loadReferralHistory(userId),
+            loadCompletedTaskCount(userId)
+        ]);
     }
 
-    async function loadTaskHistory() {
+    async function loadTaskHistory(userId) {
         const listDiv = document.getElementById('task-history-list');
-        const { data, error } = await supabaseClient.from('submissions').select('task_id, status, created_at, tasks(task_type, reward_amount)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+        const { data, error } = await supabaseClient
+            .from('submissions')
+            .select('task_id, status, created_at, tasks(task_type, reward_amount)')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
 
         if (error || !data || data.length === 0) {
             listDiv.innerHTML = '<p>No task history yet.</p>'; return;
@@ -435,77 +434,75 @@ await Promise.all([
         let html = '';
         data.forEach(sub => {
             if (!sub.tasks) return;
-            const taskTypeName = sub.tasks.task_type.replace('_', ' ');
-            html += `<div class="history-item"><div class="history-info"><strong>${taskTypeName.charAt(0).toUpperCase() + taskTypeName.slice(1)} (#${sub.task_id})</strong><p>Submitted: ${new Date(sub.created_at).toLocaleString()}</p></div><div class="history-status"><span class="status-badge status-${sub.status}">${sub.status}</span><span class="reward">Reward: ৳${sub.tasks.reward_amount}</span></div></div>`;
+            const taskTypeName = sub.tasks.task_type.replace(/_/g, ' ');
+            html += `<div class="history-item">
+                        <div class="history-info">
+                            <strong>${taskTypeName.charAt(0).toUpperCase() + taskTypeName.slice(1)} (#${sub.task_id})</strong>
+                            <p>Submitted: ${new Date(sub.created_at).toLocaleString()}</p>
+                        </div>
+                        <div class="history-status">
+                            <span class="status-badge status-${sub.status}">${sub.status}</span>
+                            <span class="reward">Reward: ৳${sub.tasks.reward_amount}</span>
+                        </div>
+                     </div>`;
         });
         listDiv.innerHTML = html;
     }
     
-    async function loadReferralHistory() {
+    async function loadReferralHistory(userId) {
         const listDiv = document.getElementById('referral-history-list');
-        const { data, count } = await supabaseClient.from('profiles').select('full_name, created_at', { count: 'exact' }).eq('referred_by', currentUser.id).order('created_at', { ascending: false });
+        const { data, count, error } = await supabaseClient
+            .from('profiles')
+            .select('full_name, created_at', { count: 'exact' })
+            .eq('referred_by', userId);
+
+        if (error) { console.error("Referral History Error:", error); return; }
+        
         document.getElementById('stat-referrals').textContent = count || 0;
         if (!data || data.length === 0) {
             listDiv.innerHTML = '<p>No one has joined using your referral link yet.</p>'; return;
         }
         let html = '';
         data.forEach(ref => {
-            html += `<div class="history-item"><strong>${ref.full_name}</strong><span>Joined on: ${new Date(ref.created_at).toLocaleDateString()}</span></div>`;
+            html += `<div class="history-item">
+                        <strong>${ref.full_name}</strong>
+                        <span>Joined on: ${new Date(ref.created_at).toLocaleDateString()}</span>
+                     </div>`;
         });
         listDiv.innerHTML = html;
     }
 
-    async function loadCompletedTaskCount() {
-        const { count } = await supabaseClient.from('submissions').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('status', 'completed');
+    async function loadCompletedTaskCount(userId) {
+        const { count, error } = await supabaseClient
+            .from('submissions')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', userId)
+            .eq('status', 'completed');
+            
+        if (error) { console.error("Completed Task Count Error:", error); return; }
         document.getElementById('stat-tasks-completed').textContent = count || 0;
     }
 
-    async function logout() {
-        await supabaseClient.auth.signOut();
-        window.location.href = '/';
+    /**
+     * Universal logout function that clears both session types.
+     */
+    function logout() {
+        supabaseClient.auth.signOut(); // Clears Google session (if any)
+        localStorage.removeItem('loggedInUserId'); // Clears custom session (if any)
+        window.location.href = '/login.html';
     }
 
-    document.getElementById('logout-btn').addEventListener('click', logout);
-    document.addEventListener('DOMContentLoaded', initializeProfile);
-    
-    
-    
-    // profile.html এর script ট্যাগের ভেতরে যোগ করুন
-async function loadNotices() {
-    if (!currentUser) return;
-    const noticeSection = document.getElementById('notice-section');
+    /**
+     * Entry point when the page is loaded.
+     */
+    document.addEventListener('DOMContentLoaded', async () => {
+        const userId = await checkAuthentication();
+        if (userId) {
+            await loadProfileData(userId);
+        }
 
-    // Fetch both public and personal notices for the user
-    const { data: notices, error } = await supabaseClient
-        .from('notices')
-        .select('*')
-        .eq('is_active', true)
-        .or(`notice_type.eq.public,and(notice_type.eq.personal,user_id.eq.${currentUser.id})`)
-        .order('created_at', { ascending: false });
-
-    if (error || !notices || notices.length === 0) {
-        noticeSection.style.display = 'none'; // কোনো নোটিশ না থাকলে সেকশনটি হাইড করুন
-        return;
-    }
-
-    noticeSection.style.display = 'grid'; // নোটিশ থাকলে সেকশনটি দেখান
-    let html = '';
-    notices.forEach(notice => {
-        const iconClass = notice.notice_type === 'public' ? 'fas fa-bullhorn' : 'fas fa-user-check';
-        html += `
-            <div class="notice-card ${notice.notice_type}">
-                <div class="notice-header">
-                    <i class="${iconClass} icon"></i>
-                    <h4>${notice.title}</h4>
-                </div>
-                <div class="notice-content">
-                    <p>${notice.content}</p>
-                </div>
-            </div>
-        `;
+        // Attach event listener to the logout button
+        document.getElementById('logout-btn').addEventListener('click', logout);
     });
-    noticeSection.innerHTML = html;
-}
+
 </script>
-</body>
-</html>
