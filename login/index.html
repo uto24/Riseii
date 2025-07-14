@@ -21,6 +21,7 @@
         input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
         .btn, .google-btn { width: 100%; padding: 14px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; border: 1px solid transparent; transition: background-color 0.2s; }
         .btn { background-color: #4f46e5; color: white; }
+        .btn-secondary { background-color: #6b7280; color: white; margin-top: 0.5rem; } /* Added for signup button */
         .google-btn { background-color: #fff; color: #333; border-color: #ccc; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
         button:disabled { background-color: #9ca3af; cursor: not-allowed; }
         .error-msg { color: #ef4444; font-weight: 600; margin-top: 10px; display: none; }
@@ -45,7 +46,10 @@
             <div class="input-group">
                 <input type="password" id="password" placeholder="Enter your Password" required>
             </div>
-            <button type="submit" id="custom-login-btn" class="btn">Login / Create Account</button>
+            <!-- SEPARATE BUTTONS FOR LOGIN AND SIGNUP -->
+            <button type="button" id="login-btn" class="btn">Login</button>
+            <button type="button" id="signup-btn" class="btn btn-secondary">Create Account</button>
+            
             <p id="error-msg" class="error-msg"></p>
         </form>
     </div>
@@ -55,78 +59,129 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZmdyeWNtbG5ncHR6aXJ3aWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1NjgwNTksImV4cCI6MjA2NjE0NDA1OX0.uWGXs8dd1TNpdGpd6P8oyr2udzXPIrghcp667zOKdv4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- Google Sign-in Logic (No changes needed here) ---
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorMsg = document.getElementById('error-msg');
+    const loginBtn = document.getElementById('login-btn');
+    const signupBtn = document.getElementById('signup-btn');
+
+    // Helper function to show/hide errors
+    function showError(message) {
+        errorMsg.textContent = message;
+        errorMsg.style.display = 'block';
+    }
+
+    function hideError() {
+        errorMsg.style.display = 'none';
+    }
+
+    // --- Google Sign-in Logic ---
     document.getElementById('google-signin-btn').addEventListener('click', async () => {
-        // ... (আগের উত্তর থেকে Google সাইন-ইনের কোড এখানে থাকবে)
         const { data, error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
         if(error) alert('Google Sign-in Error: ' + error.message);
     });
 
-    // --- Custom Login/Signup with Email and Password ---
-    document.getElementById('custom-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value.trim().toLowerCase();
-        const password = document.getElementById('password').value.trim();
-        const errorMsg = document.getElementById('error-msg');
-        errorMsg.style.display = 'none';
+    // --- LOGIN LOGIC ---
+    loginBtn.addEventListener('click', async () => {
+        hideError();
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value.trim();
 
-        if (!email || password.length < 6) {
-            errorMsg.textContent = 'Please enter a valid email and a password of at least 6 characters.';
-            errorMsg.style.display = 'block';
+        if (!email || !password) {
+            showError('Please enter both email and password.');
             return;
         }
 
-        const btn = document.getElementById('custom-login-btn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
         try {
-            // Step 1: Check if the user exists to log them in
-            let { data: user, error: fetchError } = await supabaseClient
+            // Check if user exists
+            let { data: user, error } = await supabaseClient
                 .from('profiles')
-                .select('id, password')
+                .select('id, password') // IMPORTANT: See security note below
                 .eq('email', email)
                 .single();
 
-            if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows found
-                throw fetchError;
+            if (error || !user) {
+                showError('No account found with this email. Please create an account.');
+                return;
             }
 
-            if (user) {
-                // --- USER EXISTS - ATTEMPT TO LOG IN ---
-                if (user.password === password) {
-                    localStorage.setItem('loggedInUserId', user.id);
-                    window.location.href = '/profile.html';
-                } else {
-                    errorMsg.textContent = 'Incorrect password. Please try again.';
-                    errorMsg.style.display = 'block';
-                }
+            // --- USER EXISTS - ATTEMPT TO LOG IN ---
+            // WARNING: Storing and comparing plaintext passwords is very insecure.
+            if (user.password === password) {
+                // Login successful
+                alert('Login Successful!');
+                localStorage.setItem('loggedInUserId', user.id);
+                window.location.href = '/profile.html'; // Redirect to a profile page
             } else {
-                // --- USER DOES NOT EXIST - ATTEMPT TO CREATE ACCOUNT VIA RPC ---
-                const { data: result, error: rpcError } = await supabaseClient
-                    .rpc('create_custom_user', {
-                        p_email: email,
-                        p_password: password
-                    });
-                
-                if (rpcError) throw rpcError;
-                
-                if (result.error) {
-                    // Handle errors returned from the function, e.g., "email already exists"
-                    errorMsg.textContent = result.error;
-                    errorMsg.style.display = 'block';
-                } else {
-                    alert('Account created successfully! Please log in now with your new credentials.');
-                }
+                // Incorrect password
+                showError('Incorrect password. Please try again.');
             }
-        } catch (error) {
-            errorMsg.textContent = 'An error occurred: ' + error.message;
-            errorMsg.style.display = 'block';
+
+        } catch (err) {
+            showError('An error occurred: ' + err.message);
         } finally {
-            btn.disabled = false;
-            btn.innerText = 'Login / Create Account';
+            loginBtn.disabled = false;
+            loginBtn.innerText = 'Login';
         }
     });
+
+
+    // --- SIGN UP LOGIC ---
+    signupBtn.addEventListener('click', async () => {
+        hideError();
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value.trim();
+
+        if (!email || password.length < 6) {
+            showError('Please enter a valid email and a password of at least 6 characters.');
+            return;
+        }
+
+        signupBtn.disabled = true;
+        signupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+        try {
+            // Step 1: Check if the user already exists
+            let { data: existingUser, error: checkError } = await supabaseClient
+                .from('profiles')
+                .select('id')
+                .eq('email', email)
+                .single();
+            
+            if (existingUser) {
+                showError('An account with this email already exists. Please log in.');
+                return;
+            }
+
+            // Step 2: User does not exist, so create them via RPC
+            const { data: result, error: rpcError } = await supabaseClient
+                .rpc('create_custom_user', {
+                    p_email: email,
+                    p_password: password // Sending plaintext password
+                });
+            
+            if (rpcError) throw rpcError;
+            
+            if (result && result.error) {
+                // Handle errors returned from the function
+                showError(result.error);
+            } else {
+                alert('Account created successfully! Please log in now with your new credentials.');
+                // Optionally clear the password field
+                passwordInput.value = '';
+            }
+
+        } catch (err) {
+            showError('An error occurred during sign up: ' + err.message);
+        } finally {
+            signupBtn.disabled = false;
+            signupBtn.innerText = 'Create Account';
+        }
+    });
+
 </script>
 </body>
 </html>
