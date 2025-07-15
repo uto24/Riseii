@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+{% block title %}লগইন{% endblock %}
+
+{% block content %}
+    <nav>
+        <a href="{{ url_for('index') }}">হোম</a>
+        <a href="{{ url_for('signup') }}">সাইনআপ</a>
+    </nav>
+
+    <h2>আপনার একাউন্টে লগইন করুন</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form id="login-form">
+        <label for="email">ইমেইল</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="password">পাসওয়ার্ড</label>
+        <input type="password" id="password" name="password" required>
+        
+        <button type="submit" class="btn-primary">লগইন</button>
+    </form>
+    
+    <div class="divider"><span>অথবা</span></div>
+
+    <button id="google-signin-btn" class="btn-google">
+        <i class="fab fa-google"></i> Google দিয়ে লগইন করুন
+    </button>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "{{ firebase_api_key }}",
+            authDomain: "{{ os.getenv('FIREBASE_PROJECT_ID') }}.firebaseapp.com",
+            projectId: "{{ os.getenv('FIREBASE_PROJECT_ID') }}",
+            storageBucket: "{{ os.getenv('FIREBASE_STORAGE_BUCKET') }}",
+            messagingSenderId: "{{ os.getenv('FIREBASE_MESSAGING_SENDER_ID') }}",
+            appId: "{{ os.getenv('FIREBASE_APP_ID') }}"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Email/Password Login
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    return userCredential.user.getIdToken();
+                })
+                .then((idToken) => {
+                    return fetch('/auth/set_session', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({idToken: idToken})
+                    });
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert('Login failed: ' + data.message);
+                    }
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+        });
+
+        // Google Sign-In
+        document.getElementById('google-signin-btn').addEventListener('click', function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    return result.user.getIdToken();
+                })
+                .then((idToken) => {
+                    return fetch('/auth/google', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({idToken: idToken})
+                    });
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert('Google login failed: ' + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Google Sign-In Error: ", error);
+                    alert("Google Sign-In Error: " + error.message);
+                });
+        });
+    </script>
+{% endblock %}
