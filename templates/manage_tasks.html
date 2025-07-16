@@ -1,0 +1,28 @@
+<!-- templates/manage_tasks.html -->
+<h2>সকল টাস্ক ম্যানেজ করুন</h2>
+<table>
+    <thead>
+        <tr>
+            <th>শিরোনাম</th>
+            <th>ক্যাটাগরি</th>
+            <th>পুরস্কার</th>
+            <th>স্ট্যাটাস</th>
+            <th>অ্যাকশন</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for task in all_tasks %}
+        <tr>
+            <td>{{ task.title }}</td>
+            <td>{{ task.category }}</td>
+            <td>{{ task.reward }}</td>
+            <td>{{ task.status }}</td>
+            <td>
+                <a href="/{{ admin_path }}/edit-task/{{ task.id }}">Edit</a> |
+                <a href="/{{ admin_path }}/toggle-status/{{ task.id }}">Toggle Status</a> |
+                <a href="/{{ admin_path }}/delete-task/{{ task.id }}" onclick="return confirm('আপনি কি নিশ্চিত?')">Delete</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
