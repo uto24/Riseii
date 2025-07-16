@@ -3,31 +3,119 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>একাউন্ট তৈরি করুন</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>নতুন একাউন্ট খুলুন - টাস্ক অ্যাপ</title>
+    <!-- Font Awesome for Google Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding-top: 50px; }
-        .container { max-width: 450px; width: 100%; margin: auto; background: white; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h2 { color: #1877f2; text-align: center; }
-        .flash { padding: 1em; margin-bottom: 1em; border-radius: 5px; color: white; text-align: center; }
-        .flash.success { background-color: #4CAF50; }
-        .flash.error { background-color: #f44336; }
-        .flash.info { background-color: #2196F3; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
-        .btn-primary { background-color: #1877f2; color: white; }
-        .btn-google { background-color: #db4437; color: white; }
-        .divider { text-align: center; border-bottom: 1px solid #ccc; line-height: 0.1em; margin: 25px 0; }
-        .divider span { background: #fff; padding: 0 10px; }
-        .login-link { text-align: center; margin-top: 20px; }
-        .login-link a { color: #1877f2; text-decoration: none; font-weight: bold; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .signup-container {
+            max-width: 400px;
+            width: 100%;
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .signup-container h2 {
+            color: #1c1e21;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+        .flash {
+            padding: 1em;
+            margin-bottom: 1em;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+        }
+        .flash.success { background-color: #42b72a; }
+        .flash.error { background-color: #fa3e3e; }
+        .flash.info { background-color: #1877f2; }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #606770;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 17px;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #42b72a;
+            color: white;
+        }
+        .btn-primary:disabled {
+            background-color: #a8d9a1;
+            cursor: not-allowed;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #36a420;
+        }
+        .btn-google {
+            background-color: #4285F4;
+            color: white;
+        }
+        .btn-google:hover {
+            background-color: #3367D6;
+        }
+        .divider {
+            text-align: center;
+            border-bottom: 1px solid #dadde1;
+            line-height: 0.1em;
+            margin: 25px 0;
+            color: #8a8d91;
+        }
+        .divider span {
+            background: #fff;
+            padding: 0 10px;
+        }
+        .login-link {
+            margin-top: 25px;
+            font-size: 15px;
+        }
+        .login-link a {
+            color: #1877f2;
+            text-decoration: none;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>আপনার একাউন্ট তৈরি করুন</h2>
+    <div class="signup-container">
+        <h2>নতুন একাউন্ট খুলুন</h2>
 
+        <!-- Flash messages for server-side notifications -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -36,30 +124,39 @@
             {% endif %}
         {% endwith %}
 
-        <form method="post">
-            <label for="name">আপনার নাম</label>
-            <input type="text" id="name" name="name" required>
-            
-            <label for="email">আপনার ইমেইল</label>
-            <input type="email" id="email" name="email" required>
+        <!-- Client-side error/status message -->
+        <div id="client-message" class="flash" style="display: none;"></div>
 
-            <label for="password">একটি পাসওয়ার্ড দিন</label>
-            <input type="password" id="password" name="password" required>
-
-            <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
-            <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
-            
-            <button type="submit" class="btn-primary">সাইন আপ</button>
+        <!-- Email/Password Signup Form -->
+        <form id="signup-form" method="post" action="{{ url_for('signup') }}">
+            <div class="form-group">
+                <label for="name">আপনার নাম</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">ইমেইল</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label>
+                <input type="password" id="password" name="password" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
+                <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
+            </div>
+            <button type="submit" id="signup-button" class="btn btn-primary">একাউন্ট খুলুন</button>
         </form>
         
         <div class="divider"><span>অথবা</span></div>
 
-        <button id="google-signup-btn" class="btn-google">
-            <i class="fab fa-google"></i> Google দিয়ে সাইন আপ করুন
+        <!-- Google Signup Button -->
+        <button id="google-signup-btn" class="btn btn-google">
+            <i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান
         </button>
 
         <div class="login-link">
-            <p>ஏற்கனவே ஒரு கணக்கு உள்ளதா? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></p>
+            একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a>
         </div>
     </div>
 
@@ -68,31 +165,48 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     
     <script>
-        // আপনার Firebase প্রজেক্টের কনফিগারেশন। এটি সার্ভার থেকে রেন্ডার হবে।
-        // login.html এর মতো একই কনফিগারেশন এখানেও ব্যবহার করতে হবে।
-        // নিরাপত্তার জন্য এই কী-গুলো সার্ভার থেকে আনা ভালো, যা app.py তে করা আছে।
+        // --- Firebase Configuration ---
         const firebaseConfig = {
-            apiKey: "{{ firebase_api_key }}", // app.py থেকে আসবে
-            authDomain: "{{ os.getenv('FIREBASE_PROJECT_ID') }}.firebaseapp.com",
-            projectId: "{{ os.getenv('FIREBASE_PROJECT_ID') }}",
-            // বাকি কী-গুলোও প্রয়োজন হলে যুক্ত করতে হবে
+            apiKey: "{{ config.firebase_api_key }}",
+            authDomain: "{{ config.firebase_auth_domain }}",
+            projectId: "{{ config.firebase_project_id }}",
+            messagingSenderId: "{{ config.firebase_messaging_sender_id }}",
+            appId: "{{ config.firebase_app_id }}"
         };
 
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Google Sign-Up/Sign-In
-        document.getElementById('google-signup-btn').addEventListener('click', function() {
+        // --- DOM Elements ---
+        const signupForm = document.getElementById('signup-form');
+        const signupButton = document.getElementById('signup-button');
+        const googleButton = document.getElementById('google-signup-btn');
+        const clientMessage = document.getElementById('client-message');
+
+        // --- Helper Function to show messages ---
+        function showMessage(text, type = 'error') {
+            clientMessage.textContent = text;
+            clientMessage.className = `flash ${type}`;
+            clientMessage.style.display = 'block';
+        }
+        
+        // --- Event listener to intercept form submission for loading state ---
+        // This is for the standard email/password form
+        signupForm.addEventListener('submit', function() {
+            signupButton.disabled = true;
+            signupButton.textContent = 'প্রসেসিং...';
+        });
+
+        // --- Event Listener for Google Sign-Up ---
+        googleButton.addEventListener('click', function() {
             const provider = new firebase.auth.GoogleAuthProvider();
+            const referrerCode = document.getElementById('referrer_code').value;
+
             auth.signInWithPopup(provider)
-                .then((result) => {
-                    return result.user.getIdToken();
-                })
-                .then((idToken) => {
-                    // সাইনআপ পেইজ থেকে রেফারেল কোড সংগ্রহ করা
-                    const referrerCode = document.getElementById('referrer_code').value;
-                    
-                    // সার্ভারের API তে টোকেন এবং রেফার কোড পাঠানো
+                .then(result => result.user.getIdToken())
+                .then(idToken => {
+                    // Send token and referrer code to the server
                     return fetch('/api/auth/google', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -105,16 +219,22 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        window.location.href = data.redirect_url; // ড্যাশবোর্ডে রিডাইরেক্ট
+                        // Redirect to dashboard on successful signup/login
+                        window.location.href = data.redirect_url;
                     } else {
-                        alert('Google সাইন আপ ব্যর্থ হয়েছে: ' + data.message);
+                        throw new Error(data.message || 'Server-side error during Google Sign-Up.');
                     }
                 })
-                .catch((error) => {
+                .catch(error => {
                     console.error("Google Sign-Up Error: ", error);
-                    alert("একটি সমস্যা হয়েছে: " + error.message);
+                    let friendlyMessage = 'Google দিয়ে সাইন আপ করা সম্ভব হয়নি।';
+                    if (error.code === 'auth/popup-closed-by-user') {
+                        friendlyMessage = 'আপনি সাইন আপ পপ-আপটি বন্ধ করে দিয়েছেন।';
+                    }
+                    showMessage(friendlyMessage, 'error');
                 });
         });
+
     </script>
 </body>
-              </html>
+</html>
