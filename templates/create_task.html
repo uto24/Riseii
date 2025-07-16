@@ -3,14 +3,47 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>নতুন টাস্ক তৈরি</title>
+    <title>নতুন টাস্ক তৈরি - অ্যাডমিন প্যানেল</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;}
-        .container { max-width: 600px; width: 100%; }
-        .form-container { background: white; border-radius: 12px; padding: 30px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .form-container h2 { margin-top: 0; text-align: center; color: #1877f2; margin-bottom: 25px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #606770; }
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+        }
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+            text-align: center;
+            color: #1877f2;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #606770;
+        }
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 14px;
@@ -20,106 +53,184 @@
             font-size: 16px;
             font-family: inherit;
         }
-        .form-group textarea { resize: vertical; min-height: 100px; }
-        .btn-submit { width: 100%; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 17px; margin-top: 10px; background-color: #42b72a; color: white; }
-        .back-link { display: block; text-align: center; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
-        
-        /* ডাইনামিক ফিল্ডের জন্য স্টাইল */
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 17px;
+            margin-top: 10px;
+            background-color: #42b72a;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-submit:hover {
+            background-color: #36a420;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1877f2;
+            text-decoration: none;
+            font-weight: 600;
+        }
         .extra-fields {
             display: none; /* ডিফল্টভাবে লুকানো থাকবে */
             border-left: 3px solid #1877f2;
-            padding-left: 15px;
-            margin-top: 20px;
+            padding-left: 20px;
+            margin-top: 25px;
+            padding-top: 5px;
+        }
+        .extra-fields legend {
+            font-weight: 600;
+            color: #1877f2;
+            padding: 0 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- admin_path ভেরিয়েবলটি app.py থেকে আসছে -->
-        <a href="/{{ admin_path }}" class="back-link">← অ্যাডমিন ড্যাশবোর্ডে ফিরে যান</a>
+        <a href="/{{ admin_path }}/manage-tasks" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> সকল টাস্ক ম্যানেজ করুন
+        </a>
         <div class="form-container">
             <h2>নতুন টাস্ক তৈরি করুন</h2>
             <form method="post">
                 <!-- সাধারণ ফিল্ড (সব টাস্কের জন্য) -->
                 <div class="form-group">
                     <label for="title">টাস্কের শিরোনাম</label>
-                    <input type="text" id="title" name="title" required>
+                    <input type="text" id="title" name="title" placeholder="যেমন: আমাদের ফেসবুক পেইজে লাইক দিন" required>
                 </div>
                 <div class="form-group">
                     <label for="description">টাস্কের বিবরণ</label>
-                    <textarea id="description" name="description" required></textarea>
+                    <textarea id="description" name="description" placeholder="এখানে ইউজারদের জন্য বিস্তারিত নির্দেশনা লিখুন" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="reward">পুরস্কারের পরিমাণ (টাকা)</label>
-                    <input type="number" id="reward" name="reward" step="0.01" required>
+                    <input type="number" id="reward" name="reward" step="0.01" placeholder="যেমন: 5.00" required>
                 </div>
 
                 <!-- টাস্কের ধরণ সিলেক্ট করার ড্রপডাউন -->
                 <div class="form-group">
                     <label for="task_type">টাস্কের ধরণ</label>
                     <select id="task_type" name="task_type" onchange="showExtraFields()" required>
-                        <option value="">-- একটি ধরণ সিলেক্ট করুন --</option>
+                        <option value="" disabled selected>-- একটি ধরণ সিলেক্ট করুন --</option>
                         <option value="fb_post_screenshot">Facebook Post (Screenshot)</option>
+                        <option value="fb_page_like_screenshot">Facebook Page Like (Screenshot)</option>
                         <option value="yt_watch_screenshot">YouTube Watch (Screenshot)</option>
+                        <option value="website_visit_timer">Website Visit (Timer)</option>
                         <option value="ad_watch_timer">Ad Watch (Timer)</option>
                     </select>
                 </div>
 
-                <!-- Facebook Post এর জন্য অতিরিক্ত ফিল্ড -->
-                <div id="fb_post_fields" class="extra-fields">
+                <!-- অতিরিক্ত ফিল্ডগুলো -->
+                
+                <!-- Facebook Post এর জন্য -->
+                <fieldset id="fb_post_fields" class="extra-fields">
+                    <legend>Facebook Post Fields</legend>
                     <div class="form-group">
                         <label for="caption">ফেসবুক পোস্টের ক্যাপশন</label>
                         <textarea id="caption" name="caption"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="image_url">ছবির URL (ডাউনলোডের জন্য)</label>
-                        <input type="url" id="image_url" name="image_url">
+                        <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
                     </div>
-                </div>
+                </fieldset>
 
-                <!-- YouTube Watch এর জন্য অতিরিক্ত ফিল্ড -->
-                <div id="yt_watch_fields" class="extra-fields">
+                <!-- Facebook Page Like এর জন্য -->
+                <fieldset id="fb_page_like_fields" class="extra-fields">
+                    <legend>Facebook Page Like Fields</legend>
+                    <div class="form-group">
+                        <label for="fb_page_url">ফেসবুক পেইজের URL</label>
+                        <input type="url" id="fb_page_url" name="target_url" placeholder="https://facebook.com/yourpage">
+                    </div>
+                </fieldset>
+
+                <!-- YouTube Watch এর জন্য -->
+                <fieldset id="yt_watch_fields" class="extra-fields">
+                    <legend>YouTube Watch Fields</legend>
                     <div class="form-group">
                         <label for="yt_target_url">ইউটিউব ভিডিওর URL</label>
-                        <input type="url" id="yt_target_url" name="yt_target_url">
+                        <input type="url" id="yt_target_url" name="target_url" placeholder="https://youtube.com/watch?v=...">
                     </div>
-                </div>
+                </fieldset>
 
-                <!-- Ad Watch এর জন্য অতিরিক্ত ফিল্ড -->
-                <div id="ad_watch_fields" class="extra-fields">
+                <!-- Website Visit এর জন্য -->
+                <fieldset id="website_visit_fields" class="extra-fields">
+                    <legend>Website Visit Fields</legend>
+                    <div class="form-group">
+                        <label for="website_url">ওয়েবসাইটের লিঙ্ক (URL)</label>
+                        <input type="url" id="website_url" name="target_url" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="website_timer_duration">ভিজিটের সময় (সেকেন্ড)</label>
+                        <input type="number" id="website_timer_duration" name="timer_duration" value="60">
+                    </div>
+                </fieldset>
+                
+                <!-- Ad Watch এর জন্য -->
+                <fieldset id="ad_watch_fields" class="extra-fields">
+                    <legend>Ad Watch Fields</legend>
                     <div class="form-group">
                         <label for="ad_target_url">বিজ্ঞাপনের লিঙ্ক (URL)</label>
-                        <input type="url" id="ad_target_url" name="ad_target_url">
+                        <input type="url" id="ad_target_url" name="target_url" placeholder="https://ad-network.com/ad-link">
                     </div>
                     <div class="form-group">
-                        <label for="timer_duration">টাইমারের সময় (সেকেন্ড)</label>
-                        <input type="number" id="timer_duration" name="timer_duration" value="30">
+                        <label for="ad_timer_duration">টাইমারের সময় (সেকেন্ড)</label>
+                        <input type="number" id="ad_timer_duration" name="timer_duration" value="30">
                     </div>
-                </div>
+                </fieldset>
 
-                <button type="submit" class="btn-submit">টাস্ক তৈরি করুন</button>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-plus"></i> টাস্ক তৈরি করুন
+                </button>
             </form>
         </div>
     </div>
 
     <script>
         function showExtraFields() {
+            // একটি ম্যাপ তৈরি করা, কোন ভ্যালুর জন্য কোন ফিল্ড দেখানো হবে
+            const fieldMap = {
+                'fb_post_screenshot': 'fb_post_fields',
+                'fb_page_like_screenshot': 'fb_page_like_fields',
+                'yt_watch_screenshot': 'yt_watch_fields',
+                'website_visit_timer': 'website_visit_fields',
+                'ad_watch_timer': 'ad_watch_fields'
+            };
+
             // প্রথমে সব অতিরিক্ত ফিল্ড লুকিয়ে ফেলা
-            document.getElementById('fb_post_fields').style.display = 'none';
-            document.getElementById('yt_watch_fields').style.display = 'none';
-            document.getElementById('ad_watch_fields').style.display = 'none';
+            document.querySelectorAll('.extra-fields').forEach(field => {
+                field.style.display = 'none';
+                // তাদের ভেতরের ইনপুটগুলোকেও disabled করা যেতে পারে
+                field.querySelectorAll('input, textarea').forEach(input => input.required = false);
+            });
 
-            // সিলেক্ট করা টাস্কের ধরণ অনুযায়ী নির্দিষ্ট ফিল্ড দেখানো
             const selectedType = document.getElementById('task_type').value;
-
-            if (selectedType === 'fb_post_screenshot') {
-                document.getElementById('fb_post_fields').style.display = 'block';
-            } else if (selectedType === 'yt_watch_screenshot') {
-                document.getElementById('yt_watch_fields').style.display = 'block';
-            } else if (selectedType === 'ad_watch_timer') {
-                document.getElementById('ad_watch_fields').style.display = 'block';
+            const fieldToShowId = fieldMap[selectedType];
+            
+            if (fieldToShowId) {
+                const fieldToShow = document.getElementById(fieldToShowId);
+                fieldToShow.style.display = 'block';
+                // শুধুমাত্র দৃশ্যমান ফিল্ডের ইনপুটগুলো required করা
+                fieldToShow.querySelectorAll('input, textarea').forEach(input => {
+                    // আপনি চাইলে এখানে কিছু 필্ডকে required করতে পারেন
+                    // যেমন: if (input.name === 'target_url') input.required = true;
+                });
             }
         }
+
+        // পেইজ লোড হওয়ার সাথে সাথে একবার চালানো
+        document.addEventListener('DOMContentLoaded', showExtraFields);
     </script>
 </body>
 </html>
