@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ড্যাশবোর্ড</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; }
+        .container { max-width: 700px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .header h2 { margin: 0; color: #333; }
+        .header .logout-btn { color: #1877f2; text-decoration: none; font-weight: bold; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h3 { margin-top: 0; color: #1877f2; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .balance-card { text-align: center; }
+        .balance-card .balance-amount { font-size: 2.5em; font-weight: bold; color: #4CAF50; margin: 10px 0; }
+        .referral-link { padding: 10px; background: #e9ebee; border: 1px dashed #ccc; border-radius: 4px; word-wrap: break-word; user-select: all; }
+        .task-list a { text-decoration: none; }
+        .task-item { display: block; background: #f7f7f7; padding: 15px; border-radius: 6px; margin-bottom: 10px; color: #333; transition: background-color 0.2s; }
+        .task-item:hover { background-color: #e9ebee; }
+        .task-history ul { list-style-type: none; padding: 0; }
+        .task-history li { background: #f9f9f9; padding: 10px; border-radius: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>স্বাগতম, {{ session.user_name }}!</h2>
+            <a href="{{ url_for('logout') }}" class="logout-btn">লগআউট</a>
+        </div>
+
+        <div class="card balance-card">
+            <h3>আপনার বর্তমান ব্যালেন্স</h3>
+            <p class="balance-amount">৳ {{ "%.2f"|format(user.balance) }}</p>
+        </div>
+
+        <div class="card">
+            <h3>আপনার রেফারেল প্রোগ্রাম</h3>
+            <p>আপনার বন্ধুদের এই লিঙ্কটি শেয়ার করুন। তারা জয়েন করলে আপনারা উভয়েই বোনাস পাবেন।</p>
+            <p><strong>আপনার রেফার কোড:</strong> {{ user.my_referral_code }}</p>
+            <p><strong>শেয়ার করার লিঙ্ক:</strong></p>
+            <p class="referral-link">{{ referral_link }}</p>
+        </div>
+
+        <div class="card task-list">
+            <h3>কাজ সমূহ (Available Tasks)</h3>
+            <a href="{{ url_for('task_fb_post') }}">
+                <div class="task-item">
+                    <strong>ফেসবুক পোস্ট টাস্ক</strong> - আয় করুন ৳১০.০০
+                </div>
+            </a>
+            <!-- এখানে অন্যান্য টাস্কের লিঙ্ক যুক্ত হবে -->
+            <div class="task-item" style="background: #eee; color: #aaa; cursor: not-allowed;">
+                <strong>ভিডিও দেখার টাস্ক (শীঘ্রই আসছে)</strong>
+            </div>
+        </div>
+
+        <div class="card task-history">
+            <h3>আপনার কাজের ইতিহাস</h3>
+            {% if task_history %}
+                <ul>
+                {% for task in task_history %}
+                    <li>
+                        <span>{{ task.submitted_at.strftime('%d-%b-%Y') }} - {{ task.task_type }}</span>
+                        <span style="font-weight: bold; color: {% if task.status == 'completed' %}green{% elif task.status == 'pending' %}orange{% else %}red{% endif %};">
+                            {{ task.status|capitalize }}
+                        </span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>আপনি এখনো কোনো কাজ সম্পন্ন করেননি।</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+  </html>
