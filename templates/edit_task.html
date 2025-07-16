@@ -4,129 +4,45 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>টাস্ক এডিট করুন</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 600px;
-            width: 100%;
-        }
-        .form-container {
-            background: white;
-            border-radius: 12px;
-            padding: 30px 40px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .form-container h2 {
-            margin-top: 0;
-            text-align: center;
-            color: #1877f2;
-            margin-bottom: 25px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #606770;
-        }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
-            font-family: inherit;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 17px;
-            margin-top: 10px;
-            background-color: #42b72a;
-            color: white;
-        }
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #1877f2;
-            text-decoration: none;
-            font-weight: 600;
-        }
-    </style>
+    <!-- ... (আগের CSS কোড) ... -->
 </head>
 <body>
     <div class="container">
-        <!-- 'manage_tasks' ফাংশনের URL ব্যবহার করা হচ্ছে, যা অ্যাডমিনকে টাস্ক ম্যানেজমেন্ট পেইজে ফিরিয়ে নিয়ে যাবে -->
         <a href="{{ url_for('manage_tasks') }}" class="back-link">← টাস্ক ম্যানেজমেন্টে ফিরে যান</a>
-        
         <div class="form-container">
             <h2>"{{ task.title }}" টাস্কটি এডিট করুন</h2>
-            
-            <!-- ফর্মটি বর্তমান টাস্ক এডিট করার জন্য POST রিকোয়েস্ট পাঠাবে -->
             <form method="post">
                 <div class="form-group">
                     <label for="title">টাস্কের শিরোনাম</label>
-                    <!-- 'value' অ্যাট্রিবিউটে বর্তমান টাস্কের শিরোনাম দেখানো হচ্ছে -->
                     <input type="text" id="title" name="title" value="{{ task.title }}" required>
                 </div>
-                
                 <div class="form-group">
                     <label for="description">টাস্কের বিবরণ</label>
-                    <!-- টেক্সটএরিয়ার ভেতরে বর্তমান বিবরণ দেখানো হচ্ছে -->
                     <textarea id="description" name="description" required>{{ task.description }}</textarea>
                 </div>
-                
                 <div class="form-group">
                     <label for="reward">পুরস্কারের পরিমাণ (টাকা)</label>
                     <input type="number" id="reward" name="reward" value="{{ task.reward }}" step="0.01" required>
                 </div>
-
                 <div class="form-group">
                     <label for="target_url">লক্ষ্য URL (Target URL)</label>
                     <input type="text" id="target_url" name="target_url" value="{{ task.target_url }}" required>
                 </div>
-
                 <div class="form-group">
                     <label for="category">ক্যাটাগরি</label>
-                    <input type="text" id="category" name="category" value="{{ task.category }}" placeholder="যেমন: Facebook, Website, YouTube" required>
+                    <input type="text" id="category" name="category" value="{{ task.category }}" required>
                 </div>
-
                 <div class="form-group">
                     <label for="task_type">টাস্কের ধরণ</label>
                     <select id="task_type" name="task_type" required>
-                        <!-- বর্তমান টাস্কের ধরণটি ডিফল্টভাবে সিলেক্ট করা থাকবে -->
                         <option value="screenshot_upload" {% if task.task_type == 'screenshot_upload' %}selected{% endif %}>Screenshot Upload</option>
                         <option value="website_visit" {% if task.task_type == 'website_visit' %}selected{% endif %}>Website Visit</option>
-                        <!-- ভবিষ্যতে আরও অপশন যোগ করা যেতে পারে -->
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label for="icon_class">আইকন ক্লাস (Font Awesome)</label>
-                    <input type="text" id="icon_class" name="icon_class" value="{{ task.icon_class }}" placeholder="যেমন: fa-brands fa-facebook" required>
+                    <input type="text" id="icon_class" name="icon_class" value="{{ task.icon_class }}" required>
                 </div>
-                
                 <button type="submit" class="btn-submit">আপডেট করুন</button>
             </form>
         </div>
