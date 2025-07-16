@@ -1,6 +1,5 @@
 # ==============================================================================
-#           FULL & COMPLETE APPLICATION FILE: app.py
-#       (Features: Unique Link Admin Panel, Dynamic Tasks, Auth, etc.)
+#           FINAL & RELEASE-READY APPLICATION FILE: app.py
 # ==============================================================================
 
 import os
@@ -16,11 +15,10 @@ from firebase_admin import credentials, firestore, auth
 # --- অ্যাপ এবং Firebase ইনিশিয়ালাইজেশন ---
 load_dotenv()
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "a_very_secure_default_secret_key_789")
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "a_very_strong_production_secret_key")
 
 # .env ফাইল থেকে গোপন অ্যাডমিন পাথ লোড করুন
-# এটি অনুমান করা কঠিন এমন একটি ইউনিক স্ট্রিং হওয়া উচিত।
-SECRET_ADMIN_PATH = os.getenv("SECRET_ADMIN_PATH", "super-secret-admin-access-path-a1b2c3d4")
+SECRET_ADMIN_PATH = os.getenv("SECRET_ADMIN_PATH", "secure-admin-panel-for-production-e5f8")
 
 try:
     firebase_creds_json_str = os.getenv('FIREBASE_CREDENTIALS_JSON')
@@ -32,7 +30,7 @@ try:
     
     firebase_admin.initialize_app(cred)
     db = firestore.client()
-    print("SUCCESS: Firebase Initialized for Unique Link Admin App.")
+    print("SUCCESS: Firebase Initialized for Production.")
 except Exception as e:
     print(f"FATAL ERROR: Could not initialize Firebase. Error: {e}")
     db = None
@@ -72,8 +70,24 @@ def signup():
                 'referred_by': referrer_code, 'my_referral_code': my_referral_code,
                 'created_at': firestore.SERVER_TIMESTAMP
             }
-            db.collection('users').document(user_record.uid).set(user_data)
-            # এখানে রেফারেল বোনাস এবং হিস্টোরি লজিক যুক্ত করা যেতে পারে
+            user_doc_ref = db.collection('users').document(user_record.uid)
+            user_doc_ref.set(user_data)
+            
+            # রেফারেল বোনাস এবং হিস্টোরি লজিক
+            if referrer_code:
+                query = db.collection('users').where('my_referral_code', '==', referrer_code).limit(1).stream()
+                referrer_list = list(query)
+                if referrer_list:
+                    referrer_doc = referrer_list[0]
+                    referrer_ref = db.collection('users').document(referrer_doc.id)
+                    reward_amount = 5.0
+                    referrer_ref.update({'balance': firestore.Increment(reward_amount)})
+                    user_doc_ref.update({'balance': firestore.Increment(reward_amount)})
+                    db.collection('referrals').add({'referrer_id': referrer_doc.id, 'referred_id': user_record.uid, 'referred_user_email': email, 'reward_amount': reward_amount, 'timestamp': firestore.SERVER_TIMESTAMP})
+                    db.collection('balance_history').add({'user_id': referrer_doc.id, 'amount': reward_amount, 'type': 'referral_bonus', 'description': f'Bonus for referring {email}', 'timestamp': firestore.SERVER_TIMESTAMP})
+                    db.collection('balance_history').add({'user_id': user_record.uid, 'amount': reward_amount, 'type': 'signup_referral_bonus', 'description': f'Bonus for joining with code {referrer_code}', 'timestamp': firestore.SERVER_TIMESTAMP})
+                    flash('রেফারেলের জন্য আপনি এবং আপনার বন্ধু উভয়েই বোনাস পেয়েছেন!', 'info')
+
             flash('রেজিস্ট্রেশন সফল হয়েছে!', 'success')
             return redirect(url_for('login'))
         except Exception as e:
@@ -104,9 +118,7 @@ def set_session():
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
         user_doc = db.collection('users').document(uid).get()
-        if user_doc.exists:
-            user_data = user_doc.to_dict()
-        else: # Handle Google Sign-in for new users
+        if not user_doc.exists: # Handle Google Sign-in for new users
             user_info = auth.get_user(uid)
             user_data = {
                 'name': user_info.display_name or 'Google User', 'email': user_info.email,
@@ -114,9 +126,9 @@ def set_session():
                 'created_at': firestore.SERVER_TIMESTAMP
             }
             db.collection('users').document(uid).set(user_data)
-
+        
         session['user_id'] = uid
-        session['user_name'] = user_data.get('name')
+        session['user_name'] = user_doc.to_dict().get('name') if user_doc.exists else user_info.display_name
         return jsonify({"status": "success", "redirect_url": url_for('dashboard')})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 401
@@ -132,8 +144,26 @@ def dashboard():
         return redirect(url_for('login'))
         
     user = user_doc.to_dict()
-    # ... (বাকি সব হিস্টোরি fetch করার কোড আগের মতোই) ...
-    return render_template('dashboard.html', user=user)
+    referral_link = url_for('signup', ref=user.get('my_referral_code'), _external=True)
+
+    # Fetching data for the dashboard
+    tasks_query = db.collection('tasks').where('status', '==', 'active').stream()
+    active_tasks = [dict(task.to_dict(), **{'id': task.id}) for task in tasks_query]
+
+    referrals_query = db.collection('referrals').where('referrer_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).stream()
+    my_referrals = [doc.to_dict() for doc in referrals_query]
+
+    balance_query = db.collection('balance_history').where('user_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).stream()
+    balance_history = [doc.to_dict() for doc in balance_query]
+    
+    return render_template(
+        'dashboard.html', 
+        user=user, 
+        referral_link=referral_link,
+        active_tasks=active_tasks,
+        my_referrals=my_referrals,
+        balance_history=balance_history
+    )
 
 @app.route('/task/<task_id>', methods=['GET', 'POST'])
 @login_required
@@ -160,7 +190,6 @@ def view_task(task_id):
         return redirect(url_for('dashboard'))
 
     return render_template('task_view.html', task=task, task_id=task_id)
-
 
 # --- UNIQUE LINK ADMIN PANEL ---
 @app.route(f'/{SECRET_ADMIN_PATH}')
@@ -220,6 +249,5 @@ def create_task():
 
 # --- লোকাল টেস্টিং এর জন্য ---
 if __name__ == '__main__':
-    # লোকাল মেশিনে চালানোর সময় গোপন অ্যাডমিন লিঙ্কটি প্রিন্ট করা হবে
     print(f"Admin panel is accessible at: http://127.0.0.1:8080/{SECRET_ADMIN_PATH}")
     app.run(host='0.0.0.0', port=8080, debug=True)
