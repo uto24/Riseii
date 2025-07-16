@@ -4,83 +4,37 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ড্যাশবোর্ড - {{ user.name }}</title>
-    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
-
-        body {
-            font-family: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 850px;
-            margin: auto;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
-            margin-bottom: 25px;
-        }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.07); margin-bottom: 25px; }
         .header h2 { margin: 0; color: #1c1e21; font-size: 22px; }
-        .nav-links a { color: #1877f2; text-decoration: none; font-weight: 600; margin-left: 20px; transition: color 0.2s; }
-        .nav-links a:hover { color: #166fe5; }
-
-        /* Notification Bar Styles */
-        .notification-bar { padding: 15px 20px; margin-bottom: 20px; border-radius: 8px; color: white; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .notification-bar.success { background: linear-gradient(45deg, #28a745, #218838); }
-        .notification-bar.error { background: linear-gradient(45deg, #dc3545, #c82333); }
-        .notification-close { position: absolute; top: 50%; right: 15px; transform: translateY(-50%); background: rgba(255,255,255,0.2); border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 24px; color: white; text-decoration: none; font-size: 16px; transition: background-color 0.2s; }
-        .notification-close:hover { background: rgba(255,255,255,0.4); }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
-        }
+        .nav-links a { color: #1877f2; text-decoration: none; font-weight: 600; margin-left: 20px; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.07); }
         .card-header { display: flex; align-items: center; font-size: 18px; font-weight: 600; color: #1c1e21; margin-bottom: 20px; }
         .card-header i { margin-right: 12px; color: #1877f2; font-size: 20px; width: 25px; text-align: center; }
-
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
         .balance-card .balance-amount { font-size: 2.8em; font-weight: 700; color: #28a745; margin: 5px 0 10px 0; }
         .referral-link { padding: 12px; background: #f0f2f5; border: 1px dashed #ced0d4; border-radius: 6px; word-wrap: break-word; user-select: all; font-family: 'Courier New', Courier, monospace; }
-        .all-tasks-link { display: block; text-align: center; margin-top: 20px; padding: 14px; background: #1877f2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: background-color 0.2s; }
-        .all-tasks-link:hover { background-color: #166fe5; }
-        
-        /* Tab System Styles */
+        .all-tasks-link { display: block; text-align: center; margin-top: 20px; padding: 14px; background: #1877f2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; }
         .tab-nav { display: flex; border-bottom: 2px solid #e9ebee; margin-bottom: 20px; }
         .tab-button { padding: 10px 20px; cursor: pointer; background: none; border: none; font-size: 16px; font-weight: 600; color: #606770; position: relative; }
         .tab-button.active { color: #1877f2; }
         .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #1877f2; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
         .history-table { width: 100%; border-collapse: collapse; }
         .history-table th, .history-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e9ebee; }
         .history-table th { background-color: #f7f7f9; font-weight: 600; color: #606770; font-size: 14px; }
-        .history-table tr:last-child td { border-bottom: none; }
-        .history-table td { color: #3c4043; font-size: 15px; }
         .status { font-weight: bold; padding: 4px 10px; border-radius: 15px; color: white; font-size: 12px; text-transform: uppercase; }
         .status.pending { background-color: #ffc107; color: #333; }
         .status.completed { background-color: #28a745; }
         .status.rejected { background-color: #dc3545; }
         .amount { font-weight: 600; color: #28a745; }
         .no-data { color: #8a8d91; text-align: center; padding: 30px; }
-        
-        @media (max-width: 768px) {
-            .grid-container { grid-template-columns: 1fr; }
-            .header { flex-direction: column; gap: 10px; }
-            .tab-button { padding: 10px 12px; font-size: 14px; }
-        }
+        @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } .header { flex-direction: column; gap: 10px; } }
     </style>
 </head>
 <body>
@@ -88,22 +42,12 @@
         <div class="header">
             <h2>স্বাগতম, {{ user.name | e }}!</h2>
             <div class="nav-links">
-                <a href="{{ url_for('tasks_page') }}">সকল কাজ</a>
+                <!-- লিঙ্কটি এখন ড্যাশবোর্ডকেই নির্দেশ করছে -->
+                <a href="{{ url_for('dashboard') }}">সকল কাজ</a>
                 <a href="{{ url_for('logout') }}">লগআউট</a>
             </div>
         </div>
 
-        <div id="notification-container">
-            {% if notifications %}
-                {% for notification in notifications %}
-                    <div class="notification-bar {{ notification.type }}">
-                        <i class="fa-solid fa-bell" style="margin-right: 10px;"></i>{{ notification.message }}
-                        <a href="#" class="notification-close" data-id="{{ notification.id }}">×</a>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-        
         <div class="grid-container">
             <div class="card balance-card">
                 <div class="card-header"><i class="fa-solid fa-wallet"></i><h3>আপনার ব্যালেন্স</h3></div>
@@ -118,18 +62,10 @@
 
         <div class="card">
             <div class="tab-nav">
-                <button class="tab-button active" onclick="openTab(event, 'taskHistory')">
-                    <i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজের ইতিহাস
-                </button>
-                <button class="tab-button" onclick="openTab(event, 'referralHistory')">
-                    <i class="fa-solid fa-users" style="margin-right: 8px;"></i>রেফারেল ইতিহাস
-                </button>
-                <button class="tab-button" onclick="openTab(event, 'balanceHistory')">
-                    <i class="fa-solid fa-money-bill-transfer" style="margin-right: 8px;"></i>ব্যালেন্স ইতিহাস
-                </button>
+                <button class="tab-button active" onclick="openTab(event, 'taskHistory')"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজের ইতিহাস</button>
+                <button class="tab-button" onclick="openTab(event, 'referralHistory')"><i class="fa-solid fa-users" style="margin-right: 8px;"></i>রেফারেল ইতিহাস</button>
+                <button class="tab-button" onclick="openTab(event, 'balanceHistory')"><i class="fa-solid fa-money-bill-transfer" style="margin-right: 8px;"></i>ব্যালেন্স ইতিহাস</button>
             </div>
-
-            <!-- Task History Tab -->
             <div id="taskHistory" class="tab-content active">
                 {% if task_history %}
                     <table class="history-table">
@@ -137,7 +73,7 @@
                         <tbody>
                         {% for task in task_history %}
                             <tr>
-                                <td>{{ task.submitted_at.strftime('%d-%b-%Y') if task.submitted_at else 'N/A' }}</td>
+                                <td>{{ task.submitted_at.strftime('%d-%b-%Y') if task.submitted_at and task.submitted_at.strftime else 'N/A' }}</td>
                                 <td>{{ task.task_title }}</td>
                                 <td><span class="status {{ task.status }}">{{ task.status|capitalize }}</span></td>
                             </tr>
@@ -148,8 +84,6 @@
                     <p class="no-data">আপনি এখনো কোনো কাজ জমা দেননি।</p>
                 {% endif %}
             </div>
-
-            <!-- Referral History Tab -->
             <div id="referralHistory" class="tab-content">
                 {% if my_referrals %}
                     <table class="history-table">
@@ -157,7 +91,7 @@
                         <tbody>
                         {% for ref in my_referrals %}
                             <tr>
-                                <td>{{ ref.timestamp.strftime('%d-%b-%Y') if ref.timestamp else 'N/A' }}</td>
+                                <td>{{ ref.timestamp.strftime('%d-%b-%Y') if ref.timestamp and ref.timestamp.strftime else 'N/A' }}</td>
                                 <td>{{ ref.referred_user_email }}</td>
                                 <td class="amount">৳ {{ "%.2f"|format(ref.reward_amount) }}</td>
                             </tr>
@@ -168,8 +102,6 @@
                     <p class="no-data">আপনি এখনো কাউকে সফলভাবে রেফার করেননি।</p>
                 {% endif %}
             </div>
-
-            <!-- Balance History Tab -->
             <div id="balanceHistory" class="tab-content">
                 {% if balance_history %}
                     <table class="history-table">
@@ -177,7 +109,7 @@
                         <tbody>
                         {% for entry in balance_history %}
                             <tr>
-                                <td>{{ entry.timestamp.strftime('%d-%b-%y %H:%M') if entry.timestamp else 'N/A' }}</td>
+                                <td>{{ entry.timestamp.strftime('%d-%b-%Y %H:%M') if entry.timestamp and entry.timestamp.strftime else 'N/A' }}</td>
                                 <td>{{ entry.description }}</td>
                                 <td class="amount">+ ৳ {{ "%.2f"|format(entry.amount) }}</td>
                             </tr>
@@ -188,37 +120,18 @@
                     <p class="no-data">আপনার কোনো ব্যালেন্স লেনদেনের রেকর্ড নেই।</p>
                 {% endif %}
             </div>
-            
-            <a href="#" class="all-tasks-link">সকল কাজ দেখুন এবং আয় করুন</a>
         </div>
     </div>
-
     <script>
-        // JavaScript for Tab functionality
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
+            for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
             tablinks = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
+            for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", "");}
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
-
-        // JavaScript for closing notifications
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('notification-close')) {
-                e.preventDefault();
-                const notificationBar = e.target.parentElement;
-                const notificationId = e.target.getAttribute('data-id');
-                notificationBar.style.display = 'none';
-                fetch(`/api/notification/mark-as-read/${notificationId}`, { method: 'POST' });
-            }
-        });
     </script>
 </body>
 </html>
