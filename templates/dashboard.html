@@ -82,5 +82,100 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- dashboard.html ফাইলের body অংশে নিচের কার্ডগুলো যোগ করুন -->
+
+<!-- ... (আগের প্রোফাইল, ব্যালেন্স, রেফারেল লিঙ্ক, টাস্ক লিস্ট কার্ডগুলো এখানে থাকবে) ... -->
+
+<!-- নতুন: রেফারেল হিস্টোরি কার্ড -->
+<div class="card">
+    <h3>আপনার রেফারেল হিস্টোরি</h3>
+    {% if my_referrals %}
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>তারিখ</th>
+                    <th>জয়েন করেছেন</th>
+                    <th>বোনাস</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for referral in my_referrals %}
+                <tr>
+                    <td>
+                        {% if referral.timestamp and referral.timestamp.strftime %}
+                            {{ referral.timestamp.strftime('%d-%b-%Y') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ referral.referred_user_email }}</td>
+                    <td>৳ {{ "%.2f"|format(referral.reward_amount) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>আপনি এখনো কাউকে সফলভাবে রেফার করেননি।</p>
+    {% endif %}
+</div>
+
+<!-- নতুন: ব্যালেন্স হিস্টোরি কার্ড -->
+<div class="card">
+    <h3>আপনার ব্যালেন্স হিস্টোরি</h3>
+    {% if balance_history %}
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>তারিখ</th>
+                    <th>বিবরণ</th>
+                    <th>পরিমাণ</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for entry in balance_history %}
+                <tr>
+                    <td>
+                        {% if entry.timestamp and entry.timestamp.strftime %}
+                            {{ entry.timestamp.strftime('%d-%b-%Y %H:%M') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ entry.description }}</td>
+                    <td style="color: green; font-weight: bold;">+ ৳ {{ "%.2f"|format(entry.amount) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>আপনার কোনো ব্যালেন্স লেনদেনের রেকর্ড নেই।</p>
+    {% endif %}
+</div>
+
+
+<!-- dashboard.html ফাইলের <style> ট্যাগে নিচের CSS যোগ করুন -->
+<style>
+    /* ... (আপনার আগের সব CSS এখানে থাকবে) ... */
+    
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+    .history-table th, .history-table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    .history-table th {
+        background-color: #f7f7f7;
+        font-weight: 600;
+        color: #555;
+    }
+    .history-table tr:last-child td {
+        border-bottom: none;
+    }
+</style>
 </body>
 </html>
