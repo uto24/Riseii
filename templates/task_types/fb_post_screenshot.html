@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <title>{{ task.title }}</title>
+    <!-- CSS styles for tasks -->
+    <style> /* ... (আপনার কমন CSS) ... */ </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('tasks_page') }}" class="back-link">← সকল কাজে ফিরে যান</a>
+        <div class="card">
+            <h2>{{ task.title }}</h2>
+            <p><strong>পুরস্কার: ৳{{ "%.2f"|format(task.reward) }}</strong></p>
+            <hr>
+            <h3>নির্দেশনা:</h3>
+            <ol>
+                <li>নিচের ছবিটি ডাউনলোড করুন।</li>
+                <li>নিচের ক্যাপশনটি কপি করে আপনার ফেসবুক প্রোফাইল বা পেইজে ছবিটি সহ পোস্ট করুন।</li>
+                <li>আপনার পোস্টের একটি স্ক্রিনশট নিন।</li>
+                <li>নিচে সেই স্ক্রিনশটটি আপলোড করে সাবমিট করুন।</li>
+            </ol>
+            
+            <h4>পোস্টের উপকরণ:</h4>
+            <p><strong>ক্যাপশন:</strong></p>
+            <blockquote style="background:#eee; padding:10px; border-left:3px solid #ccc;">{{ task.caption }}</blockquote>
+            <p><strong>ছবি:</strong></p>
+            <img src="{{ task.image_url }}" alt="Task Image" style="max-width:300px; border-radius:8px;">
+            <br><br>
+            <a href="{{ task.image_url }}" download><button>ছবি ডাউনলোড করুন</button></a>
+        </div>
+        
+        <div class="card">
+            <h3>কাজ জমা দিন</h3>
+            <form id="task-form" method="post">
+                <label for="screenshot-file">স্ক্রিনশট আপলোড করুন:</label>
+                <input type="file" id="screenshot-file" accept="image/*" required>
+                <input type="hidden" id="screenshot-url" name="screenshot_url">
+                <div id="upload-status"></div>
+                <button type="submit" id="submit-button" disabled>প্রথমে আপলোড করুন</button>
+            </form>
+        </div>
+    </div>
+    <script> /* ImgBB আপলোডের জন্য JavaScript কোড এখানে থাকবে */ </script>
+</body>
+</html>
