@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>স্বাগতম - টাস্ক অ্যাপ</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
+        .welcome-container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1877f2; margin-bottom: 15px; }
+        p { color: #555; font-size: 1.1em; }
+        .button-group { margin-top: 30px; }
+        .btn { display: inline-block; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 0 10px; transition: transform 0.2s; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background-color: #1877f2; color: white; }
+        .btn-secondary { background-color: #e4e6eb; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>টাস্ক আর্নিং প্ল্যাটফর্মে স্বাগতম!</h1>
+        <p>সহজ কাজ করে আয় করুন। আজই আমাদের সাথে যোগ দিন।</p>
+        <div class="button-group">
+            <a href="{{ url_for('login') }}" class="btn btn-primary">লগইন করুন</a>
+            <a href="{{ url_for('signup') }}" class="btn btn-secondary">একাউন্ট খুলুন</a>
+        </div>
+    </div>
+</body>
+</html>
