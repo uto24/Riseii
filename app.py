@@ -129,7 +129,8 @@ def mark_notification_as_read(notification_id):
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# --- User-Facing Pages ---
+# app.py ফাইলের dashboard ফাংশনটির সম্পূর্ণ সংশোধিত রূপ
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -142,16 +143,34 @@ def dashboard():
     user = user_doc.to_dict()
     referral_link = url_for('signup', ref=user.get('my_referral_code'), _external=True)
 
-    # Fetching notifications
+    # ১. Fetching notifications (আপনার কোডে এটি আছে)
     notifications_query = db.collection('notifications').where('user_id', '==', user_id).where('is_read', '==', False).order_by('timestamp', direction=firestore.Query.DESCENDING)
     notifications = [dict(doc.to_dict(), **{'id': doc.id}) for doc in notifications_query.stream()]
     
-    # Fetching task submission history
+    # ২. Fetching task submission history (আপনার কোডে এটি আছে)
     submissions_query = db.collection('task_submissions').where('user_id', '==', user_id).order_by('submitted_at', direction=firestore.Query.DESCENDING).limit(10).stream()
     task_history = [doc.to_dict() for doc in submissions_query]
 
-    return render_template('dashboard.html', user=user, referral_link=referral_link, notifications=notifications, task_history=task_history)
+    # --- নতুন করে যোগ করা অংশ ---
+    # ৩. Fetching Referral History
+    referrals_query = db.collection('referrals').where('referrer_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(10).stream()
+    my_referrals = [doc.to_dict() for doc in referrals_query]
 
+    # ৪. Fetching Balance History
+    balance_query = db.collection('balance_history').where('user_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(10).stream()
+    balance_history = [doc.to_dict() for doc in balance_query]
+    # --- নতুন অংশ শেষ ---
+
+    # --- render_template এ নতুন ভেরিয়েবলগুলো যোগ করা ---
+    return render_template(
+        'dashboard.html', 
+        user=user, 
+        referral_link=referral_link, 
+        notifications=notifications, 
+        task_history=task_history,
+        my_referrals=my_referrals,      # <-- এই ভেরিয়েবলটি যোগ করা হয়েছে
+        balance_history=balance_history # <-- এই ভেরিয়েবলটিও যোগ করা হয়েছে
+    )
 @app.route('/tasks')
 @login_required
 def tasks_page():
