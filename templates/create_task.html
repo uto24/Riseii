@@ -23,58 +23,103 @@
         .form-group textarea { resize: vertical; min-height: 100px; }
         .btn-submit { width: 100%; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 17px; margin-top: 10px; background-color: #42b72a; color: white; }
         .back-link { display: block; text-align: center; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
+        
+        /* ডাইনামিক ফিল্ডের জন্য স্টাইল */
+        .extra-fields {
+            display: none; /* ডিফল্টভাবে লুকানো থাকবে */
+            border-left: 3px solid #1877f2;
+            padding-left: 15px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 'manage_tasks' পেইজে ফিরে যাওয়ার লিঙ্ক -->
-        <a href="{{ url_for('manage_tasks') }}" class="back-link">← টাস্ক ম্যানেজমেন্টে ফিরে যান</a>
-        
+        <!-- admin_path ভেরিয়েবলটি app.py থেকে আসছে -->
+        <a href="/{{ admin_path }}" class="back-link">← অ্যাডমিন ড্যাশবোর্ডে ফিরে যান</a>
         <div class="form-container">
             <h2>নতুন টাস্ক তৈরি করুন</h2>
             <form method="post">
+                <!-- সাধারণ ফিল্ড (সব টাস্কের জন্য) -->
                 <div class="form-group">
                     <label for="title">টাস্কের শিরোনাম</label>
-                    <input type="text" id="title" name="title" placeholder="যেমন: আমাদের ফেসবুক পেজে লাইক দিন" required>
+                    <input type="text" id="title" name="title" required>
                 </div>
-                
                 <div class="form-group">
                     <label for="description">টাস্কের বিবরণ</label>
-                    <textarea id="description" name="description" placeholder="টাস্কটি কিভাবে সম্পন্ন করতে হবে তার বিস্তারিত লিখুন" required></textarea>
+                    <textarea id="description" name="description" required></textarea>
                 </div>
-                
                 <div class="form-group">
                     <label for="reward">পুরস্কারের পরিমাণ (টাকা)</label>
-                    <input type="number" id="reward" name="reward" step="0.01" placeholder="যেমন: 5.00" required>
+                    <input type="number" id="reward" name="reward" step="0.01" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="target_url">লক্ষ্য URL (Target URL)</label>
-                    <input type="text" id="target_url" name="target_url" placeholder="যেমন: https://facebook.com/example" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="category">ক্যাটাগরি</label>
-                    <input type="text" id="category" name="category" placeholder="যেমন: Facebook, Website, YouTube" required>
-                </div>
-
+                <!-- টাস্কের ধরণ সিলেক্ট করার ড্রপডাউন -->
                 <div class="form-group">
                     <label for="task_type">টাস্কের ধরণ</label>
-                    <select id="task_type" name="task_type" required>
-                        <option value="screenshot_upload">Screenshot Upload</option>
-                        <option value="website_visit">Website Visit</option>
-                        <!-- ভবিষ্যতে আরও অপশন যোগ করা যেতে পারে -->
+                    <select id="task_type" name="task_type" onchange="showExtraFields()" required>
+                        <option value="">-- একটি ধরণ সিলেক্ট করুন --</option>
+                        <option value="fb_post_screenshot">Facebook Post (Screenshot)</option>
+                        <option value="yt_watch_screenshot">YouTube Watch (Screenshot)</option>
+                        <option value="ad_watch_timer">Ad Watch (Timer)</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="icon_class">আইকন ক্লাস (Font Awesome)</label>
-                    <input type="text" id="icon_class" name="icon_class" placeholder="যেমন: fa-brands fa-facebook" required>
+                <!-- Facebook Post এর জন্য অতিরিক্ত ফিল্ড -->
+                <div id="fb_post_fields" class="extra-fields">
+                    <div class="form-group">
+                        <label for="caption">ফেসবুক পোস্টের ক্যাপশন</label>
+                        <textarea id="caption" name="caption"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="image_url">ছবির URL (ডাউনলোডের জন্য)</label>
+                        <input type="url" id="image_url" name="image_url">
+                    </div>
                 </div>
-                
+
+                <!-- YouTube Watch এর জন্য অতিরিক্ত ফিল্ড -->
+                <div id="yt_watch_fields" class="extra-fields">
+                    <div class="form-group">
+                        <label for="yt_target_url">ইউটিউব ভিডিওর URL</label>
+                        <input type="url" id="yt_target_url" name="yt_target_url">
+                    </div>
+                </div>
+
+                <!-- Ad Watch এর জন্য অতিরিক্ত ফিল্ড -->
+                <div id="ad_watch_fields" class="extra-fields">
+                    <div class="form-group">
+                        <label for="ad_target_url">বিজ্ঞাপনের লিঙ্ক (URL)</label>
+                        <input type="url" id="ad_target_url" name="ad_target_url">
+                    </div>
+                    <div class="form-group">
+                        <label for="timer_duration">টাইমারের সময় (সেকেন্ড)</label>
+                        <input type="number" id="timer_duration" name="timer_duration" value="30">
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-submit">টাস্ক তৈরি করুন</button>
             </form>
         </div>
     </div>
+
+    <script>
+        function showExtraFields() {
+            // প্রথমে সব অতিরিক্ত ফিল্ড লুকিয়ে ফেলা
+            document.getElementById('fb_post_fields').style.display = 'none';
+            document.getElementById('yt_watch_fields').style.display = 'none';
+            document.getElementById('ad_watch_fields').style.display = 'none';
+
+            // সিলেক্ট করা টাস্কের ধরণ অনুযায়ী নির্দিষ্ট ফিল্ড দেখানো
+            const selectedType = document.getElementById('task_type').value;
+
+            if (selectedType === 'fb_post_screenshot') {
+                document.getElementById('fb_post_fields').style.display = 'block';
+            } else if (selectedType === 'yt_watch_screenshot') {
+                document.getElementById('yt_watch_fields').style.display = 'block';
+            } else if (selectedType === 'ad_watch_timer') {
+                document.getElementById('ad_watch_fields').style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
