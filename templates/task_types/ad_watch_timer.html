@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <title>{{ task.title }}</title>
+    <!-- CSS -->
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('tasks_page') }}" class="back-link">← সকল কাজে ফিরে যান</a>
+        <div class="card">
+            <h2>{{ task.title }}</h2>
+            <p><strong>পুরস্কার: ৳{{ "%.2f"|format(task.reward) }}</strong></p>
+            <hr>
+            <h3>নির্দেশনা:</h3>
+            <p>নিচের বাটনে ক্লিক করে বিজ্ঞাপনটি দেখুন। একটি টাইমার শুরু হবে। টাইমার শেষ হলে 'কাজ জমা দিন' বাটনটি সক্রিয় হবে।</p>
+            
+            <button id="start-ad-btn">বিজ্ঞাপন দেখা শুরু করুন</button>
+            
+            <h3 id="timer-display" style="text-align:center; font-size: 2em; margin-top: 20px; display:none;"></h3>
+
+            <form method="post" id="task-form" style="display:none;">
+                <p>আপনি সফলভাবে বিজ্ঞাপনটি দেখেছেন।</p>
+                <button type="submit">কাজ জমা দিন</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const startBtn = document.getElementById('start-ad-btn');
+        const timerDisplay = document.getElementById('timer-display');
+        const taskForm = document.getElementById('task-form');
+        const adUrl = "{{ task.target_url }}";
+        let timerDuration = parseInt("{{ task.timer_duration }}");
+
+        startBtn.addEventListener('click', function() {
+            // নতুন ট্যাবে বিজ্ঞাপন ওপেন করা
+            window.open(adUrl, '_blank');
+            
+            // বাটন লুকিয়ে ফেলা এবং টাইমার দেখানো
+            startBtn.style.display = 'none';
+            timerDisplay.style.display = 'block';
+            
+            let timeLeft = timerDuration;
+            timerDisplay.textContent = timeLeft;
+            
+            const countdown = setInterval(function() {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    timerDisplay.textContent = 'সম্পন্ন!';
+                    taskForm.style.display = 'block'; // ফর্ম দেখানো
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
