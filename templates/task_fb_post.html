@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ task.title }}</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { color: #1877f2; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .task-card { border: 1px solid #ddd; padding: 20px; margin-bottom: 15px; border-radius: 8px; }
+        .task-card h3 { margin-top: 0; color: #333; }
+        .task-card ol { padding-left: 20px; }
+        .task-card blockquote { background: #e9ebee; border-left: 5px solid #ccc; padding: 10px; margin: 10px 0; }
+        .task-image { max-width: 100%; border-radius: 5px; margin: 15px 0; }
+        input[type=file] { border: 1px solid #ccc; display: block; width: 100%; padding: 10px; border-radius: 6px; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 20px; }
+        .btn-primary { background-color: #1877f2; color: white; }
+        .btn-secondary { background-color: #34A853; color: white; margin-top: 0; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('dashboard') }}" class="back-link">← ড্যাশবোর্ডে ফিরে যান</a>
+        <h2>{{ task.title }}</h2>
+
+        <div class="task-card">
+            <h3>নির্দেশনা:</h3>
+            <ol>
+                <li>নিচের ছবিটি ডাউনলোড করুন।</li>
+                <li>আপনার ফেসবুকে ছবিটি পোস্ট করুন এবং এই ক্যাপশনটি দিন: <br> <blockquote>{{ task.caption }}</blockquote></li>
+                <li>আপনার পোস্টের একটি স্ক্রিনশট নিন।</li>
+                <li>নিচে সেই স্ক্রিনশটটি আপলোড করে সাবমিট করুন।</li>
+            </ol>
+        </div>
+
+        <div class="task-card">
+            <h3>কাজের উপকরণ (Materials):</h3>
+            <img src="{{ task.image_url }}" alt="Image to post" class="task-image">
+            <a href="{{ task.image_url }}" download><button class="btn-secondary">ছবি ডাউনলোড করুন</button></a>
+        </div>
+
+        <div class="task-card">
+            <h3>আপনার কাজ জমা দিন:</h3>
+            <form method="post" enctype="multipart/form-data">
+                <label for="screenshot">স্ক্রিনশট আপলোড করুন:</label>
+                <input type="file" id="screenshot" name="screenshot" accept="image/*" required>
+                <button type="submit" class="btn-primary">টাস্ক জমা দিন</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
