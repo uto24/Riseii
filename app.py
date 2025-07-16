@@ -188,27 +188,40 @@ def tasks_page():
 @login_required
 def view_task(task_id):
     task_ref = db.collection('tasks').document(task_id)
-    task = task_ref.get().to_dict()
-    if not task:
+    task_doc = task_ref.get()
+    if not task_doc.exists:
         flash("টাস্কটি খুঁজে পাওয়া যায়নি।", "error")
         return redirect(url_for('tasks_page'))
     
+    task = task_doc.to_dict()
+    
     if request.method == 'POST':
-        submission_data = {'user_id': session['user_id'], 'task_id': task_id, 'task_title': task.get('title'), 'reward': task.get('reward'), 'status': 'pending', 'submitted_at': firestore.SERVER_TIMESTAMP}
-        if task.get('task_type') == 'screenshot_upload':
+        submission_data = {
+            'user_id': session['user_id'], 'task_id': task_id,
+            'task_title': task.get('title'), 'reward': task.get('reward'),
+            'status': 'pending', 'submitted_at': firestore.SERVER_TIMESTAMP
+        }
+        
+        # টাস্কের ধরণ অনুযায়ী প্রুফ গ্রহণ
+        task_type = task.get('task_type')
+        if task_type in ['fb_post_screenshot', 'yt_watch_screenshot']:
             proof_url = request.form.get('screenshot_url')
             if not proof_url:
                 flash("স্ক্রিনশট আপলোড ব্যর্থ হয়েছে।", "error")
                 return redirect(url_for('view_task', task_id=task_id))
             submission_data['proof'] = {'screenshot_url': proof_url}
+        elif task_type == 'ad_watch_timer':
+            # টাইমার টাস্কের জন্য কোনো প্রুফ নেই, এটি স্বয়ংক্রিয়ভাবে সম্পন্ন হবে (ভবিষ্যতের জন্য)
+            # আপাতত এটিকে পেন্ডিং হিসেবেই রাখা হচ্ছে অ্যাডমিন রিভিউ এর জন্য
+            submission_data['proof'] = {'completed': True}
+
         db.collection('task_submissions').add(submission_data)
         flash("আপনার কাজ জমা দেওয়া হয়েছে। পর্যালোচনার পর ব্যালেন্স যোগ করা হবে।", "success")
         return redirect(url_for('tasks_page'))
 
-    template_file = f"task_types/{task.get('task_type', 'unknown')}_task.html"
-    return render_template(template_file, task=task, task_id=task_id)
-
-
+    # টাস্কের ধরণ অনুযায়ী সঠিক টেমপ্লেট ফাইল রেন্ডার করা
+    template_name = f"task_types/{task.get('task_type', 'default')}.html"
+    return render_template(template_name, task=task, task_id=task_id)
 # --- UNIQUE LINK ADMIN PANEL ---
 @app.route(f'/{SECRET_ADMIN_PATH}')
 def admin_dashboard():
@@ -254,14 +267,34 @@ def manage_tasks():
     all_tasks = [dict(task.to_dict(), **{'id': task.id}) for task in tasks_query]
     return render_template('manage_tasks.html', all_tasks=all_tasks, admin_path=SECRET_ADMIN_PATH)
 
+# create_task.html এর জন্য একটি উন্নত ফর্ম লাগবে যা এই সব ফিল্ড দেখাবে
 @app.route(f'/{SECRET_ADMIN_PATH}/create-task', methods=['GET', 'POST'])
 def create_task():
     if request.method == 'POST':
-        db.collection('tasks').add({'title': request.form['title'], 'description': request.form['description'], 'category': request.form['category'], 'task_type': request.form['task_type'], 'reward': float(request.form['reward']), 'target_url': request.form['target_url'], 'status': 'active', 'icon_class': request.form['icon_class'], 'created_at': firestore.SERVER_TIMESTAMP})
-        flash('নতুন টাস্ক সফলভাবে তৈরি করা হয়েছে।', 'success')
-        return redirect(url_for('manage_tasks'))
-    return render_template('create_task.html', admin_path=SECRET_ADMIN_PATH)
+        task_data = {
+            'title': request.form['title'],
+            'description': request.form['description'],
+            'reward': float(request.form['reward']),
+            'task_type': request.form['task_type'],
+            'status': 'active',
+            'created_at': firestore.SERVER_TIMESTAMP
+        }
+        
+        # টাস্কের ধরণ অনুযায়ী অতিরিক্ত ডেটা যোগ করা
+        if task_data['task_type'] == 'fb_post_screenshot':
+            task_data['caption'] = request.form.get('caption', '')
+            task_data['image_url'] = request.form.get('image_url', '')
+        elif task_data['task_type'] == 'ad_watch_timer':
+            task_data['target_url'] = request.form.get('target_url', '')
+            task_data['timer_duration'] = int(request.form.get('timer_duration', 30))
+        elif task_data['task_type'] == 'yt_watch_screenshot':
+            task_data['target_url'] = request.form.get('target_url', '')
 
+        db.collection('tasks').add(task_data)
+        flash('নতুন টাস্ক সফলভাবে তৈরি করা হয়েছে।', 'success')
+        return redirect(url_for('manage_tasks')) # manage_tasks একটি নতুন রুট হবে
+        
+    return render_template('create_task.html', admin_path=SECRET_ADMIN_PATH)
 @app.route(f'/{SECRET_ADMIN_PATH}/edit-task/<task_id>', methods=['GET', 'POST'])
 def edit_task(task_id):
     task_ref = db.collection('tasks').document(task_id)
