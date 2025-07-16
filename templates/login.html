@@ -1,114 +1,254 @@
-{% extends "layout.html" %}
-{% block title %}লগইন{% endblock %}
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>লগইন করুন - টাস্ক অ্যাপ</title>
+    <!-- Font Awesome for Google Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .login-container {
+            max-width: 400px;
+            width: 100%;
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .login-container h2 {
+            color: #1c1e21;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+        .flash {
+            padding: 1em;
+            margin-bottom: 1em;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+        }
+        .flash.success { background-color: #42b72a; }
+        .flash.error { background-color: #fa3e3e; }
+        .flash.info { background-color: #1877f2; }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #606770;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 17px;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #1877f2;
+            color: white;
+        }
+        .btn-primary:disabled {
+            background-color: #9fbeec;
+            cursor: not-allowed;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #166fe5;
+        }
+        .btn-google {
+            background-color: #4285F4;
+            color: white;
+        }
+        .btn-google:hover {
+            background-color: #3367D6;
+        }
+        .divider {
+            text-align: center;
+            border-bottom: 1px solid #dadde1;
+            line-height: 0.1em;
+            margin: 25px 0;
+            color: #8a8d91;
+        }
+        .divider span {
+            background: #fff;
+            padding: 0 10px;
+        }
+        .signup-link {
+            margin-top: 25px;
+            font-size: 15px;
+        }
+        .signup-link a {
+            color: #1877f2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>আপনার একাউন্টে লগইন করুন</h2>
 
-{% block content %}
-    <nav>
-        <a href="{{ url_for('index') }}">হোম</a>
-        <a href="{{ url_for('signup') }}">সাইনআপ</a>
-    </nav>
+        <!-- Flash messages for server-side notifications -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <h2>আপনার একাউন্টে লগইন করুন</h2>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="flash {{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+        <!-- Client-side error/status message -->
+        <div id="client-message" class="flash" style="display: none;"></div>
 
-    <form id="login-form">
-        <label for="email">ইমেইল</label>
-        <input type="email" id="email" name="email" required>
+        <!-- Email/Password Login Form -->
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">ইমেইল</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">পাসওয়ার্ড</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" id="login-button" class="btn btn-primary">লগইন</button>
+        </form>
         
-        <label for="password">পাসওয়ার্ড</label>
-        <input type="password" id="password" name="password" required>
-        
-        <button type="submit" class="btn-primary">লগইন</button>
-    </form>
-    
-    <div class="divider"><span>অথবা</span></div>
+        <div class="divider"><span>অথবা</span></div>
 
-    <button id="google-signin-btn" class="btn-google">
-        <i class="fab fa-google"></i> Google দিয়ে লগইন করুন
-    </button>
-{% endblock %}
+        <!-- Google Login Button -->
+        <button id="google-signin-btn" class="btn btn-google">
+            <i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান
+        </button>
 
-{% block scripts %}
+        <div class="signup-link">
+            একাউন্ট নেই? <a href="{{ url_for('signup') }}">নতুন একাউন্ট খুলুন</a>
+        </div>
+    </div>
+
     <!-- Firebase SDK Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     
     <script>
+        // --- Firebase Configuration ---
+        // This config object is populated by the server (app.py)
         const firebaseConfig = {
-            apiKey: "{{ firebase_api_key }}",
-            authDomain: "{{ os.getenv('FIREBASE_PROJECT_ID') }}.firebaseapp.com",
-            projectId: "{{ os.getenv('FIREBASE_PROJECT_ID') }}",
-            storageBucket: "{{ os.getenv('FIREBASE_STORAGE_BUCKET') }}",
-            messagingSenderId: "{{ os.getenv('FIREBASE_MESSAGING_SENDER_ID') }}",
-            appId: "{{ os.getenv('FIREBASE_APP_ID') }}"
+            apiKey: "{{ config.firebase_api_key }}",
+            authDomain: "{{ config.firebase_auth_domain }}",
+            projectId: "{{ config.firebase_project_id }}",
+            messagingSenderId: "{{ config.firebase_messaging_sender_id }}",
+            appId: "{{ config.firebase_app_id }}"
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Email/Password Login
-        document.getElementById('login-form').addEventListener('submit', function(e) {
+        // --- DOM Elements ---
+        const loginForm = document.getElementById('login-form');
+        const loginButton = document.getElementById('login-button');
+        const googleButton = document.getElementById('google-signin-btn');
+        const clientMessage = document.getElementById('client-message');
+
+        // --- Helper Function to show messages ---
+        function showMessage(text, type = 'error') {
+            clientMessage.textContent = text;
+            clientMessage.className = `flash ${type}`;
+            clientMessage.style.display = 'block';
+        }
+
+        // --- Helper function to handle server session creation ---
+        function createServerSession(idToken) {
+            return fetch('/api/set_session', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({idToken: idToken})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = data.redirect_url;
+                } else {
+                    throw new Error(data.message || 'Server session could not be created.');
+                }
+            });
+        }
+
+        // --- Event Listener for Email/Password Login ---
+        loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
+            // Disable button and show loading state
+            loginButton.disabled = true;
+            loginButton.textContent = 'প্রসেসিং...';
+            clientMessage.style.display = 'none';
+
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    return userCredential.user.getIdToken();
-                })
-                .then((idToken) => {
-                    return fetch('/auth/set_session', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({idToken: idToken})
-                    });
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        alert('Login failed: ' + data.message);
+                .then(userCredential => userCredential.user.getIdToken())
+                .then(idToken => createServerSession(idToken))
+                .catch(error => {
+                    // Handle login errors
+                    let friendlyMessage = 'ভুল ইমেইল অথবা পাসওয়ার্ড।';
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        // Keep the message generic for security
+                        friendlyMessage = 'আপনার দেওয়া ইমেইল বা পাসওয়ার্ডটি ভুল।';
                     }
+                    showMessage(friendlyMessage, 'error');
                 })
-                .catch((error) => {
-                    alert('Error: ' + error.message);
+                .finally(() => {
+                    // Re-enable button
+                    loginButton.disabled = false;
+                    loginButton.textContent = 'লগইন';
                 });
         });
 
-        // Google Sign-In
-        document.getElementById('google-signin-btn').addEventListener('click', function() {
+        // --- Event Listener for Google Sign-In ---
+        googleButton.addEventListener('click', function() {
             const provider = new firebase.auth.GoogleAuthProvider();
+            
             auth.signInWithPopup(provider)
-                .then((result) => {
-                    return result.user.getIdToken();
-                })
-                .then((idToken) => {
-                    return fetch('/auth/google', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({idToken: idToken})
-                    });
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        alert('Google login failed: ' + data.message);
-                    }
-                })
-                .catch((error) => {
+                .then(result => result.user.getIdToken())
+                .then(idToken => createServerSession(idToken))
+                .catch(error => {
+                    // Handle Google sign-in errors
                     console.error("Google Sign-In Error: ", error);
-                    alert("Google Sign-In Error: " + error.message);
+                    let friendlyMessage = 'Google দিয়ে লগইন করা সম্ভব হয়নি।';
+                    if (error.code === 'auth/popup-closed-by-user') {
+                        friendlyMessage = 'আপনি লগইন পপ-আপটি বন্ধ করে দিয়েছেন।';
+                    }
+                    showMessage(friendlyMessage, 'error');
                 });
         });
+
     </script>
-{% endblock %}
+</body>
+</html>
