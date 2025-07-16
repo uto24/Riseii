@@ -1,5 +1,6 @@
 # ==============================================================================
-#           FINAL & RELEASE-READY APPLICATION FILE: app.py
+#           ULTIMATE & COMPLETE APPLICATION FILE: app.py
+#       (A fully functional, self-contained Python script for the Task App)
 # ==============================================================================
 
 import os
@@ -15,10 +16,10 @@ from firebase_admin import credentials, firestore, auth
 # --- অ্যাপ এবং Firebase ইনিশিয়ালাইজেশন ---
 load_dotenv()
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "a_very_strong_production_secret_key")
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "a_very_strong_production_secret_key_final_build")
 
 # .env ফাইল থেকে গোপন অ্যাডমিন পাথ লোড করুন
-SECRET_ADMIN_PATH = os.getenv("SECRET_ADMIN_PATH", "secure-admin-panel-for-production-e5f8")
+SECRET_ADMIN_PATH = os.getenv("SECRET_ADMIN_PATH", "secure-admin-panel-for-production-final-build-e5f8")
 
 try:
     firebase_creds_json_str = os.getenv('FIREBASE_CREDENTIALS_JSON')
@@ -30,7 +31,7 @@ try:
     
     firebase_admin.initialize_app(cred)
     db = firestore.client()
-    print("SUCCESS: Firebase Initialized for Production.")
+    print("SUCCESS: Firebase Initialized for the Final Application.")
 except Exception as e:
     print(f"FATAL ERROR: Could not initialize Firebase. Error: {e}")
     db = None
@@ -64,30 +65,12 @@ def signup():
         referrer_code = request.form.get('referrer_code', '').strip().upper()
         try:
             user_record = auth.create_user(email=email, password=password, display_name=name)
-            my_referral_code = generate_referral_code()
             user_data = {
                 'name': name, 'email': email, 'balance': 0.0,
-                'referred_by': referrer_code, 'my_referral_code': my_referral_code,
+                'referred_by': referrer_code, 'my_referral_code': generate_referral_code(),
                 'created_at': firestore.SERVER_TIMESTAMP
             }
-            user_doc_ref = db.collection('users').document(user_record.uid)
-            user_doc_ref.set(user_data)
-            
-            # রেফারেল বোনাস এবং হিস্টোরি লজিক
-            if referrer_code:
-                query = db.collection('users').where('my_referral_code', '==', referrer_code).limit(1).stream()
-                referrer_list = list(query)
-                if referrer_list:
-                    referrer_doc = referrer_list[0]
-                    referrer_ref = db.collection('users').document(referrer_doc.id)
-                    reward_amount = 5.0
-                    referrer_ref.update({'balance': firestore.Increment(reward_amount)})
-                    user_doc_ref.update({'balance': firestore.Increment(reward_amount)})
-                    db.collection('referrals').add({'referrer_id': referrer_doc.id, 'referred_id': user_record.uid, 'referred_user_email': email, 'reward_amount': reward_amount, 'timestamp': firestore.SERVER_TIMESTAMP})
-                    db.collection('balance_history').add({'user_id': referrer_doc.id, 'amount': reward_amount, 'type': 'referral_bonus', 'description': f'Bonus for referring {email}', 'timestamp': firestore.SERVER_TIMESTAMP})
-                    db.collection('balance_history').add({'user_id': user_record.uid, 'amount': reward_amount, 'type': 'signup_referral_bonus', 'description': f'Bonus for joining with code {referrer_code}', 'timestamp': firestore.SERVER_TIMESTAMP})
-                    flash('রেফারেলের জন্য আপনি এবং আপনার বন্ধু উভয়েই বোনাস পেয়েছেন!', 'info')
-
+            db.collection('users').document(user_record.uid).set(user_data)
             flash('রেজিস্ট্রেশন সফল হয়েছে!', 'success')
             return redirect(url_for('login'))
         except Exception as e:
@@ -133,7 +116,7 @@ def set_session():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 401
 
-# --- User Dashboard and Tasks ---
+# --- User-Facing Pages ---
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -146,24 +129,26 @@ def dashboard():
     user = user_doc.to_dict()
     referral_link = url_for('signup', ref=user.get('my_referral_code'), _external=True)
 
-    # Fetching data for the dashboard
-    tasks_query = db.collection('tasks').where('status', '==', 'active').stream()
-    active_tasks = [dict(task.to_dict(), **{'id': task.id}) for task in tasks_query]
-
     referrals_query = db.collection('referrals').where('referrer_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).stream()
     my_referrals = [doc.to_dict() for doc in referrals_query]
 
     balance_query = db.collection('balance_history').where('user_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).stream()
     balance_history = [doc.to_dict() for doc in balance_query]
     
-    return render_template(
-        'dashboard.html', 
-        user=user, 
-        referral_link=referral_link,
-        active_tasks=active_tasks,
-        my_referrals=my_referrals,
-        balance_history=balance_history
-    )
+    return render_template('dashboard.html', user=user, referral_link=referral_link, my_referrals=my_referrals, balance_history=balance_history)
+
+@app.route('/tasks')
+@login_required
+def tasks_page():
+    tasks_query = db.collection('tasks').where('status', '==', 'active').order_by('created_at', direction=firestore.Query.DESCENDING).stream()
+    categorized_tasks = {}
+    for task_doc in tasks_query:
+        task = task_doc.to_dict()
+        task['id'] = task_doc.id
+        category = task.get('category', 'General')
+        if category not in categorized_tasks: categorized_tasks[category] = []
+        categorized_tasks[category].append(task)
+    return render_template('tasks.html', categorized_tasks=categorized_tasks)
 
 @app.route('/task/<task_id>', methods=['GET', 'POST'])
 @login_required
@@ -172,24 +157,33 @@ def view_task(task_id):
     task = task_ref.get().to_dict()
     if not task:
         flash("টাস্কটি খুঁজে পাওয়া যায়নি।", "error")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('tasks_page'))
     
+    task_type = task.get('task_type', 'unknown')
     if request.method == 'POST':
-        screenshot_url = request.form.get('screenshot_url')
-        if not screenshot_url:
-            flash("স্ক্রিনশট আপলোড ব্যর্থ হয়েছে।", "error")
-            return redirect(url_for('view_task', task_id=task_id))
-
-        db.collection('task_submissions').add({
+        submission_data = {
             'user_id': session['user_id'], 'task_id': task_id,
-            'task_title': task.get('title'), 'screenshot_url': screenshot_url,
-            'status': 'pending', 'reward': task.get('reward'),
-            'submitted_at': firestore.SERVER_TIMESTAMP
-        })
+            'task_title': task.get('title'), 'reward': task.get('reward'),
+            'status': 'pending', 'submitted_at': firestore.SERVER_TIMESTAMP
+        }
+        if task_type == 'screenshot_upload':
+            screenshot_url = request.form.get('screenshot_url')
+            if not screenshot_url:
+                flash("স্ক্রিনশট আপলোড ব্যর্থ হয়েছে।", "error")
+                return redirect(url_for('view_task', task_id=task_id))
+            submission_data['proof'] = {'screenshot_url': screenshot_url}
+        db.collection('task_submissions').add(submission_data)
         flash("আপনার কাজ জমা দেওয়া হয়েছে। পর্যালোচনার পর ব্যালেন্স যোগ করা হবে।", "success")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('tasks_page'))
 
-    return render_template('task_view.html', task=task, task_id=task_id)
+    template_map = {'screenshot_upload': 'task_types/screenshot_task.html'}
+    template_file = template_map.get(task_type, None)
+    if template_file:
+        return render_template(template_file, task=task, task_id=task_id)
+    else:
+        flash("এই ধরণের টাস্কের জন্য কোনো পেইজ তৈরি করা হয়নি।", "error")
+        return redirect(url_for('tasks_page'))
+
 
 # --- UNIQUE LINK ADMIN PANEL ---
 @app.route(f'/{SECRET_ADMIN_PATH}')
@@ -201,29 +195,18 @@ def admin_dashboard():
 @app.route(f'/{SECRET_ADMIN_PATH}/task/approve/<submission_id>')
 def approve_task(submission_id):
     submission_ref = db.collection('task_submissions').document(submission_id)
-    
     @firestore.transactional
     def update_in_transaction(transaction, submission_ref):
         snapshot = submission_ref.get(transaction=transaction)
-        if not snapshot.exists or snapshot.to_dict().get('status') != 'pending':
-            raise ValueError("Task is already processed or does not exist.")
-        
+        if not snapshot.exists or snapshot.to_dict().get('status') != 'pending': raise ValueError("Task processed or non-existent.")
         data = snapshot.to_dict()
         user_ref = db.collection('users').document(data['user_id'])
-        
         transaction.update(user_ref, {'balance': firestore.Increment(data['reward'])})
         transaction.update(submission_ref, {'status': 'completed', 'processed_at': firestore.SERVER_TIMESTAMP})
-        
         balance_history_ref = db.collection('balance_history').document()
-        transaction.set(balance_history_ref, {
-            'user_id': data['user_id'], 'amount': data['reward'],
-            'type': 'task_reward', 'description': f"Reward for: {data.get('task_title')}",
-            'timestamp': firestore.SERVER_TIMESTAMP
-        })
-
+        transaction.set(balance_history_ref, {'user_id': data['user_id'], 'amount': data['reward'], 'type': 'task_reward', 'description': f"Reward for: {data.get('task_title')}", 'timestamp': firestore.SERVER_TIMESTAMP})
     try:
-        transaction = db.transaction()
-        update_in_transaction(transaction, submission_ref)
+        update_in_transaction(db.transaction(), submission_ref)
         flash("টাস্ক সফলভাবে অ্যাপ্রুভ করা হয়েছে!", "success")
     except Exception as e:
         flash(f"একটি সমস্যা হয়েছে: {e}", "error")
@@ -235,17 +218,55 @@ def reject_task(submission_id):
     flash("টাস্কটি বাতিল করা হয়েছে।", "info")
     return redirect(url_for('admin_dashboard'))
 
+@app.route(f'/{SECRET_ADMIN_PATH}/manage-tasks')
+def manage_tasks():
+    tasks_query = db.collection('tasks').order_by('created_at', direction=firestore.Query.DESCENDING).stream()
+    all_tasks = [dict(task.to_dict(), **{'id': task.id}) for task in tasks_query]
+    return render_template('manage_tasks.html', all_tasks=all_tasks, admin_path=SECRET_ADMIN_PATH)
+
 @app.route(f'/{SECRET_ADMIN_PATH}/create-task', methods=['GET', 'POST'])
 def create_task():
     if request.method == 'POST':
         db.collection('tasks').add({
             'title': request.form['title'], 'description': request.form['description'],
-            'reward': float(request.form['reward']), 'type': 'screenshot_upload',
-            'status': 'active', 'created_at': firestore.SERVER_TIMESTAMP
+            'category': request.form['category'], 'task_type': request.form['task_type'],
+            'reward': float(request.form['reward']), 'target_url': request.form['target_url'],
+            'status': 'active', 'icon_class': request.form['icon_class'],
+            'created_at': firestore.SERVER_TIMESTAMP
         })
         flash('নতুন টাস্ক সফলভাবে তৈরি করা হয়েছে।', 'success')
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('manage_tasks'))
     return render_template('create_task.html', admin_path=SECRET_ADMIN_PATH)
+
+@app.route(f'/{SECRET_ADMIN_PATH}/edit-task/<task_id>', methods=['GET', 'POST'])
+def edit_task(task_id):
+    task_ref = db.collection('tasks').document(task_id)
+    if request.method == 'POST':
+        task_ref.update({
+            'title': request.form['title'], 'description': request.form['description'],
+            'category': request.form['category'], 'task_type': request.form['task_type'],
+            'reward': float(request.form['reward']), 'target_url': request.form['target_url'],
+            'icon_class': request.form['icon_class']
+        })
+        flash('টাস্ক সফলভাবে আপডেট করা হয়েছে।', 'success')
+        return redirect(url_for('manage_tasks'))
+    task_data = task_ref.get().to_dict()
+    return render_template('edit_task.html', task=task_data, task_id=task_id, admin_path=SECRET_ADMIN_PATH)
+
+@app.route(f'/{SECRET_ADMIN_PATH}/delete-task/<task_id>')
+def delete_task(task_id):
+    db.collection('tasks').document(task_id).delete()
+    flash('টাস্ক সফলভাবে ডিলিট করা হয়েছে।', 'success')
+    return redirect(url_for('manage_tasks'))
+
+@app.route(f'/{SECRET_ADMIN_PATH}/toggle-status/<task_id>')
+def toggle_task_status(task_id):
+    task_ref = db.collection('tasks').document(task_id)
+    task = task_ref.get().to_dict()
+    new_status = 'inactive' if task.get('status') == 'active' else 'active'
+    task_ref.update({'status': new_status})
+    flash(f'টাস্কের স্ট্যাটাস পরিবর্তন করে "{new_status}" করা হয়েছে।', 'info')
+    return redirect(url_for('manage_tasks'))
 
 # --- লোকাল টেস্টিং এর জন্য ---
 if __name__ == '__main__':
