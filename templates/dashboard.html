@@ -1,181 +1,122 @@
-<!-- templates/dashboard.html এর আপডেট করা কোড -->
 <!doctype html>
 <html lang="bn">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ড্যাশবোর্ড</title>
-    <!-- এখানে আপনার CSS স্টাইলগুলো থাকবে -->
+    <title>ড্যাশবোর্ড - {{ user.name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; }
-        .container { max-width: 700px; margin: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .header h2 { margin: 0; color: #333; }
-        .header .logout-btn { color: #1877f2; text-decoration: none; font-weight: bold; }
-        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .card h3 { margin-top: 0; color: #1877f2; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .balance-card .balance-amount { font-size: 2.5em; font-weight: bold; color: #4CAF50; margin: 10px 0; }
-        .referral-link { padding: 10px; background: #e9ebee; border: 1px dashed #ccc; border-radius: 4px; word-wrap: break-word; user-select: all; }
+        .container { max-width: 800px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; }
+        .header h2 { margin: 0; color: #1c1e21; font-size: 22px; }
+        .nav-links a { color: #1877f2; text-decoration: none; font-weight: 600; margin-left: 20px; }
+        .nav-links a.admin-link { color: #e44d26; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card h3 { margin-top: 0; font-size: 18px; color: #1877f2; border-bottom: 1px solid #e9ebee; padding-bottom: 12px; margin-bottom: 20px; }
+        .balance-card { text-align: center; }
+        .balance-card .balance-amount { font-size: 2.8em; font-weight: 700; color: #36a420; margin: 10px 0; }
+        .referral-link { padding: 12px; background: #e9ebee; border: 1px dashed #ced0d4; border-radius: 6px; word-wrap: break-word; user-select: all; font-family: 'Courier New', Courier, monospace; }
         .task-list a { text-decoration: none; }
-        .task-item { display: block; background: #f7f7f7; padding: 15px; border-radius: 6px; margin-bottom: 10px; color: #333; transition: background-color 0.2s; }
-        .task-item:hover { background-color: #e9ebee; }
-        .task-history ul { list-style-type: none; padding: 0; }
-        .task-history li { background: #f9f9f9; padding: 10px; border-radius: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .task-item { display: flex; justify-content: space-between; align-items: center; background: #f7f7f7; padding: 18px; border-radius: 8px; margin-bottom: 10px; color: #1c1e21; transition: transform 0.2s, box-shadow 0.2s; }
+        .task-item:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .task-item strong { font-size: 16px; }
+        .task-reward { font-weight: 600; color: #36a420; }
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .history-table th, .history-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e9ebee; }
+        .history-table th { background-color: #f0f2f5; font-weight: 600; color: #606770; font-size: 14px; }
+        .history-table tr:last-child td { border-bottom: none; }
+        .history-table td { color: #3c4043; font-size: 15px; }
+        .history-table .amount { font-weight: 600; color: #36a420; }
+        .no-data { color: #8a8d91; text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <!-- user অবজেক্ট আছে কিনা চেক করা হচ্ছে -->
-            <h2>স্বাগতম, {{ user.name if user else 'Guest' }}!</h2>
-            <a href="{{ url_for('logout') }}" class="logout-btn">লগআউট</a>
+            <h2>স্বাগতম, {{ user.name | e }}!</h2>
+            <div class="nav-links">
+                {% if session.user_role == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="admin-link">অ্যাডমিন প্যানেল</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">লগআউট</a>
+            </div>
         </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <div class="card balance-card">
             <h3>আপনার বর্তমান ব্যালেন্স</h3>
-            <!-- user এবং user.balance আছে কিনা চেক করা হচ্ছে -->
-            <p class="balance-amount">৳ {{ "%.2f"|format(user.balance) if user and user.balance is defined else '0.00' }}</p>
+            <p class="balance-amount">৳ {{ "%.2f"|format(user.balance) }}</p>
         </div>
 
         <div class="card">
             <h3>আপনার রেফারেল প্রোগ্রাম</h3>
             <p>আপনার বন্ধুদের এই লিঙ্কটি শেয়ার করুন। তারা জয়েন করলে আপনারা উভয়েই বোনাস পাবেন।</p>
-            <!-- referral_link ভেরিয়েবল আছে কিনা চেক করা হচ্ছে -->
-            {% if referral_link %}
-                <p><strong>শেয়ার করার লিঙ্ক:</strong></p>
-                <p class="referral-link">{{ referral_link }}</p>
-            {% endif %}
+            <p class="referral-link" title="Copy to clipboard">{{ referral_link }}</p>
         </div>
 
         <div class="card task-list">
             <h3>কাজ সমূহ (Available Tasks)</h3>
-            <a href="{{ url_for('task_fb_post') }}">
-                <div class="task-item">
-                    <strong>ফেসবুক পোস্ট টাস্ক</strong> - আয় করুন ৳১০.০০
-                </div>
-            </a>
+            {% if active_tasks %}
+                {% for task in active_tasks %}
+                    <a href="{{ url_for('view_task', task_id=task.id) }}">
+                        <div class="task-item">
+                            <strong>{{ task.title }}</strong>
+                            <span class="task-reward">আয় করুন ৳{{ "%.2f"|format(task.reward) }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p class="no-data">বর্তমানে কোনো নতুন কাজ নেই। পরে আবার চেষ্টা করুন।</p>
+            {% endif %}
         </div>
 
-        <div class="card task-history">
-            <h3>আপনার কাজের ইতিহাস</h3>
-            {% if task_history %}
-                <ul>
-                {% for task in task_history %}
-                    <li>
-                        <span>
-                            <!-- submitted_at অবজেক্ট এবং strftime মেথড আছে কিনা চেক করা হচ্ছে -->
-                            {% if task.submitted_at and task.submitted_at.strftime %}
-                                {{ task.submitted_at.strftime('%d-%b-%Y') }}
-                            {% else %}
-                                Pending Date
-                            {% endif %}
-                            - {{ task.task_type or 'Unknown Task' }}
-                        </span>
-                        <span style="font-weight: bold; color: {% if task.status == 'completed' %}green{% elif task.status == 'pending' %}orange{% else %}red{% endif %};">
-                            {{ (task.status or 'unknown')|capitalize }}
-                        </span>
-                    </li>
-                {% endfor %}
-                </ul>
+        <div class="card">
+            <h3>আপনার রেফারেল হিস্টোরি</h3>
+            {% if my_referrals %}
+                <table class="history-table">
+                    <thead><tr><th>তারিখ</th><th>জয়েন করেছেন</th><th>বোনাস</th></tr></thead>
+                    <tbody>
+                    {% for ref in my_referrals %}
+                        <tr>
+                            <td>{{ ref.timestamp.strftime('%d-%b-%Y') if ref.timestamp else 'N/A' }}</td>
+                            <td>{{ ref.referred_user_email }}</td>
+                            <td class="amount">৳ {{ "%.2f"|format(ref.reward_amount) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
-                <p>আপনি এখনো কোনো কাজ সম্পন্ন করেননি।</p>
+                <p class="no-data">আপনি এখনো কাউকে সফলভাবে রেফার করেননি।</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>আপনার ব্যালেন্স হিস্টোরি</h3>
+            {% if balance_history %}
+                <table class="history-table">
+                    <thead><tr><th>তারিখ</th><th>বিবরণ</th><th>পরিমাণ</th></tr></thead>
+                    <tbody>
+                    {% for entry in balance_history %}
+                        <tr>
+                            <td>{{ entry.timestamp.strftime('%d-%b-%Y %H:%M') if entry.timestamp else 'N/A' }}</td>
+                            <td>{{ entry.description }}</td>
+                            <td class="amount">+ ৳ {{ "%.2f"|format(entry.amount) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-data">আপনার কোনো ব্যালেন্স লেনদেনের রেকর্ড নেই।</p>
             {% endif %}
         </div>
     </div>
-
-    <!-- dashboard.html ফাইলের body অংশে নিচের কার্ডগুলো যোগ করুন -->
-
-<!-- ... (আগের প্রোফাইল, ব্যালেন্স, রেফারেল লিঙ্ক, টাস্ক লিস্ট কার্ডগুলো এখানে থাকবে) ... -->
-
-<!-- নতুন: রেফারেল হিস্টোরি কার্ড -->
-<div class="card">
-    <h3>আপনার রেফারেল হিস্টোরি</h3>
-    {% if my_referrals %}
-        <table class="history-table">
-            <thead>
-                <tr>
-                    <th>তারিখ</th>
-                    <th>জয়েন করেছেন</th>
-                    <th>বোনাস</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for referral in my_referrals %}
-                <tr>
-                    <td>
-                        {% if referral.timestamp and referral.timestamp.strftime %}
-                            {{ referral.timestamp.strftime('%d-%b-%Y') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td>{{ referral.referred_user_email }}</td>
-                    <td>৳ {{ "%.2f"|format(referral.reward_amount) }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>আপনি এখনো কাউকে সফলভাবে রেফার করেননি।</p>
-    {% endif %}
-</div>
-
-<!-- নতুন: ব্যালেন্স হিস্টোরি কার্ড -->
-<div class="card">
-    <h3>আপনার ব্যালেন্স হিস্টোরি</h3>
-    {% if balance_history %}
-        <table class="history-table">
-            <thead>
-                <tr>
-                    <th>তারিখ</th>
-                    <th>বিবরণ</th>
-                    <th>পরিমাণ</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for entry in balance_history %}
-                <tr>
-                    <td>
-                        {% if entry.timestamp and entry.timestamp.strftime %}
-                            {{ entry.timestamp.strftime('%d-%b-%Y %H:%M') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td>{{ entry.description }}</td>
-                    <td style="color: green; font-weight: bold;">+ ৳ {{ "%.2f"|format(entry.amount) }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>আপনার কোনো ব্যালেন্স লেনদেনের রেকর্ড নেই।</p>
-    {% endif %}
-</div>
-
-
-<!-- dashboard.html ফাইলের <style> ট্যাগে নিচের CSS যোগ করুন -->
-<style>
-    /* ... (আপনার আগের সব CSS এখানে থাকবে) ... */
-    
-    .history-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-    .history-table th, .history-table td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #eee;
-    }
-    .history-table th {
-        background-color: #f7f7f7;
-        font-weight: 600;
-        color: #555;
-    }
-    .history-table tr:last-child td {
-        border-bottom: none;
-    }
-</style>
 </body>
 </html>
