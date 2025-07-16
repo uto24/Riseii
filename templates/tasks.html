@@ -128,44 +128,27 @@
     </style>
 </head>
 <body>
+    
     <div class="container">
-        <a href="{{ url_for('dashboard') }}" class="back-link">← ড্যাশবোর্ডে ফিরে যান</a>
+        <h1>সকল কাজ</h1>
+        <a href="{{ url_for('dashboard') }}">← ড্যাশবোর্ডে ফিরে যান</a>
         
-        <div class="page-header">
-            <h1>সকল কাজ</h1>
-            <p>আপনার পছন্দের কাজ বেছে নিন এবং আয় শুরু করুন!</p>
-        </div>
-
         {% if categorized_tasks %}
             {% for category, tasks in categorized_tasks.items() %}
-                <div class="category-section">
-                    <h2 class="category-header">
-                        <!-- ডাটাবেস থেকে আসা আইকন ক্লাস ব্যবহার করা হচ্ছে -->
-                        <i class="{{ tasks[0].icon_class if tasks and tasks[0].icon_class else 'fa-solid fa-list-check' }}"></i>
-                        {{ category }}
-                    </h2>
-                    <div class="task-grid">
-                        {% for task in tasks %}
-                            <a href="{{ url_for('view_task', task_id=task.id) }}" class="task-card">
-                                <div>
-                                    <h3>{{ task.title }}</h3>
-                                    <!-- বর্ণনার প্রথম ১০০ অক্ষর দেখানো হচ্ছে -->
-                                    <p class="description">{{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}</p>
-                                </div>
-                                <div class="task-footer">
-                                    <span class="task-reward">৳ {{ "%.2f"|format(task.reward) }}</span>
-                                    <span class="task-button">কাজ করুন →</span>
-                                </div>
-                            </a>
-                        {% endfor %}
-                    </div>
+                <div class="task-category">
+                    <h3>{{ category }}</h3>
+                    {% for task in tasks %}
+                         <a href="{{ url_for('view_task', task_id=task.id) }}">
+                            <div class="task-item">
+                                <strong>{{ task.title }}</strong>
+                                <span class="task-reward">আয় করুন ৳{{ "%.2f"|format(task.reward) }}</span>
+                            </div>
+                        </a>
+                    {% endfor %}
                 </div>
             {% endfor %}
         {% else %}
-            <div class="no-tasks">
-                <h2>দুঃখিত!</h2>
-                <p>বর্তমানে কোনো নতুন কাজ উপলব্ধ নেই। অনুগ্রহ করে পরে আবার চেষ্টা করুন।</p>
-            </div>
+            <p class="no-data">বর্তমানে কোনো নতুন কাজ নেই।</p>
         {% endif %}
     </div>
 </body>
