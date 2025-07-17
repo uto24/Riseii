@@ -81,63 +81,6 @@ def signup():
 
 
 
-@app.route('/withdraw', methods=['GET', 'POST'])
-@login_required
-def withdraw_page():
-    user_id = session['user_id']
-    user_ref = db.collection('users').document(user_id)
-    user_doc = user_ref.get()
-
-    if not user_doc.exists:
-        flash("ব্যবহারকারী খুঁজে পাওয়া যায়নি।", "error")
-        return redirect(url_for('dashboard'))
-
-    user_data = user_doc.to_dict()
-
-    # --- শর্তগুলো পরীক্ষা করা ---
-    
-    # শর্ত ১: সর্বনিম্ন ব্যালেন্স
-    current_balance = user_data.get('balance', 0)
-    is_balance_eligible = current_balance >= 150
-
-    # শর্ত ২: সর্বনিম্ন রেফারেল
-    referrals_query = db.collection('referrals').where('referrer_id', '==', user_id)
-    referral_count = len(list(referrals_query.stream()))
-    are_referrals_eligible = referral_count >= 5
-
-    # শর্ত ৩: অ্যাকাউন্টের বয়স
-    account_created_at = user_data.get('created_at')
-    is_account_old_enough = False
-    if account_created_at:
-        # সময়কে timezone-aware থেকে naive-এ রূপান্তর করা হচ্ছে
-        # কারণ datetime.now() ডিফল্টভাবে naive
-        if account_created_at.tzinfo:
-            account_created_at = account_created_at.replace(tzinfo=None)
-        
-        three_days_ago = datetime.now() - timedelta(days=3)
-        is_account_old_enough = account_created_at < three_days_ago
-
-    # সমস্ত শর্ত পূরণ হয়েছে কিনা তা চেক করা
-    all_conditions_met = is_balance_eligible and are_referrals_eligible and is_account_old_enough
-
-    # ফর্ম সাবমিশনের জন্য (যদিও এই পেইজে সাবমিট বাটন নেই, এটি ভবিষ্যতের জন্য)
-    if request.method == 'POST' and all_conditions_met:
-        # এখানে উইথড্র রিকোয়েস্ট প্রসেস করার কোড থাকবে
-        # যেমন: একটি 'withdraw_requests' কালেকশনে ডেটা সেভ করা
-        pass
-
-    # টেমপ্লেটে পাঠানোর জন্য ডেটা প্রস্তুত করা
-    eligibility_data = {
-        'current_balance': current_balance,
-        'is_balance_eligible': is_balance_eligible,
-        'referral_count': referral_count,
-        'are_referrals_eligible': are_referrals_eligible,
-        'account_created_at': account_created_at.strftime('%d %b, %Y') if account_created_at else "N/A",
-        'is_account_old_enough': is_account_old_enough,
-        'all_conditions_met': all_conditions_met
-    }
-
-    return render_template('withdraw.html', eligibility=eligibility_data, user=user_data)
 
 
 @app.route('/login')
@@ -191,6 +134,144 @@ def mark_notification_as_read(notification_id):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # app.py ফাইলের dashboard ফাংশনটির সম্পূর্ণ সংশোধিত রূপ
+# app.py ফাইলের ভেতরে এই দুটি ফাংশন রাখুন বা প্রতিস্থাপন করুন
+# ফাইলের উপরে from datetime import datetime, timedelta ইম্পোর্ট করা আছে কিনা নিশ্চিত করুন
+
+@app.route('/withdraw', methods=['GET', 'POST'])
+@login_required
+def withdraw_page():
+    """
+    ইউজারের উইথড্র করার যোগ্যতা যাচাই করে এবং ফর্ম দেখায়।
+    ফর্ম সাবমিট হলে তথ্য সেশনে সেভ করে গ্যাস ফি পেইজে রিডাইরেক্ট করে।
+    """
+    user_id = session['user_id']
+    user_ref = db.collection('users').document(user_id)
+    user_doc = user_ref.get()
+
+    if not user_doc.exists:
+        flash("ব্যবহারকারী খুঁজে পাওয়া যায়নি।", "error")
+        return redirect(url_for('dashboard'))
+
+    user_data = user_doc.to_dict()
+
+    # --- শর্তগুলো পরীক্ষা করা ---
+    
+    # শর্ত ১: সর্বনিম্ন ব্যালেন্স
+    current_balance = user_data.get('balance', 0)
+    is_balance_eligible = current_balance >= 150
+
+    # শর্ত ২: সর্বনিম্ন রেফারেল
+    # এই কোয়েরিটি কার্যকর করার জন্য Firestore Index প্রয়োজন হতে পারে
+    referrals_query = db.collection('referrals').where('referrer_id', '==', user_id)
+    referral_count = len(list(referrals_query.stream()))
+    are_referrals_eligible = referral_count >= 5
+
+    # শর্ত ৩: অ্যাকাউন্টের বয়স
+    account_created_at = user_data.get('created_at')
+    is_account_old_enough = False
+    if account_created_at:
+        # সময়কে timezone-aware থেকে naive-এ রূপান্তর করা হচ্ছে
+        if hasattr(account_created_at, 'tzinfo') and account_created_at.tzinfo:
+            account_created_at = account_created_at.replace(tzinfo=None)
+        
+        three_days_ago = datetime.now() - timedelta(days=3)
+        is_account_old_enough = account_created_at < three_days_ago
+
+    # সমস্ত শর্ত পূরণ হয়েছে কিনা তা চেক করা
+    all_conditions_met = is_balance_eligible and are_referrals_eligible and is_account_old_enough
+
+    # যখন ইউজার 'Get Passkey & Proceed' বাটনে ক্লিক করে
+    if request.method == 'POST':
+        # যদি ইউজার যোগ্য না হয়, তাহলে তাকে আবার উইথড্র পেইজেই ফেরত পাঠানো হবে
+        if not all_conditions_met:
+            flash("দুঃখিত, আপনি এখনো উইথড্র করার জন্য সম্পূর্ণ যোগ্য হননি।", "error")
+            return redirect(url_for('withdraw_page'))
+            
+        # ফর্ম থেকে তথ্য সংগ্রহ করা
+        amount_to_withdraw = request.form.get('amount')
+        account_number = request.form.get('accountNumber')
+        payment_method = request.form.get('method')
+        
+        # ব্যালেন্সের চেয়ে বেশি উইথড্র করার চেষ্টা করছে কিনা তা পরীক্ষা করা
+        if float(amount_to_withdraw) > current_balance:
+            flash("আপনার ব্যালেন্সের চেয়ে বেশি টাকা উইথড্র করা সম্ভব নয়।", "error")
+            return redirect(url_for('withdraw_page'))
+
+        # তথ্যগুলো সেশনে সেভ করে গ্যাস ফি পেইজে পাঠানো হচ্ছে
+        session['withdraw_details'] = {
+            'amount': amount_to_withdraw,
+            'number': account_number,
+            'method': payment_method
+        }
+        return redirect(url_for('gase_page'))
+
+    # GET রিকোয়েস্টের জন্য টেমপ্লেটে ডেটা পাঠানো হচ্ছে
+    eligibility_data = {
+        'current_balance': current_balance,
+        'is_balance_eligible': is_balance_eligible,
+        'referral_count': referral_count,
+        'are_referrals_eligible': are_referrals_eligible,
+        'account_created_at': account_created_at.strftime('%d %b, %Y') if account_created_at else "N/A",
+        'is_account_old_enough': is_account_old_enough,
+        'all_conditions_met': all_conditions_met
+    }
+
+    return render_template('withdraw.html', eligibility=eligibility_data, user=user_data)
+
+
+@app.route('/gase', methods=['GET', 'POST'])
+@login_required
+def gase_page():
+    """
+    গ্যাস ফি পেমেন্টের তথ্য গ্রহণ করে এবং চূড়ান্ত উইথড্র রিকোয়েস্ট তৈরি করে।
+    """
+    user_id = session['user_id']
+    
+    # যদি সেশনে উইথড্রর তথ্য না থাকে, তাহলে ইউজারকে আবার উইথড্র পেইজে পাঠানো হবে
+    if 'withdraw_details' not in session:
+        flash("অনুগ্রহ করে প্রথমে উইথড্রর তথ্য পূরণ করুন।", "info")
+        return redirect(url_for('withdraw_page'))
+
+    # যখন ইউজার গ্যাস ফি পেমেন্টের তথ্য সাবমিট করবে
+    if request.method == 'POST':
+        payment_method = request.form.get('payment_method')
+        sender_number = request.form.get('sender_number')
+        trx_id = request.form.get('trx_id')
+
+        if not all([payment_method, sender_number, trx_id]):
+            flash("অনুগ্রহ করে গ্যাস ফি পেমেন্টের সব তথ্য সঠিকভাবে পূরণ করুন।", "error")
+            return redirect(url_for('gase_page'))
+
+        # সেশন থেকে উইথড্রর তথ্য পুনরুদ্ধার করা
+        withdraw_details = session.pop('withdraw_details', None) # তথ্য ব্যবহার করার পর সেশন থেকে মুছে ফেলা হচ্ছে
+        if not withdraw_details:
+             flash("সেশনের মেয়াদ শেষ হয়ে গেছে, অনুগ্রহ করে আবার চেষ্টা করুন।", "error")
+             return redirect(url_for('withdraw_page'))
+
+        # একটি নতুন 'withdraw_requests' কালেকশনে রিকোয়েস্ট সেভ করা
+        db.collection('withdraw_requests').add({
+            'user_id': user_id,
+            'status': 'pending_verification', # স্ট্যাটাস: অ্যাডমিন এখন এটি রিভিউ করবে
+            'withdraw_details': withdraw_details,
+            'gas_fee_info': {
+                'payment_method': payment_method,
+                'sender_number': sender_number,
+                'trx_id': trx_id
+            },
+            'requested_at': firestore.SERVER_TIMESTAMP
+        })
+
+        flash("আপনার উইথড্র রিকোয়েস্ট এবং পেমেন্টের তথ্য সফলভাবে জমা দেওয়া হয়েছে। অ্যাডমিন ভেরিফাই করার পর আপনার পেমেন্ট প্রসেস করা হবে।", "success")
+        return redirect(url_for('dashboard'))
+
+
+    # GET রিকোয়েস্টের জন্য gase.html পেইজটি রেন্ডার করা
+    return render_template('gase.html')
+
+
+
+
+
 
 @app.route('/dashboard')
 @login_required
