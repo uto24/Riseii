@@ -173,38 +173,33 @@ def dashboard():
     )
     # app.py -> view_task ফাংশনটি ডিবাগিং এর জন্য পরিবর্তন করুন
 
+# app.py ফাইলের ভেতরে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
+
 @app.route('/task/<task_id>', methods=['GET', 'POST'])
 @login_required
 def view_task(task_id):
+   
     user_id = session['user_id']
-    print(f"--- Debugging view_task for task_id: {task_id}, user_id: {user_id} ---") # ডিবাগিং লাইন
-
     task_ref = db.collection('tasks').document(task_id)
     task_doc = task_ref.get()
 
-    if not task_doc.exists:
-        print(f"DEBUG: Task with id '{task_id}' does not exist. Redirecting...") # ডিবাগিং লাইন
+    # ১. টাস্কটি ডাটাবেসে আছে কিনা বা active কিনা তা পরীক্ষা করা
+    if not task_doc.exists or task_doc.to_dict().get('status') != 'active':
         flash("দুঃখিত, এই টাস্কটি আর উপলব্ধ নেই।", "error")
-        return redirect(url_for('tasks_page'))
+        return redirect(url_for('dashboard')) # পরিবর্তন: tasks_page এর পরিবর্তে dashboard
     
     task = task_doc.to_dict()
-    print(f"DEBUG: Task found. Title: {task.get('title')}") # ডিবাগিং লাইন
 
+    # ২. ইউজার এই টাস্কটি ইতিমধ্যে জমা দিয়েছে কিনা তা পরীক্ষা করা
     existing_submission_query = db.collection('task_submissions') \
                                   .where('user_id', '==', user_id) \
                                   .where('task_id', '==', task_id) \
                                   .limit(1) \
                                   .stream()
-    
-    submissions = list(existing_submission_query)
-    if len(submissions) > 0:
-        print(f"DEBUG: User has already submitted this task. Redirecting...") # ডিবাগিং লাইন
-        flash("আপনি ইতিমধ্যে এই কাজটি জমা দিয়েছেন।", "info")
-        return redirect(url_for('tasks_page'))
 
-    print("DEBUG: User has not submitted this task. Proceeding to render template.") # ডিবাগিং লাইন
-    
- 
+    if len(list(existing_submission_query)) > 0:
+        flash("আপনি ইতিমধ্যে এই কাজটি জমা দিয়েছেন।", "info")
+        return redirect(url_for('dashboard')) # পরিবর্তন: tasks_page এর পরিবর্তে dashboard
 
     # ৩. ফর্ম সাবমিশন হ্যান্ডেল করা (POST request)
     if request.method == 'POST':
@@ -214,50 +209,45 @@ def view_task(task_id):
             'task_id': task_id,
             'task_title': task.get('title', 'Untitled Task'),
             'reward': task.get('reward', 0),
-            'status': 'pending',  # সমস্ত সাবমিশন পর্যালোচনার জন্য পেন্ডিং থাকবে
+            'status': 'pending',
             'submitted_at': firestore.SERVER_TIMESTAMP
         }
         
         task_type = task.get('task_type')
 
         # ক. স্ক্রিনশট-ভিত্তিক টাস্কগুলোর জন্য প্রুফ গ্রহণ
-        # এখন fb_page_like_screenshot সহ সব স্ক্রিনশট টাস্ক এখানে অন্তর্ভুক্ত
         if task_type in ['fb_post_screenshot', 'yt_watch_screenshot', 'fb_page_like_screenshot', 'screenshot_upload_task']:
             proof_url = request.form.get('screenshot_url')
             if not proof_url or 'http' not in proof_url:
                 flash("স্ক্রিনশট আপলোড ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।", "error")
                 return redirect(url_for('view_task', task_id=task_id))
             
-            # 'proof' নামে একটি ম্যাপ (অবজেক্ট) হিসেবে সেভ করা হচ্ছে
             submission_data['proof'] = {'screenshot_url': proof_url}
         
         # খ. টাইমার-ভিত্তিক টাস্কগুলোর জন্য প্রুফ গ্রহণ
         elif task_type in ['ad_watch_timer', 'website_visit_timer']:
-            # এই ধরনের টাস্কের জন্য JavaScript টাইমার শেষ করলেই সাবমিট হয়।
-            # আমরা ধরে নিচ্ছি ইউজার সৎ, তবে অ্যাডমিন রিভিউ করতে পারে।
             submission_data['proof'] = {'completed_by_timer': True}
         
         # গ. অন্যান্য বা অজানা টাস্কের ধরণ
         else:
             flash("অজানা টাস্কের ধরণ। সাবমিট করা সম্ভব নয়।", "error")
-            return redirect(url_for('tasks_page'))
+            return redirect(url_for('dashboard')) # পরিবর্তন: tasks_page এর পরিবর্তে dashboard
 
         # ৪. ডাটাবেসে সাবমিশন সেভ করা
         db.collection('task_submissions').add(submission_data)
         flash("আপনার কাজ সফলভাবে জমা দেওয়া হয়েছে। পর্যালোচনার পর ব্যালেন্স যোগ করা হবে।", "success")
-        return redirect(url_for('tasks_page'))
+        return redirect(url_for('dashboard')) # পরিবর্তন: tasks_page এর পরিবর্তে dashboard
 
     # ৫. সঠিক টেমপ্লেট রেন্ডার করা (GET request)
-    # টাস্কের ধরণ অনুযায়ী সঠিক HTML ফাইলটি খুঁজে বের করা
     template_name = f"task_types/{task.get('task_type', 'default')}.html"
     
     try:
         return render_template(template_name, task=task, task_id=task_id)
     except Exception as e:
         # যদি কোনো কারণে টেমপ্লেট ফাইল খুঁজে পাওয়া না যায়
-        print(f"Template not found for task type: {task.get('task_type')}. Error: {e}")
+        print(f"Template not found for '{template_name}'. Error: {e}")
         flash("এই টাস্কটি দেখার জন্য একটি সমস্যা হচ্ছে।", "error")
-        return redirect(url_for('tasks_page'))
+        return redirect(url_for('dashboard')) # পরিবর্তন: tasks_page এর পরিবর্তে dashboard
     
 # --- UNIQUE LINK ADMIN PANEL ---
 @app.route(f'/{SECRET_ADMIN_PATH}')
