@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>উইথড্র - টাস্ক অ্যাপ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
+        
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .card h2 { margin-top: 0; font-size: 24px; text-align: center; color: #1877f2; border-bottom: 1px solid #e9ebee; padding-bottom: 15px; margin-bottom: 20px; }
+        .balance-display { background-color: #e9f5ea; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 25px; }
+        .balance-display .amount { font-size: 2.2em; font-weight: 700; color: #28a745; }
+        
+        /* Eligibility Checklist */
+        .eligibility-check { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        .eligibility-check h4 { margin-top: 0; text-align: center; margin-bottom: 15px; }
+        .eligibility-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-weight: 600; font-size: 16px; }
+        .eligibility-item i { font-size: 1.2rem; }
+        .eligibility-item.pass { color: #28a745; }
+        .eligibility-item.fail { color: #dc3545; }
+
+        /* Withdraw Form */
+        .withdraw-form { margin-top: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #606770; }
+        .form-group input, .form-group select { width: 100%; padding: 14px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        
+        .btn { display: block; width: 100%; box-sizing: border-box; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 17px; text-decoration: none; text-align: center; transition: all 0.2s ease; }
+        .btn-passkey { background-color: #ffc107; color: #333; }
+        .btn-passkey:hover { background-color: #e0a800; transform: translateY(-2px); }
+
+        .back-link { display: inline-block; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
+        .error-message { text-align: center; background-color: #fbe9e7; color: #dc3545; padding: 15px; border-radius: 8px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('dashboard') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> ড্যাশবোর্ডে ফিরে যান</a>
+        
+        <div class="card">
+            <h2><i class="fa-solid fa-money-bill-transfer" style="margin-right: 10px;"></i>উপার্জন তুলে নিন</h2>
+            <div class="balance-display">
+                <p>আপনার বর্তমান ব্যালেন্স</p>
+                <p class="amount">৳ {{ "%.2f"|format(eligibility.current_balance) }}</p>
+            </div>
+
+            <!-- Eligibility Checklist Section -->
+            <div class="eligibility-check">
+                <h4>উইথড্র করার যোগ্যতা</h4>
+                
+                <div class="eligibility-item {{ 'pass' if eligibility.is_balance_eligible else 'fail' }}">
+                    <i class="fas {{ 'fa-check-circle' if eligibility.is_balance_eligible else 'fa-times-circle' }}"></i>
+                    <span>সর্বনিম্ন ব্যালেন্স ১৫০৳ (আপনার আছে: ৳{{ "%.2f"|format(eligibility.current_balance) }})</span>
+                </div>
+                
+                <div class="eligibility-item {{ 'pass' if eligibility.are_referrals_eligible else 'fail' }}">
+                    <i class="fas {{ 'fa-check-circle' if eligibility.are_referrals_eligible else 'fa-times-circle' }}"></i>
+                    <span>কমপক্ষে ৫টি রেফারেল (আপনার আছে: {{ eligibility.referral_count }}টি)</span>
+                </div>
+
+                <div class="eligibility-item {{ 'pass' if eligibility.is_account_old_enough else 'fail' }}">
+                    <i class="fas {{ 'fa-check-circle' if eligibility.is_account_old_enough else 'fa-times-circle' }}"></i>
+                    <span>কমপক্ষে ৩ দিন পুরোনো একাউন্ট (আপনার একাউন্ট খোলা হয়েছে: {{ eligibility.account_created_at }})</span>
+                </div>
+            </div>
+
+            <!-- Withdraw Form (যদি সব শর্ত পূরণ হয়) -->
+            {% if eligibility.all_conditions_met %}
+                <div class="withdraw-form">
+                    <hr style="margin: 25px 0; border-style: dashed;">
+                    <h4>পেমেন্টের তথ্য পূরণ করুন</h4>
+                    <form>
+                        <div class="form-group">
+                            <label for="method">পেমেন্ট মেথড</label>
+                            <select id="method" name="method" required>
+                                <option value="bkash">bKash</option>
+                                <option value="nagad">Nagad</option>
+                                <option value="rocket">Rocket</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="accountNumber">একাউন্ট নম্বর</label>
+                            <input type="text" id="accountNumber" name="accountNumber" placeholder="আপনার পেমেন্ট নম্বরটি দিন" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">টাকার পরিমাণ</label>
+                            <input type="number" id="amount" name="amount" min="150" max="{{ eligibility.current_balance }}" placeholder="সর্বনিম্ন ১৫০ টাকা" required>
+                        </div>
+                        
+                        <!-- Get Passkey বাটন -->
+                        <!-- এখানে আমরা /gase পেজের লিঙ্ক ব্যবহার করছি, যেমনটা আপনি আগে উল্লেখ করেছিলেন -->
+                        <a href="{{ url_for('gase_page') }}" class="btn btn-passkey">
+                            Get Passkey & Submit
+                        </a>
+                        <p style="text-align:center; font-size:14px; color:#606770; margin-top:15px;">
+                            উইথড্র সাবমিট করার জন্য আপনাকে পাসকী পেইজে যেতে হবে।
+                        </p>
+                    </form>
+                </div>
+            {% else %}
+                <div class="error-message" style="margin-top: 25px;">
+                    <p>আপনি এখনো উইথড্র করার জন্য যোগ্য হননি। অনুগ্রহ করে উপরের শর্তগুলো পূরণ করুন।</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+                  </html>
