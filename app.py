@@ -175,6 +175,37 @@ def dashboard():
 
 # app.py ফাইলের ভেতরে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
 
+
+# app.py ফাইলের ভেতরে এই নতুন ফাংশনটি যোগ করুন
+
+@app.route('/tasks')
+@login_required
+def tasks_page():
+    """
+    সমস্ত অ্যাক্টিভ টাস্কের একটি তালিকা দেখায়।
+    """
+    user_id = session['user_id']
+    
+    # প্রথমে ইউজারের করা সব টাস্কের আইডিগুলো একটি সেটে নিয়ে আসা হচ্ছে
+    submissions_query = db.collection('task_submissions').where('user_id', '==', user_id).stream()
+    completed_task_ids = {sub.to_dict().get('task_id') for sub in submissions_query}
+
+    # এখন সব 'active' টাস্ক আনা হচ্ছে
+    tasks_query = db.collection('tasks').where('status', '==', 'active').order_by('created_at', direction=firestore.Query.DESCENDING).stream()
+    
+    available_tasks = []
+    for task_doc in tasks_query:
+        task_id = task_doc.id
+        # যদি টাস্কটি ইতিমধ্যে করা না হয়ে থাকে, তাহলেই লিস্টে যোগ করা হবে
+        if task_id not in completed_task_ids:
+            task_data = task_doc.to_dict()
+            task_data['id'] = task_id
+            available_tasks.append(task_data)
+            
+    return render_template('tasks.html', available_tasks=available_tasks)
+
+
+
 @app.route('/task/<task_id>', methods=['GET', 'POST'])
 @login_required
 def view_task(task_id):
