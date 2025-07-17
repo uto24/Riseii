@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>গ্যাস ফি পেমেন্ট - টাস্ক অ্যাপ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
+        
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: auto; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .card h2 { margin-top: 0; font-size: 24px; text-align: center; color: #1877f2; border-bottom: 1px solid #e9ebee; padding-bottom: 15px; margin-bottom: 20px; }
+        .card h3 { font-size: 18px; font-weight: 600; color: #1c1e21; margin-bottom: 15px; }
+        p, li { line-height: 1.7; color: #3c4043; }
+        
+        .payment-info { background-color: #e9f5ff; padding: 20px; border-radius: 8px; border: 1px solid #b3e5fc; }
+        .payment-number-box { display: flex; justify-content: space-between; align-items: center; background-color: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .payment-number { font-size: 1.5em; font-weight: 700; letter-spacing: 1px; }
+        .copy-btn { background-color: #1877f2; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #606770; }
+        .form-group input, .form-group select { width: 100%; padding: 14px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        
+        .btn-submit { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 17px; background-color: #28a745; color: white; }
+        .btn-submit:disabled { background-color: #a8d9a1; cursor: not-allowed; }
+
+        .back-link { display: inline-block; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
+        .flash { padding: 1em; margin-bottom: 1em; border-radius: 6px; color: white; font-weight: 500; text-align: center; }
+        .flash.error { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('withdraw_page') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> উইথড্র পেইজে ফিরে যান</a>
+
+        <div class="card">
+            <h2><i class="fa-solid fa-shield-halved" style="margin-right: 10px;"></i>পাসকী এবং গ্যাস ফি</h2>
+            <p>আপনার অ্যাকাউন্টের সর্বোচ্চ সুরক্ষা নিশ্চিত করতে এবং উইথড্র প্রক্রিয়া সম্পন্ন করতে, আপনাকে একটি এককালীন গ্যাস ফি প্রদান করতে হবে। সফল পেমেন্টের পর আপনার रजिस्टर्ड ইমেইলে একটি গোপন **পাসকী (Passkey)** পাঠানো হবে, যা প্রতিটি উইথড্রর সময় প্রয়োজন হবে।</p>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-money-check-dollar" style="margin-right: 10px;"></i>পেমেন্ট নির্দেশনা (এককালীন: ২০৳)</h3>
+            <div class="payment-info">
+                <p>নিচের নম্বরে **২০ টাকা** সেন্ড মানি করুন এবং তারপর আপনার পেমেন্টের তথ্য নিচের ফর্মে জমা দিন।</p>
+                <div class="payment-number-box">
+                    <span id="payment-number" class="payment-number">01912107604</span>
+                    <button class="copy-btn" onclick="copyNumber()">Copy Number</button>
+                </div>
+            </div>
+
+            <hr style="margin: 25px 0; border-style: dashed;">
+
+            <h3>পেমেন্টের তথ্য জমা দিন</h3>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="post">
+                <div class="form-group">
+                    <label for="payment_method">পেমেন্ট মেথড</label>
+                    <select id="payment_method" name="payment_method" required>
+                        <option value="bkash">bKash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="rocket">Rocket</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sender_number">আপনার সেন্ডার নম্বর</label>
+                    <input type="text" id="sender_number" name="sender_number" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন" required>
+                </div>
+                <div class="form-group">
+                    <label for="trx_id">ট্রানজেকশন আইডি (TrxID)</label>
+                    <input type="text" id="trx_id" name="trx_id" placeholder="আপনার পেমেন্টের TrxID" required>
+                </div>
+                <button type="submit" id="submit-btn" class="btn-submit">তথ্য জমা দিন এবং উইথড্র রিকোয়েস্ট করুন</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function copyNumber() {
+            const numberText = document.getElementById('payment-number').innerText;
+            navigator.clipboard.writeText(numberText).then(function() {
+                alert('নম্বরটি কপি করা হয়েছে!');
+            }, function(err) {
+                alert('কপি করতে সমস্যা হয়েছে: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
