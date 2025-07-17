@@ -1,29 +1,127 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>স্বাগতম - টাস্ক অ্যাপ</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TakaJoy - অনলাইনে আয়ের সহজ পথ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
-        .welcome-container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        h1 { color: #1877f2; margin-bottom: 15px; }
-        p { color: #555; font-size: 1.1em; }
-        .button-group { margin-top: 30px; }
-        .btn { display: inline-block; text-decoration: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 0 10px; transition: transform 0.2s; }
-        .btn:hover { transform: translateY(-2px); }
-        .btn-primary { background-color: #1877f2; color: white; }
-        .btn-secondary { background-color: #e4e6eb; color: #333; }
+        :root {
+            --bg-color: #121212;
+            --primary-color: #1f1f1f;
+            --accent-color: #00ffc6;
+            --text-color: #e0e0e0;
+            --text-secondary-color: #a0a0a0;
+            --border-color: #333;
+        }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color); color: var(--text-color); }
+        .main-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 2rem; box-sizing: border-box; }
+        .notice-card { background-color: var(--primary-color); border-radius: 12px; padding: 2.5rem; max-width: 650px; width: 100%; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border-top: 4px solid var(--accent-color); }
+        .icon-upgrade { width: 60px; height: 60px; color: var(--accent-color); margin-bottom: 1rem; animation: pulse 2s infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
+        h1 { font-size: 2.2rem; font-weight: 700; margin: 0 0 0.5rem 0; background: linear-gradient(90deg, #ffffff, #aafff0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .notice-text { font-size: 1.1rem; color: var(--text-secondary-color); line-height: 1.7; margin-bottom: 2rem; }
+        strong { color: var(--accent-color); font-weight: 600; }
+        .divider { height: 1px; background: var(--border-color); margin: 2rem auto; width: 80%; }
+        .site-content h2 { font-size: 1.5rem; font-weight: 600; color: var(--text-color); margin-bottom: 1.5rem; }
+        .features-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; text-align: left; }
+        .feature-item { background-color: #252525; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-color); font-size: 1rem; font-weight: 500; }
+        .footer { margin-top: 2rem; font-size: 0.9rem; color: #666; }
+        
+        /* --- নতুন বাটন স্টাইল --- */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .btn {
+            text-decoration: none;
+            color: var(--bg-color);
+            background-color: var(--accent-color);
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 2px solid var(--accent-color);
+        }
+        .btn:hover {
+            background-color: transparent;
+            color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 198, 0.1);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--accent-color);
+        }
+        .btn-secondary:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+        
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .notice-card { padding: 1.5rem; }
+            .notice-text { font-size: 1rem; }
+            .action-buttons { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
-    <div class="welcome-container">
-        <h1>টাস্ক আর্নিং প্ল্যাটফর্মে স্বাগতম!</h1>
-        <p>সহজ কাজ করে আয় করুন। আজই আমাদের সাথে যোগ দিন।</p>
-        <div class="button-group">
-            <a href="{{ url_for('login') }}" class="btn btn-primary">লগইন করুন</a>
-            <a href="{{ url_for('signup') }}" class="btn btn-secondary">একাউন্ট খুলুন</a>
+
+    <div class="main-container">
+        <div class="notice-card">
+            <svg class="icon-upgrade" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            
+            <h1>আমরা আরও উন্নত হচ্ছি!</h1>
+            
+            <p class="notice-text">
+                আমাদের সাইটে আপনাকে স্বাগতম! আমরা বর্তমানে আমাদের পরিষেবা উন্নত করার জন্য কাজ করছি। <strong>চিন্তার কিছু নেই, সাইটের সমস্ত ফিচার সম্পূর্ণভাবে কার্যকর আছে।</strong> আমরা শুধু আপনার জন্য সবকিছু আরও দ্রুত, নিরাপদ এবং লাভজনক করে তুলছি। আমাদের সাথে থাকার জন্য ধন্যবাদ!
+            </p>
+
+            <!-- ======================================================= -->
+            <!--          ডাইনামিক বাটন সেকশন (নতুন পরিবর্তন)          -->
+            <!-- ======================================================= -->
+            <div class="action-buttons">
+                {% if is_logged_in %}
+                    <!-- যদি ইউজার লগইন করা থাকে -->
+                    <a href="{{ url_for('dashboard') }}" class="btn">
+                        <i class="fa-solid fa-user-circle" style="margin-right: 8px;"></i>আমার প্রোফাইল
+                    </a>
+                    <a href="{{ url_for('tasks_page') }}" class="btn btn-secondary">
+                        <i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজ করুন
+                    </a>
+                {% else %}
+                    <!-- যদি ইউজার লগইন করা না থাকে -->
+                    <a href="{{ url_for('login') }}" class="btn">লগইন করুন</a>
+                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">একাউন্ট খুলুন</a>
+                {% endif %}
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="site-content">
+                <h2>TakaJoy: অনলাইনে আয়ের সহজ পথ</h2>
+                <div class="features-list">
+                    <div class="feature-item">✅ ভিডিও দেখে আয় করুন</div>
+                    <div class="feature-item">✅ সহজ কাজ সম্পন্ন করুন</div>
+                    <div class="feature-item">✅ গেম খেলে পয়েন্ট জিতুন</div>
+                    <div class="feature-item">✅ বিকাশ/নগদে দ্রুত পেমেন্ট</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            © 2024 TakaJoy. সর্বস্বত্ব সংরক্ষিত।
         </div>
     </div>
+
 </body>
 </html>
