@@ -3,23 +3,85 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>উইথড্র - টাস্ক অ্যাপ</title>
+    <title>উপার্জন তুলে নিন - টাস্ক অ্যাপ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
         
-        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: auto; }
-        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        .card h2 { margin-top: 0; font-size: 24px; text-align: center; color: #1877f2; border-bottom: 1px solid #e9ebee; padding-bottom: 15px; margin-bottom: 20px; }
-        .balance-display { background-color: #e9f5ea; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 25px; }
-        .balance-display .amount { font-size: 2.2em; font-weight: 700; color: #28a745; }
+        body { 
+            font-family: 'Hind Siliguri', sans-serif; 
+            background-color: #f0f2f5; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex;
+            justify-content: center;
+        }
+        .container { 
+            max-width: 600px; 
+            width: 100%;
+            margin: auto; 
+        }
+        .card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+        }
+        .card h2 { 
+            margin-top: 0; 
+            font-size: 24px; 
+            text-align: center; 
+            color: #1877f2; 
+            border-bottom: 1px solid #e9ebee; 
+            padding-bottom: 15px; 
+            margin-bottom: 20px; 
+        }
+        .balance-display { 
+            background-color: #e9f5ea; 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center; 
+            margin-bottom: 25px; 
+            border: 1px solid #c8e6c9;
+        }
+        .balance-display p { 
+            margin: 0;
+            color: #388e3c;
+            font-weight: 500;
+        }
+        .balance-display .amount { 
+            font-size: 2.2em; 
+            font-weight: 700; 
+            color: #2e7d32; 
+        }
         
         /* Eligibility Checklist */
-        .eligibility-check { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
-        .eligibility-check h4 { margin-top: 0; text-align: center; margin-bottom: 15px; }
-        .eligibility-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-weight: 600; font-size: 16px; }
-        .eligibility-item i { font-size: 1.2rem; }
+        .eligibility-check { 
+            border: 1px solid #dddfe2; 
+            padding: 20px; 
+            border-radius: 8px; 
+            background-color: #fafafa;
+        }
+        .eligibility-check h4 { 
+            margin-top: 0; 
+            text-align: center; 
+            margin-bottom: 15px; 
+            color: #1c1e21;
+        }
+        .eligibility-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 12px; 
+            font-weight: 600; 
+            font-size: 16px; 
+        }
+        .eligibility-item i { 
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
         .eligibility-item.pass { color: #28a745; }
         .eligibility-item.fail { color: #dc3545; }
 
@@ -27,14 +89,57 @@
         .withdraw-form { margin-top: 25px; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #606770; }
-        .form-group input, .form-group select { width: 100%; padding: 14px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .form-group input, .form-group select { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid #dddfe2; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            font-family: inherit;
+        }
         
-        .btn { display: block; width: 100%; box-sizing: border-box; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 17px; text-decoration: none; text-align: center; transition: all 0.2s ease; }
-        .btn-passkey { background-color: #ffc107; color: #333; }
-        .btn-passkey:hover { background-color: #e0a800; transform: translateY(-2px); }
+        .btn { 
+            display: block; 
+            width: 100%; 
+            box-sizing: border-box; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 17px; 
+            text-decoration: none; 
+            text-align: center; 
+            transition: all 0.2s ease; 
+        }
+        .btn-passkey { 
+            background: linear-gradient(45deg, #ffc107, #ffb300); 
+            color: #212529; 
+            border: none;
+        }
+        .btn-passkey:hover { 
+            background: linear-gradient(45deg, #ffb300, #ffa000); 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4);
+        }
 
-        .back-link { display: inline-block; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
-        .error-message { text-align: center; background-color: #fbe9e7; color: #dc3545; padding: 15px; border-radius: 8px; font-weight: 600; }
+        .back-link { 
+            display: inline-block; 
+            margin-bottom: 20px; 
+            color: #1877f2; 
+            text-decoration: none; 
+            font-weight: 600; 
+        }
+        .error-message { 
+            text-align: center; 
+            background-color: #fbe9e7; 
+            color: #dc3545; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            border: 1px solid #ffcdd2;
+        }
     </style>
 </head>
 <body>
@@ -71,9 +176,19 @@
             <!-- Withdraw Form (যদি সব শর্ত পূরণ হয়) -->
             {% if eligibility.all_conditions_met %}
                 <div class="withdraw-form">
-                    <hr style="margin: 25px 0; border-style: dashed;">
+                    <hr style="margin: 25px 0; border: none; border-top: 1px dashed #ced0d4;">
                     <h4>পেমেন্টের তথ্য পূরণ করুন</h4>
-                    <form>
+                    
+                    <!-- সার্ভার থেকে আসা ফ্ল্যাশ মেসেজ দেখানোর জন্য -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="flash {{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="post" action="{{ url_for('withdraw_page') }}">
                         <div class="form-group">
                             <label for="method">পেমেন্ট মেথড</label>
                             <select id="method" name="method" required>
@@ -83,7 +198,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="accountNumber">একাউন্ট নম্বর</label>
+                            <label for="accountNumber">একাউন্ট নম্বর (পার্সোনাল)</label>
                             <input type="text" id="accountNumber" name="accountNumber" placeholder="আপনার পেমেন্ট নম্বরটি দিন" required>
                         </div>
                         <div class="form-group">
@@ -91,13 +206,11 @@
                             <input type="number" id="amount" name="amount" min="150" max="{{ eligibility.current_balance }}" placeholder="সর্বনিম্ন ১৫০ টাকা" required>
                         </div>
                         
-                        <!-- Get Passkey বাটন -->
-                        <!-- এখানে আমরা /gase পেজের লিঙ্ক ব্যবহার করছি, যেমনটা আপনি আগে উল্লেখ করেছিলেন -->
-                        <a href="{{ url_for('gase_page') }}" class="btn btn-passkey">
-                            Get Passkey & Submit
-                        </a>
+                        <button type="submit" class="btn btn-passkey">
+                            Get Passkey & Proceed <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                         <p style="text-align:center; font-size:14px; color:#606770; margin-top:15px;">
-                            উইথড্র সাবমিট করার জন্য আপনাকে পাসকী পেইজে যেতে হবে।
+                            উইথড্র সাবমিট করার জন্য আপনাকে পরবর্তী পেইজে গ্যাস ফি প্রদান করতে হবে।
                         </p>
                     </form>
                 </div>
@@ -109,4 +222,4 @@
         </div>
     </div>
 </body>
-                  </html>
+</html>
