@@ -184,45 +184,90 @@ def tasks_page():
         if category not in categorized_tasks: categorized_tasks[category] = []
         categorized_tasks[category].append(task)
     return render_template('tasks.html', categorized_tasks=categorized_tasks)
+# app.py ফাইলের ভেতরে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
 
 @app.route('/task/<task_id>', methods=['GET', 'POST'])
 @login_required
 def view_task(task_id):
+    """
+    একটি নির্দিষ্ট টাস্ক দেখায় এবং ইউজারের সাবমিশন গ্রহণ করে।
+    """
+    user_id = session['user_id']
     task_ref = db.collection('tasks').document(task_id)
     task_doc = task_ref.get()
+
+    # ১. টাস্কটি ডাটাবেসে আছে কিনা তা পরীক্ষা করা
     if not task_doc.exists:
-        flash("টাস্কটি খুঁজে পাওয়া যায়নি।", "error")
+        flash("দুঃখিত, এই টাস্কটি আর উপলব্ধ নেই।", "error")
         return redirect(url_for('tasks_page'))
     
     task = task_doc.to_dict()
-    
-    if request.method == 'POST':
-        submission_data = {
-            'user_id': session['user_id'], 'task_id': task_id,
-            'task_title': task.get('title'), 'reward': task.get('reward'),
-            'status': 'pending', 'submitted_at': firestore.SERVER_TIMESTAMP
-        }
-        
-        # টাস্কের ধরণ অনুযায়ী প্রুফ গ্রহণ
-        task_type = task.get('task_type')
-        if task_type in ['fb_post_screenshot', 'yt_watch_screenshot']:
-            proof_url = request.form.get('screenshot_url')
-            if not proof_url:
-                flash("স্ক্রিনশট আপলোড ব্যর্থ হয়েছে।", "error")
-                return redirect(url_for('view_task', task_id=task_id))
-            submission_data['proof'] = {'screenshot_url': proof_url}
-        elif task_type == 'ad_watch_timer':
-            # টাইমার টাস্কের জন্য কোনো প্রুফ নেই, এটি স্বয়ংক্রিয়ভাবে সম্পন্ন হবে (ভবিষ্যতের জন্য)
-            # আপাতত এটিকে পেন্ডিং হিসেবেই রাখা হচ্ছে অ্যাডমিন রিভিউ এর জন্য
-            submission_data['proof'] = {'completed': True}
 
-        db.collection('task_submissions').add(submission_data)
-        flash("আপনার কাজ জমা দেওয়া হয়েছে। পর্যালোচনার পর ব্যালেন্স যোগ করা হবে।", "success")
+    # ২. ইউজার এই টাস্কটি ইতিমধ্যে জমা দিয়েছে কিনা তা পরীক্ষা করা
+    # এটি ডুপ্লিকেট সাবমিশন প্রতিরোধ করবে।
+    existing_submission_query = db.collection('task_submissions') \
+                                  .where('user_id', '==', user_id) \
+                                  .where('task_id', '==', task_id) \
+                                  .limit(1) \
+                                  .stream()
+
+    if len(list(existing_submission_query)) > 0:
+        flash("আপনি ইতিমধ্যে এই কাজটি জমা দিয়েছেন।", "info")
         return redirect(url_for('tasks_page'))
 
-    # টাস্কের ধরণ অনুযায়ী সঠিক টেমপ্লেট ফাইল রেন্ডার করা
+    # ৩. ফর্ম সাবমিশন হ্যান্ডেল করা (POST request)
+    if request.method == 'POST':
+        # একটি বেস সাবমিশন ডিকশনারি তৈরি করা
+        submission_data = {
+            'user_id': user_id,
+            'task_id': task_id,
+            'task_title': task.get('title', 'Untitled Task'),
+            'reward': task.get('reward', 0),
+            'status': 'pending',  # সমস্ত সাবমিশন পর্যালোচনার জন্য পেন্ডিং থাকবে
+            'submitted_at': firestore.SERVER_TIMESTAMP
+        }
+        
+        task_type = task.get('task_type')
+
+        # ক. স্ক্রিনশট-ভিত্তিক টাস্কগুলোর জন্য প্রুফ গ্রহণ
+        # এখন fb_page_like_screenshot সহ সব স্ক্রিনশট টাস্ক এখানে অন্তর্ভুক্ত
+        if task_type in ['fb_post_screenshot', 'yt_watch_screenshot', 'fb_page_like_screenshot', 'screenshot_upload_task']:
+            proof_url = request.form.get('screenshot_url')
+            if not proof_url or 'http' not in proof_url:
+                flash("স্ক্রিনশট আপলোড ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।", "error")
+                return redirect(url_for('view_task', task_id=task_id))
+            
+            # 'proof' নামে একটি ম্যাপ (অবজেক্ট) হিসেবে সেভ করা হচ্ছে
+            submission_data['proof'] = {'screenshot_url': proof_url}
+        
+        # খ. টাইমার-ভিত্তিক টাস্কগুলোর জন্য প্রুফ গ্রহণ
+        elif task_type in ['ad_watch_timer', 'website_visit_timer']:
+            # এই ধরনের টাস্কের জন্য JavaScript টাইমার শেষ করলেই সাবমিট হয়।
+            # আমরা ধরে নিচ্ছি ইউজার সৎ, তবে অ্যাডমিন রিভিউ করতে পারে।
+            submission_data['proof'] = {'completed_by_timer': True}
+        
+        # গ. অন্যান্য বা অজানা টাস্কের ধরণ
+        else:
+            flash("অজানা টাস্কের ধরণ। সাবমিট করা সম্ভব নয়।", "error")
+            return redirect(url_for('tasks_page'))
+
+        # ৪. ডাটাবেসে সাবমিশন সেভ করা
+        db.collection('task_submissions').add(submission_data)
+        flash("আপনার কাজ সফলভাবে জমা দেওয়া হয়েছে। পর্যালোচনার পর ব্যালেন্স যোগ করা হবে।", "success")
+        return redirect(url_for('tasks_page'))
+
+    # ৫. সঠিক টেমপ্লেট রেন্ডার করা (GET request)
+    # টাস্কের ধরণ অনুযায়ী সঠিক HTML ফাইলটি খুঁজে বের করা
     template_name = f"task_types/{task.get('task_type', 'default')}.html"
-    return render_template(template_name, task=task, task_id=task_id)
+    
+    try:
+        return render_template(template_name, task=task, task_id=task_id)
+    except Exception as e:
+        # যদি কোনো কারণে টেমপ্লেট ফাইল খুঁজে পাওয়া না যায়
+        print(f"Template not found for task type: {task.get('task_type')}. Error: {e}")
+        flash("এই টাস্কটি দেখার জন্য একটি সমস্যা হচ্ছে।", "error")
+        return redirect(url_for('tasks_page'))
+    
 # --- UNIQUE LINK ADMIN PANEL ---
 @app.route(f'/{SECRET_ADMIN_PATH}')
 def admin_dashboard():
