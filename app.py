@@ -171,49 +171,40 @@ def dashboard():
         my_referrals=my_referrals,      # <-- এই ভেরিয়েবলটি যোগ করা হয়েছে
         balance_history=balance_history # <-- এই ভেরিয়েবলটিও যোগ করা হয়েছে
     )
-    
-@app.route('/tasks')
-@login_required
-def tasks_page():
-    tasks_query = db.collection('tasks').where('status', '==', 'active').order_by('created_at', direction=firestore.Query.DESCENDING).stream()
-    categorized_tasks = {}
-    for task_doc in tasks_query:
-        task = task_doc.to_dict()
-        task['id'] = task_doc.id
-        category = task.get('category', 'General')
-        if category not in categorized_tasks: categorized_tasks[category] = []
-        categorized_tasks[category].append(task)
-    return render_template('tasks.html', categorized_tasks=categorized_tasks)
-# app.py ফাইলের ভেতরে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
+    # app.py -> view_task ফাংশনটি ডিবাগিং এর জন্য পরিবর্তন করুন
 
 @app.route('/task/<task_id>', methods=['GET', 'POST'])
 @login_required
 def view_task(task_id):
-    """
-    একটি নির্দিষ্ট টাস্ক দেখায় এবং ইউজারের সাবমিশন গ্রহণ করে।
-    """
     user_id = session['user_id']
+    print(f"--- Debugging view_task for task_id: {task_id}, user_id: {user_id} ---") # ডিবাগিং লাইন
+
     task_ref = db.collection('tasks').document(task_id)
     task_doc = task_ref.get()
 
-    # ১. টাস্কটি ডাটাবেসে আছে কিনা তা পরীক্ষা করা
     if not task_doc.exists:
+        print(f"DEBUG: Task with id '{task_id}' does not exist. Redirecting...") # ডিবাগিং লাইন
         flash("দুঃখিত, এই টাস্কটি আর উপলব্ধ নেই।", "error")
         return redirect(url_for('tasks_page'))
     
     task = task_doc.to_dict()
+    print(f"DEBUG: Task found. Title: {task.get('title')}") # ডিবাগিং লাইন
 
-    # ২. ইউজার এই টাস্কটি ইতিমধ্যে জমা দিয়েছে কিনা তা পরীক্ষা করা
-    # এটি ডুপ্লিকেট সাবমিশন প্রতিরোধ করবে।
     existing_submission_query = db.collection('task_submissions') \
                                   .where('user_id', '==', user_id) \
                                   .where('task_id', '==', task_id) \
                                   .limit(1) \
                                   .stream()
-
-    if len(list(existing_submission_query)) > 0:
+    
+    submissions = list(existing_submission_query)
+    if len(submissions) > 0:
+        print(f"DEBUG: User has already submitted this task. Redirecting...") # ডিবাগিং লাইন
         flash("আপনি ইতিমধ্যে এই কাজটি জমা দিয়েছেন।", "info")
         return redirect(url_for('tasks_page'))
+
+    print("DEBUG: User has not submitted this task. Proceeding to render template.") # ডিবাগিং লাইন
+    
+ 
 
     # ৩. ফর্ম সাবমিশন হ্যান্ডেল করা (POST request)
     if request.method == 'POST':
