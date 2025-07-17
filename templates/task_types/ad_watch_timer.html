@@ -1,53 +1,177 @@
 <!doctype html>
 <html lang="bn">
 <head>
-    <title>{{ task.title }}</title>
-    <!-- CSS -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ task.title }} - টাস্ক</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1877f2;
+            border-bottom: 1px solid #e9ebee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1c1e21;
+            margin-bottom: 15px;
+        }
+        .task-description, ol li {
+            line-height: 1.7;
+            color: #3c4043;
+            font-size: 16px;
+            text-align: left;
+        }
+        ol { padding-left: 20px; }
+        .reward-tag { font-weight: 600; color: #28a745; }
+        
+        /* Buttons and Timer */
+        .btn {
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 17px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-visit { background-color: #34A853; color: white; }
+        .btn-visit:hover { background-color: #2c8f46; transform: translateY(-2px); }
+        .btn-visit:disabled { background-color: #a8d9a1; cursor: not-allowed; transform: none; }
+        .btn-submit { background-color: #1877f2; color: white; margin-top: 10px; }
+        .btn-submit:hover { background-color: #166fe5; transform: translateY(-2px); }
+        
+        .timer-display {
+            font-size: 3em;
+            font-weight: 700;
+            color: #dc3545;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .timer-message {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .back-link { display: inline-block; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <a href="{{ url_for('tasks_page') }}" class="back-link">← সকল কাজে ফিরে যান</a>
+        <a href="{{ url_for('tasks_page') }}" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> সকল কাজে ফিরে যান
+        </a>
+        
         <div class="card">
-            <h2>{{ task.title }}</h2>
-            <p><strong>পুরস্কার: ৳{{ "%.2f"|format(task.reward) }}</strong></p>
-            <hr>
-            <h3>নির্দেশনা:</h3>
-            <p>নিচের বাটনে ক্লিক করে বিজ্ঞাপনটি দেখুন। একটি টাইমার শুরু হবে। টাইমার শেষ হলে 'কাজ জমা দিন' বাটনটি সক্রিয় হবে।</p>
-            
-            <button id="start-ad-btn">বিজ্ঞাপন দেখা শুরু করুন</button>
-            
-            <h3 id="timer-display" style="text-align:center; font-size: 2em; margin-top: 20px; display:none;"></h3>
+            <h2><i class="fa-solid fa-eye" style="margin-right: 10px;"></i>{{ task.title }}</h2>
+            <p class="task-description">{{ task.description }}</p>
+            <p><strong>পুরস্কার:</strong> <span class="reward-tag">৳{{ "%.2f"|format(task.reward) }}</span></p>
+        </div>
 
-            <form method="post" id="task-form" style="display:none;">
-                <p>আপনি সফলভাবে বিজ্ঞাপনটি দেখেছেন।</p>
-                <button type="submit">কাজ জমা দিন</button>
+        <div class="card">
+            <h3><i class="fa-solid fa-list-check"></i> নির্দেশনা</h3>
+            <ol>
+                <li>নিচের "বিজ্ঞাপন দেখুন" বাটনে ক্লিক করুন। একটি নতুন ট্যাবে বিজ্ঞাপনটি ওপেন হবে।</li>
+                <li>এই পেইজে ফিরে এসে টাইমার শেষ হওয়া পর্যন্ত অপেক্ষা করুন।</li>
+                <li>টাইমার শেষ হলে, "কাজ জমা দিন" বাটনটি সক্রিয় হবে।</li>
+                <li>বাটনটিতে ক্লিক করে আপনার কাজ জমা দিন।</li>
+            </ol>
+        </div>
+
+        <div class="card" style="text-align: center;">
+            <h3><i class="fa-solid fa-play"></i> কাজ শুরু করুন</h3>
+            
+            <button id="start-ad-btn" class="btn btn-visit">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> বিজ্ঞাপন দেখুন
+            </button>
+            
+            <div id="timer-container" style="display:none;">
+                <p>অনুগ্রহ করে টাইমার শেষ হওয়া পর্যন্ত এই পেইজে অপেক্ষা করুন।</p>
+                <div id="timer-display" class="timer-display"></div>
+                <p id="timer-message" class="timer-message"></p>
+            </div>
+
+            <form id="task-form" method="post" style="display:none;">
+                <button type="submit" class="btn btn-submit">কাজ জমা দিন</button>
             </form>
         </div>
     </div>
+
     <script>
         const startBtn = document.getElementById('start-ad-btn');
+        const timerContainer = document.getElementById('timer-container');
         const timerDisplay = document.getElementById('timer-display');
+        const timerMessage = document.getElementById('timer-message');
         const taskForm = document.getElementById('task-form');
+        
         const adUrl = "{{ task.target_url }}";
-        let timerDuration = parseInt("{{ task.timer_duration }}");
+        // app.py থেকে timer_duration ভ্যালুটি নেওয়া হচ্ছে, ডিফল্ট ৩০ সেকেন্ড
+        const timerDuration = parseInt("{{ task.timer_duration or 30 }}", 10);
 
         startBtn.addEventListener('click', function() {
             // নতুন ট্যাবে বিজ্ঞাপন ওপেন করা
             window.open(adUrl, '_blank');
             
             // বাটন লুকিয়ে ফেলা এবং টাইমার দেখানো
+            startBtn.disabled = true;
             startBtn.style.display = 'none';
-            timerDisplay.style.display = 'block';
+            timerContainer.style.display = 'block';
             
             let timeLeft = timerDuration;
-            timerDisplay.textContent = timeLeft;
+            
+            // টাইমার ফরম্যাট করার জন্য একটি ফাংশন
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }
+            
+            timerDisplay.textContent = formatTime(timeLeft);
             
             const countdown = setInterval(function() {
                 timeLeft--;
-                timerDisplay.textContent = timeLeft;
+                timerDisplay.textContent = formatTime(timeLeft);
+                
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
-                    timerDisplay.textContent = 'সম্পন্ন!';
+                    timerDisplay.style.display = 'none';
+                    timerMessage.innerHTML = '<i class="fa-solid fa-check-circle"></i> সময় শেষ! এখন আপনি কাজটি জমা দিতে পারেন।';
                     taskForm.style.display = 'block'; // ফর্ম দেখানো
                 }
             }, 1000);
