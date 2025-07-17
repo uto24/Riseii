@@ -79,6 +79,67 @@ def signup():
     config_data = {'firebase_api_key': os.getenv('FIREBASE_API_KEY'), 'firebase_auth_domain': os.getenv('FIREBASE_AUTH_DOMAIN'), 'firebase_project_id': os.getenv('FIREBASE_PROJECT_ID')}
     return render_template('signup.html', ref_code=request.args.get('ref', ''), config=config_data)
 
+
+
+@app.route('/withdraw', methods=['GET', 'POST'])
+@login_required
+def withdraw_page():
+    user_id = session['user_id']
+    user_ref = db.collection('users').document(user_id)
+    user_doc = user_ref.get()
+
+    if not user_doc.exists:
+        flash("ব্যবহারকারী খুঁজে পাওয়া যায়নি।", "error")
+        return redirect(url_for('dashboard'))
+
+    user_data = user_doc.to_dict()
+
+    # --- শর্তগুলো পরীক্ষা করা ---
+    
+    # শর্ত ১: সর্বনিম্ন ব্যালেন্স
+    current_balance = user_data.get('balance', 0)
+    is_balance_eligible = current_balance >= 150
+
+    # শর্ত ২: সর্বনিম্ন রেফারেল
+    referrals_query = db.collection('referrals').where('referrer_id', '==', user_id)
+    referral_count = len(list(referrals_query.stream()))
+    are_referrals_eligible = referral_count >= 5
+
+    # শর্ত ৩: অ্যাকাউন্টের বয়স
+    account_created_at = user_data.get('created_at')
+    is_account_old_enough = False
+    if account_created_at:
+        # সময়কে timezone-aware থেকে naive-এ রূপান্তর করা হচ্ছে
+        # কারণ datetime.now() ডিফল্টভাবে naive
+        if account_created_at.tzinfo:
+            account_created_at = account_created_at.replace(tzinfo=None)
+        
+        three_days_ago = datetime.now() - timedelta(days=3)
+        is_account_old_enough = account_created_at < three_days_ago
+
+    # সমস্ত শর্ত পূরণ হয়েছে কিনা তা চেক করা
+    all_conditions_met = is_balance_eligible and are_referrals_eligible and is_account_old_enough
+
+    # ফর্ম সাবমিশনের জন্য (যদিও এই পেইজে সাবমিট বাটন নেই, এটি ভবিষ্যতের জন্য)
+    if request.method == 'POST' and all_conditions_met:
+        # এখানে উইথড্র রিকোয়েস্ট প্রসেস করার কোড থাকবে
+        # যেমন: একটি 'withdraw_requests' কালেকশনে ডেটা সেভ করা
+        pass
+
+    # টেমপ্লেটে পাঠানোর জন্য ডেটা প্রস্তুত করা
+    eligibility_data = {
+        'current_balance': current_balance,
+        'is_balance_eligible': is_balance_eligible,
+        'referral_count': referral_count,
+        'are_referrals_eligible': are_referrals_eligible,
+        'account_created_at': account_created_at.strftime('%d %b, %Y') if account_created_at else "N/A",
+        'is_account_old_enough': is_account_old_enough,
+        'all_conditions_met': all_conditions_met
+    }
+
+    return render_template('withdraw.html', eligibility=eligibility_data, user=user_data)
+
+
 @app.route('/login')
 def login():
     if 'user_id' in session: return redirect(url_for('dashboard'))
