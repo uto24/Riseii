@@ -1,38 +1,186 @@
 <!doctype html>
 <html lang="bn">
 <head>
-    <title>{{ task.title }}</title>
-    <!-- CSS -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ task.title }} - টাস্ক</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #FF0000; /* YouTube Red */
+            text-align: center;
+            border-bottom: 1px solid #e9ebee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1c1e21;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .card h3 i {
+            margin-right: 10px;
+            color: #FF0000;
+        }
+        .task-description, ol li {
+            line-height: 1.7;
+            color: #3c4043;
+            font-size: 16px;
+        }
+        ol { padding-left: 20px; }
+        .reward-tag { font-weight: 600; color: #28a745; }
+        
+        .btn {
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 17px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-visit { background-color: #FF0000; color: white; }
+        .btn-submit { background-color: #1877f2; color: white; }
+        .btn-submit:disabled { background-color: #9fbeec; cursor: not-allowed; transform: none; }
+        
+        .back-link { display: inline-block; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
+        
+        .upload-status { margin-top: 15px; font-weight: bold; text-align: center; padding: 10px; border-radius: 6px; }
+        .upload-status.uploading { color: #db7c00; background-color: #fff8e1; }
+        .upload-status.success { color: #28a745; background-color: #e9f5ea; }
+        .upload-status.error { color: #dc3545; background-color: #fbe9e7; }
+        
+        .proof-section input[type=file] {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #dddfe2;
+            border-radius: 8px;
+            box-sizing: border-box;
+            text-align: center;
+            color: #606770;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <a href="{{ url_for('tasks_page') }}" class="back-link">← সকল কাজে ফিরে যান</a>
-        <div class="card">
-            <h2>{{ task.title }}</h2>
-            <p><strong>পুরস্কার: ৳{{ "%.2f"|format(task.reward) }}</strong></p>
-            <hr>
-            <h3>নির্দেশনা:</h3>
-            <ol>
-                <li>নিচের লিঙ্কে ক্লিক করে ইউটিউব ভিডিওটি দেখুন।</li>
-                <li>ভিডিওটি দেখা শেষে একটি স্ক্রিনশট নিন।</li>
-                <li>নিচে সেই স্ক্রিনশটটি আপলোড করে সাবমিট করুন।</li>
-            </ol>
-
-            <h4>ভিডিও লিঙ্ক:</h4>
-            <a href="{{ task.target_url }}" target="_blank"><button>ভিডিওটি দেখুন</button></a>
-        </div>
+        <a href="{{ url_for('tasks_page') }}" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> সকল কাজে ফিরে যান
+        </a>
         
         <div class="card">
-            <h3>কাজ জমা দিন</h3>
+            <h2><i class="fa-brands fa-youtube" style="margin-right: 10px;"></i>{{ task.title }}</h2>
+            <p class="task-description">{{ task.description }}</p>
+            <p><strong>পুরস্কার:</strong> <span class="reward-tag">৳{{ "%.2f"|format(task.reward) }}</span></p>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-list-check"></i> নির্দেশনা</h3>
+            <ol>
+                <li>নিচের "ভিডিও দেখুন" বাটনে ক্লিক করে ইউটিউব ভিডিওটি ওপেন করুন।</li>
+                <li>ভিডিওটি **সম্পূর্ণ দেখুন** এবং ভিডিওটিতে একটি **লাইক (Like)** দিন।</li>
+                <li>ভিডিও দেখা শেষে, লাইক বাটন সহ একটি সম্পূর্ণ স্ক্রিনশট নিন।</li>
+                <li>নিচের আপলোড সেকশনে সেই স্ক্রিনশটটি প্রমাণ হিসেবে জমা দিন।</li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-link"></i> টাস্ক লিঙ্ক</h3>
+            <a href="{{ task.target_url }}" target="_blank" class="btn btn-visit">
+                <i class="fa-brands fa-youtube" style="margin-right: 8px;"></i> ভিডিও দেখুন
+            </a>
+        </div>
+        
+        <div class="card proof-section">
+            <h3><i class="fa-solid fa-cloud-arrow-up"></i> কাজ জমা দিন</h3>
             <form id="task-form" method="post">
-                <label for="screenshot-file">স্ক্রিনশট আপলোড করুন:</label>
+                <label for="screenshot-file">আপনার কাজের প্রুফ (স্ক্রিনশট) এখানে আপলোড করুন:</label>
                 <input type="file" id="screenshot-file" accept="image/*" required>
                 <input type="hidden" id="screenshot-url" name="screenshot_url">
                 <div id="upload-status"></div>
-                <button type="submit" id="submit-button" disabled>প্রথমে আপলোড করুন</button>
+                <button type="submit" id="submit-button" class="btn btn-submit" disabled>প্রথমে স্ক্রিনশট আপলোড করুন</button>
             </form>
         </div>
     </div>
-    <script> /* ImgBB আপলোডের জন্য JavaScript কোড এখানে থাকবে */ </script>
+
+    <script>
+        const fileInput = document.getElementById('screenshot-file');
+        const urlInput = document.getElementById('screenshot-url');
+        const submitButton = document.getElementById('submit-button');
+        const uploadStatus = document.getElementById('upload-status');
+        const apiKey = '182d745f8ab80704ec343d859c665393'; // আপনার ImgBB API Key
+
+        // --- স্ক্রিনশট আপলোড করার JavaScript ---
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'আপলোড হচ্ছে...';
+            uploadStatus.textContent = 'ছবি আপলোড করা হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...';
+            uploadStatus.className = 'upload-status uploading';
+
+            const formData = new FormData();
+            formData.append('image', file);
+            const apiUrl = `https://api.imgbb.com/1/upload?key=${apiKey}`;
+
+            fetch(apiUrl, { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.data && result.data.url) {
+                        urlInput.value = result.data.url;
+                        uploadStatus.innerHTML = '<i class="fa-solid fa-check-circle" style="margin-right: 8px;"></i>আপলোড সফল হয়েছে!';
+                        uploadStatus.className = 'upload-status success';
+                        submitButton.textContent = 'এখন টাস্ক জমা দিন';
+                        submitButton.disabled = false;
+                    } else {
+                        throw new Error(result.error ? result.error.message : 'Unknown upload error.');
+                    }
+                })
+                .catch(error => {
+                    console.error('ImgBB Upload Error:', error);
+                    uploadStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>আপলোড ব্যর্থ হয়েছে: ${error.message}`;
+                    uploadStatus.className = 'upload-status error';
+                    submitButton.textContent = 'পুনরায় চেষ্টা করুন';
+                    fileInput.value = ''; // Reset file input
+                });
+        });
+    </script>
 </body>
-              </html>
+</html>
