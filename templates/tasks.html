@@ -1,155 +1,54 @@
+<!-- templates/tasks.html এর সম্পূর্ণ নতুন কোড -->
 <!doctype html>
 <html lang="bn">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>সকল কাজ - টাস্ক অ্যাপ</title>
-    <!-- Font Awesome for Category Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-        }
-        .page-header {
-            background: white;
-            padding: 25px 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .page-header h1 {
-            margin: 0;
-            color: #1877f2;
-            font-size: 28px;
-        }
-        .page-header p {
-            margin: 10px 0 0 0;
-            color: #606770;
-            font-size: 16px;
-        }
-        .category-section {
-            margin-bottom: 35px;
-        }
-        .category-header {
-            display: flex;
-            align-items: center;
-            font-size: 22px;
-            font-weight: 600;
-            color: #1c1e21;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e9ebee;
-        }
-        .category-header i {
-            margin-right: 15px;
-            color: #1877f2;
-            width: 30px;
-            text-align: center;
-        }
-        .task-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
-        .task-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            border: 1px solid transparent;
-        }
-        .task-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            border-color: #1877f2;
-        }
-        .task-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            color: #1c1e21;
-        }
-        .task-card p.description {
-            margin: 0;
-            font-size: 14px;
-            color: #606770;
-            flex-grow: 1;
-            line-height: 1.5;
-        }
-        .task-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #e9ebee;
-        }
-        .task-reward {
-            font-weight: 700;
-            font-size: 18px;
-            color: #36a420;
-        }
-        .task-button {
-            background-color: #1877f2;
-            color: white;
-            padding: 8px 18px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #1877f2;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        .no-tasks {
-            text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: 12px;
-            color: #8a8d91;
-        }
+        /* আপনার tasks.html এর জন্য সুন্দর CSS এখানে থাকবে */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .page-header { text-align: center; margin-bottom: 30px; }
+        .page-header h1 { color: #1877f2; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
+        .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .task-card { background: white; border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s ease-in-out; }
+        .task-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .task-card h3 { margin: 0 0 10px 0; font-size: 18px; }
+        .task-card p { font-size: 14px; color: #606770; flex-grow: 1; }
+        .task-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e9ebee; }
+        .task-reward { font-weight: 700; font-size: 18px; color: #36a420; }
+        .no-tasks { text-align: center; padding: 40px; background: white; border-radius: 12px; color: #8a8d91; }
     </style>
 </head>
 <body>
-    
     <div class="container">
-        <h1>সকল কাজ</h1>
-        <a href="{{ url_for('dashboard') }}">← ড্যাশবোর্ডে ফিরে যান</a>
+        <a href="{{ url_for('dashboard') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> ড্যাশবোর্ডে ফিরে যান</a>
+        <div class="page-header">
+            <h1>সকল উপলব্ধ কাজ</h1>
+            <p>নিচের তালিকা থেকে আপনার পছন্দের কাজ বেছে নিন এবং উপার্জন শুরু করুন।</p>
+        </div>
         
-        {% if categorized_tasks %}
-            {% for category, tasks in categorized_tasks.items() %}
-                <div class="task-category">
-                    <h3>{{ category }}</h3>
-                    {% for task in tasks %}
-                         <a href="{{ url_for('view_task', task_id=task.id) }}">
-                            <div class="task-item">
-                                <strong>{{ task.title }}</strong>
-                                <span class="task-reward">আয় করুন ৳{{ "%.2f"|format(task.reward) }}</span>
-                            </div>
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="no-data">বর্তমানে কোনো নতুন কাজ নেই।</p>
-        {% endif %}
+        <div class="task-grid">
+            {% if available_tasks %}
+                {% for task in available_tasks %}
+                    <a href="{{ url_for('view_task', task_id=task.id) }}" class="task-card">
+                        <div>
+                            <h3>{{ task.title }}</h3>
+                            <p>{{ task.description | truncate(80) }}</p> <!-- বিবরণ ছোট করে দেখানো হলো -->
+                        </div>
+                        <div class="task-footer">
+                            <span class="task-reward">৳ {{ "%.2f"|format(task.reward) }}</span>
+                            <span>কাজ করুন <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p class="no-tasks">দারুণ! আপনি সব কাজ সম্পন্ন করে ফেলেছেন। নতুন কাজের জন্য পরে আবার আসুন।</p>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>
