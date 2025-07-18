@@ -7,9 +7,10 @@
   overflow: hidden;        /* বিজ্ঞাপনের বাড়তি অংশ লুকিয়ে ফেলে */
   height: 90px;            /* বিজ্ঞাপনের উচ্চতা অনুযায়ী উচ্চতা সেট করে */
   margin: 10px 0;          /* উপরে ও নিচে কিছুটা জায়গা রাখে */
-}
-
-
+ .{
+   margin: 0;
+   padding: 0;
+ }
 
         /* --- CSS VARIABLES FOR THEME --- */
         :root {
