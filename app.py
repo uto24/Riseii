@@ -90,6 +90,14 @@ def login():
     config_data = {'firebase_api_key': os.getenv('FIREBASE_API_KEY'), 'firebase_auth_domain': os.getenv('FIREBASE_AUTH_DOMAIN'), 'firebase_project_id': os.getenv('FIREBASE_PROJECT_ID')}
     return render_template('login.html', config=config_data)
 
+# app.py ফাইলের শেষে যোগ করুন
+
+# --- Custom Error Handler for 404 Not Found ---
+@app.errorhandler(404)
+def not_found_error(error):
+  
+    return render_template('404.html'), 404
+    
 @app.route('/logout')
 @login_required
 def logout():
