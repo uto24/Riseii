@@ -9,436 +9,479 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
 
-      
-        /* --- CSS VARIABLES FOR THEME --- */
-        :root {
-            --bg-color: #121212;
-            --primary-color: #1f1f1f;
-            --accent-color: #00ffc6;
-            --text-color: #e0e0e0;
-            --border-color: #333;
-        }
-
-        * {
-          margin: 0;
-          padding: 0;}
-  
-        body {
-           
-            
-            font-family: 'Hind Siliguri', sans-serif;
-            background-color: var(--bg-color);
-            justify-content: center;
-            align-items: center;
-            
-          
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .login-container {
-            max-width: 400px;
-            width: 100%;
-            background: white;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .login-container h2 {
-            color: #1c1e21;
-            font-size: 24px;
-            margin-bottom: 25px;
-        }
-        .flash {
-            padding: 1em;
-            margin-bottom: 1em;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-        }
-        .flash.success { background-color: #42b72a; }
-        .flash.error { background-color: #fa3e3e; }
-        .flash.info { background-color: #1877f2; }
-        .form-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #606770;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 17px;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-        .btn-primary {
-            background-color: #1877f2;
-            color: white;
-        }
-        .btn-primary:disabled {
-            background-color: #9fbeec;
-            cursor: not-allowed;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background-color: #166fe5;
-        }
-        .btn-google {
-            background-color: #4285F4;
-            color: white;
-        }
-        .btn-google:hover {
-            background-color: #3367D6;
-        }
-        .divider {
-            text-align: center;
-            border-bottom: 1px solid #dadde1;
-            line-height: 0.1em;
-            margin: 25px 0;
-            color: #8a8d91;
-        }
-        .divider span {
-            background: #fff;
-            padding: 0 10px;
-        }
-        .signup-link {
-            margin-top: 25px;
-            font-size: 15px;
-        }
-        .signup-link a {
-            color: #1877f2;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-            
-.responsive-ad-container {
-  display: flex;
-  justify-content: center; /* বিজ্ঞাপনটিকে মাঝখানে আনে */
-  align-items: center;
-  width: 100%;             /* কন্টেইনারকে পুরো চওড়া করে */
-  max-width: 100%;         /* নিশ্চিত করে যেন স্ক্রিনের বাইরে না যায় */
-  overflow: hidden;        /* বিজ্ঞাপনের বাড়তি অংশ লুকিয়ে ফেলে */
-  height: 90px;            /* বিজ্ঞাপনের উচ্চতা অনুযায়ী উচ্চতা সেট করে */
-  margin: 10px 0;          /* উপরে ও নিচে কিছুটা জায়গা রাখে */
-
+      /* --- থিম এবং গ্লোবাল স্টাইল --- */
+:root {
+    --bg-color: #0f1014;
+    --primary-color: #1a1b20;
+    --accent-color: #00ffc6;
+    --text-color: #e0e0e0;
+    --text-secondary-color: #a0a0a0;
+    --border-color: #353740;
+    --success-color: #2e7d32;
+    --error-color: #d32f2f;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --accent-shadow-color: rgba(0, 255, 198, 0.1);
 }
-        /* --- HEADER STYLES --- */
-        .site-header {
-            background-color: var(--primary-color);
-            padding: 0 2rem;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            position: sticky; /* হেডারকে স্ক্রলিং এর সাথে উপরে আটকে রাখবে */
-            top: 0;
-            z-index: 1000;
-        }
 
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        /* --- LOGO STYLES --- */
-        .logo a {
-            text-decoration: none;
-            color: var(--accent-color);
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
+body {
+    font-family: 'Hind Siliguri', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 
-        /* --- NAVIGATION MENU STYLES (Desktop) --- */
-        .nav-menu {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            margin: 0;
-            padding: 0;
-            gap: 2rem;
-        }
+/* --- হেডার স্টাইল --- */
+.site-header {
+    background-color: var(--primary-color);
+    padding: 0 2rem;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px var(--shadow-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
 
-        .nav-menu li a {
-            text-decoration: none;
-            color: var(--text-color);
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 5px 0;
-            position: relative;
-            transition: color 0.3s ease;
-        }
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
-        .nav-menu li a:hover {
-            color: var(--accent-color);
-        }
+.logo a {
+    text-decoration: none;
+    color: var(--accent-color);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
 
-        /* Underline effect on hover */
-        .nav-menu li a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -2px;
-            left: 0;
-            background-color: var(--accent-color);
-            transition: width 0.3s ease;
-        }
+.nav-menu {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
 
-        .nav-menu li a:hover::after {
-            width: 100%;
-        }
+.nav-menu li a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 5px 0;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-menu li a:hover {
+    color: var(--accent-color);
+}
+
+.nav-menu li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--accent-color);
+    transition: width 0.3s ease;
+}
+
+.nav-menu li a:hover::after {
+    width: 100%;
+}
+
+.login-btn a {
+    background-color: var(--accent-color);
+    color: #121212;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.login-btn a:hover {
+    background-color: #fff;
+    color: #121212;
+}
+.login-btn a:hover::after {
+    width: 0;
+}
+
+/* --- মোবাইল মেনু টগল বাটন --- */
+.menu-toggle {
+    display: none;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.menu-toggle .hamburger {
+    width: 30px;
+    height: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.menu-toggle .bar {
+    width: 100%;
+    height: 3px;
+    background-color: var(--text-color);
+    border-radius: 2px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* --- লগইন কন্টেইনার এবং মেইন কনটেন্ট --- */
+main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.login-container {
+    max-width: 420px;
+    width: 100%;
+    background: var(--primary-color);
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px var(--shadow-color);
+    text-align: center;
+}
+
+.login-container h2 {
+    color: var(--text-color);
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+/* --- ফ্ল্যাশ মেসেজ --- */
+.flash {
+    padding: 1em;
+    margin-bottom: 1.2em;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 500;
+    text-align: center;
+}
+.flash.success { background-color: var(--success-color); }
+.flash.error { background-color: var(--error-color); }
+.flash.info { background-color: #1976d2; }
+
+/* --- ফর্ম এলিমেন্ট --- */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-secondary-color);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-shadow-color);
+}
+
+/* --- বাটন স্টাইল --- */
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 17px;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+}
+
+.btn-primary:disabled {
+    background-color: #555;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--accent-shadow-color);
+    filter: brightness(1.1);
+}
+
+.btn-google {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.btn-google:hover {
+    background-color: var(--border-color);
+    color: #fff;
+}
+
+/* --- ডিভাইডার এবং সাইনআপ লিঙ্ক --- */
+.divider {
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    line-height: 0.1em;
+    margin: 30px 0;
+    color: var(--text-secondary-color);
+}
+
+.divider span {
+    background: var(--primary-color);
+    padding: 0 15px;
+    font-size: 0.9rem;
+}
+
+.signup-link {
+    margin-top: 25px;
+    font-size: 15px;
+    color: var(--text-secondary-color);
+}
+
+.signup-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: text-decoration 0.3s;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* --- ফুটার স্টাইল --- */
+.site-footer {
+    background-color: var(--primary-color);
+    color: var(--text-secondary-color);
+    padding-top: 4rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    flex-shrink: 0; /* Footer কে নিচে রাখতে সাহায্য করে */
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 3rem;
+    display: grid;
+    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.footer-column h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.footer-column h4::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 40px;
+    height: 2px;
+    background-color: var(--accent-color);
+}
+
+.footer-about .logo {
+    color: var(--accent-color);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: block;
+    text-decoration: none;
+}
         
-        /* --- LOGIN BUTTON STYLE --- */
-        .login-btn a {
-            background-color: var(--accent-color);
-            color: #121212;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
+.footer-about p {
+    line-height: 1.7;
+    margin: 0;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: var(--text-secondary-color);
+    transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--accent-color);
+    padding-left: 5px;
+}
+
+.footer-links a::before {
+    content: '›';
+    margin-right: 8px;
+    color: var(--accent-color);
+    transition: color 0.3s ease;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    color: var(--text-secondary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--bg-color);
+    transform: translateY(-3px);
+}
+
+.social-icons .fa, .social-icons .fab, .social-icons .fas {
+    font-size: 1.1rem;
+}
+
+.footer-bottom {
+    background-color: var(--bg-color);
+    text-align: center;
+    padding: 1.2rem 1rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* --- রেসপন্সিভ স্টাইল (মোবাইল) --- */
+@media (max-width: 768px) {
+    .site-header {
+        padding: 0 1.5rem;
+    }
+
+    .menu-toggle {
+        display: flex;
+        z-index: 1001; /* মেনুর উপরে থাকবে */
+    }
+
+    .nav-menu {
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .nav-menu.active {
+        max-height: 400px;
+        padding: 1rem 0;
+    }
+
+    .nav-menu li {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .nav-menu li a {
+        display: block;
+        padding: 1rem 0;
+        font-size: 1.1rem;
+    }
+    
+    .nav-menu .login-btn {
+        margin-top: 1rem;
+    }
+
+    .login-container {
+        padding: 30px 25px;
+    }
+}
         
-        .login-btn a:hover {
-            background-color: #fff;
-            color: #121212;
-        }
-        .login-btn a:hover::after { /* login বাটনে আন্ডারলাইন ইফেক্ট লাগবে না */
-            width: 0;
-        }
+/* --- হ্যামবার্গার মেনুর অ্যানিমেশন --- */
+.menu-toggle.active .bar:nth-child(1) {
+    transform: translateY(9.5px) rotate(45deg);
+}
+.menu-toggle.active .bar:nth-child(2) {
+    opacity: 0;
+}
+.menu-toggle.active .bar:nth-child(3) {
+    transform: translateY(-9.5px) rotate(-45deg);
+}
 
-
-        /* --- MOBILE MENU TOGGLE BUTTON --- */
-        .menu-toggle {
-            display: none; /* By default hidden on desktop */
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-        }
-
-        .menu-toggle .hamburger {
-            width: 30px;
-            height: 22px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .menu-toggle .bar {
-            width: 100%;
-            height: 3px;
-            background-color: var(--text-color);
-            border-radius: 2px;
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* --- RESPONSIVE STYLES (Mobile View) --- */
-        @media (max-width: 768px) {
-            .site-header {
-                padding: 0 1.5rem;
-            }
-
-            .menu-toggle {
-                display: flex; /* Show the toggle button on mobile */
-            }
-
-            .nav-menu {
-                position: absolute;
-                top: 70px; /* Header height */
-                left: 0;
-                width: 100%;
-                background-color: var(--primary-color);
-                flex-direction: column;
-                align-items: center;
-                gap: 0;
-                overflow: hidden;
-                max-height: 0; /* Initially hidden */
-                transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
-                border-bottom: 1px solid var(--border-color);
-            }
-            
-            .nav-menu.active {
-                max-height: 400px; /* A large enough height to show all items */
-                padding: 1rem 0;
-            }
-
-            .nav-menu li {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .nav-menu li a {
-                display: block;
-                padding: 1rem 0;
-                font-size: 1.1rem;
-            }
-            
-            .nav-menu .login-btn {
-                margin-top: 1rem;
-            }
-        }
-        
-        /* --- ANIMATION FOR HAMBURGER TO 'X' --- */
-        .menu-toggle.active .bar:nth-child(1) {
-            transform: translateY(9.5px) rotate(45deg);
-        }
-        .menu-toggle.active .bar:nth-child(2) {
-            opacity: 0;
-        }
-        .menu-toggle.active .bar:nth-child(3) {
-            transform: translateY(-9.5px) rotate(-45deg);
-        }
-        
-        
-        
-        
-        
-        
-        
-        /* --- FOOTER STYLES --- */
-        .site-footer {
-            background-color: var(--primary-color);
-            color: var(--text-secondary-color);
-            padding-top: 4rem;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.95rem;
-        }
-
-        /* --- FOOTER MAIN CONTAINER (Grid Layout) --- */
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem 3rem;
-            display: grid;
-            gap: 2.5rem;
-            /* Responsive grid: creates columns that are at least 220px wide */
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        }
-
-        .footer-column h4 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-top: 0;
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-        
-        /* Underline for headings */
-        .footer-column h4::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -8px;
-            width: 40px;
-            height: 2px;
-            background-color: var(--accent-color);
-        }
-
-        /* --- ABOUT COLUMN --- */
-        .footer-about .logo {
-            color: var(--accent-color);
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            display: block;
-            text-decoration: none;
-        }
-        
-        .footer-about p {
-            line-height: 1.7;
-            margin: 0;
-        }
-
-        /* --- LINKS COLUMN --- */
-        .footer-links ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.8rem;
-        }
-
-
-        .footer-links a {
-            text-decoration: none;
-            color: var(--text-secondary-color);
-            transition: color 0.3s ease, padding-left 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent-color);
-            padding-left: 5px;
-        }
-        
-        .footer-links a::before {
-            content: '›';
-            margin-right: 8px;
-            color: var(--accent-color);
-        }
-
-        /* --- SOCIAL MEDIA COLUMN --- */
-        .social-icons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .social-icons a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            color: var(--text-secondary-color);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .social-icons a:hover {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            color: var(--bg-color);
-            transform: translateY(-3px);
-        }
-
-        .social-icons svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* --- FOOTER BOTTOM BAR --- */
-        .footer-bottom {
-            background-color: var(--bg-color);
-            text-align: center;
-            padding: 1.2rem 1rem;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            color: #777;
-          }
+/* --- বিজ্ঞাপন কন্টেইনার (এটি আপনার কোডে ছিল) --- */
+.responsive-ad-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 90px;
+    margin: 10px 0;
+    }
     </style>
 </head>
 <body>
