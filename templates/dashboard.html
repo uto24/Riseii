@@ -49,8 +49,9 @@
             <h2>স্বাগতম, {{ user.get('name', 'Guest') | e }}!</h2>
             <div class="nav-links">
                 <!-- 'tasks_page' এর পরিবর্তে ড্যাশবোর্ডে বা একটি বৈধ রুটে লিঙ্ক করা হলো -->
-                <a href="{{ url_for('dashboard') }}">সকল কাজ</a>
+                <a href="{{ url_for('task') }}">সকল কাজ</a>
                 <a href="{{ url_for('logout') }}">লগআউট</a>
+                <a href="/withdraw">Withdraw</a>
             </div>
         </div>
 
@@ -68,6 +69,33 @@
             </div>
         </div>
 
+        <div class="responsive-ad-container">
+    <div class="earn" style="margin: 0;">
+    <script type="text/javascript">
+	atOptions = {
+		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
+       </div>
+</div>
+
+<style>
+responsive-ad-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 90px;
+    margin: 10px 0;
+    }
+</style>
         <div class="card">
             <div class="tab-nav">
                 <button class="tab-button active" onclick="openTab(event, 'taskHistory')"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজের ইতিহাস</button>
@@ -157,7 +185,33 @@
             </div>
         </div>
     </div>
+<div class="responsive-ad-container">
+    <div class="earn" style="margin: 0;">
+    <script type="text/javascript">
+	atOptions = {
+		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
+       </div>
+</div>
 
+<style>
+responsive-ad-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 90px;
+    margin: 10px 0;
+    }
+</style>
     <script>
         // JavaScript for Tab functionality
         function openTab(evt, tabName) {
