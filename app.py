@@ -84,29 +84,52 @@ def signup():
 
 # app.py ফাইলের অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
+# app.py -> manage_users ফাংশনটি আপডেট করুন
+
 @app.route(f'/{SECRET_ADMIN_PATH}/users')
 def manage_users():
     """
-    সমস্ত ব্যবহারকারীর একটি তালিকা দেখায়।
+    সমস্ত ব্যবহারকারীর একটি তালিকা দেখায় এবং বিস্তারিত এরর লগিং করে।
     """
     try:
-        # 'users' কালেকশন থেকে সমস্ত ডকুমেন্ট আনা হচ্ছে
-        # created_at অনুযায়ী সর্ট করা হচ্ছে যাতে নতুন ইউজাররা উপরে থাকে
+        print("DEBUG: Attempting to fetch users from Firestore...")
+        
+        # Firestore থেকে ডেটা আনার চেষ্টা করা হচ্ছে
         users_query = db.collection('users').order_by('created_at', direction=firestore.Query.DESCENDING).stream()
         
         all_users = []
         for user_doc in users_query:
             user_data = user_doc.to_dict()
-            user_data['id'] = user_doc.id  # ইউজারের ইউনিক ডকুমেন্ট আইডি যোগ করা হচ্ছে
+            user_data['id'] = user_doc.id
             all_users.append(user_data)
-            
-        return render_template('admin/users_list.html', all_users=all_users, admin_path=SECRET_ADMIN_PATH)
+        
+        print(f"DEBUG: Successfully fetched {len(all_users)} users.")
+        
+        # টেমপ্লেট রেন্ডার করার চেষ্টা করা হচ্ছে
+        print("DEBUG: Attempting to render 'admin/users_list.html'...")
+        template_response = render_template('admin/users_list.html', all_users=all_users, admin_path=SECRET_ADMIN_PATH)
+        print("DEBUG: Template rendered successfully.")
+        
+        return template_response
         
     except Exception as e:
-        flash(f"ব্যবহারকারীদের তথ্য আনতে একটি সমস্যা হয়েছে: {e}", "error")
-        # যদি কোনো এরর হয়, তাহলে অ্যাডমিন ড্যাশবোর্ডে ফেরত পাঠানো হবে
+        # এররের বিস্তারিত কারণ প্রিন্ট করা হচ্ছে
+        print("--- AN ERROR OCCURRED IN manage_users ---")
+        print(f"Error Type: {type(e).__name__}")
+        print(f"Error Details: {e}")
+        print("-----------------------------------------")
+        
+        # Jinja2 TemplateNotFound এরর বিশেষভাবে হ্যান্ডেল করা হচ্ছে
+        if isinstance(e, jinja2.exceptions.TemplateNotFound):
+            flash(f"টেমপ্লেট খুঁজে পাওয়া যায়নি: {e}", "error")
+        else:
+            flash(f"ব্যবহারকারীদের তথ্য আনতে একটি সমস্যা হয়েছে। বিস্তারিত জানতে লগ চেক করুন।", "error")
+            
         return redirect(url_for('admin_dashboard'))
 
+# ফাইলের উপরে jinja2 ইম্পোর্ট করতে ভুলবেন না (যদি না থাকে)
+from flask import Flask, render_template, ...
+import jinja2 # <-- এই লাইনটি যোগ করুন
 @app.route('/login')
 def login():
     if 'user_id' in session: return redirect(url_for('dashboard'))
