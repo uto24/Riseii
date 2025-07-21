@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>সকল ব্যবহারকারী - অ্যাডমিন প্যানেল</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        /* admin_dashboard.html থেকে CSS কপি করে এখানে ব্যবহার করতে পারেন */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; }
+        .header h1 { margin: 0; color: #1c1e21; font-size: 24px; }
+        .back-link { color: #1877f2; text-decoration: none; font-weight: 600; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow-x: auto; }
+        .user-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .user-table th, .user-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e9ebee; }
+        .user-table th { background-color: #f7f7f9; font-weight: 600; color: #606770; }
+        .user-table td { color: #3c4043; vertical-align: middle; }
+        .user-table td.password-field { font-family: 'Courier New', monospace; color: #dc3545; filter: blur(3px); transition: filter 0.3s; }
+        .user-table td.password-field:hover { filter: blur(0); }
+        .balance-cell { font-weight: 700; color: #28a745; }
+        .no-data { color: #8a8d91; text-align: center; padding: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>সকল ব্যবহারকারীর তালিকা</h1>
+            <a href="/{{ admin_path }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> অ্যাডমিন ড্যাশবোর্ডে ফিরে যান</a>
+        </div>
+
+        <div class="card">
+            {% if all_users %}
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>নাম</th>
+                            <th>ইমেইল</th>
+                            <th>পাসওয়ার্ড (Hover to see)</th>
+                            <th>ব্যালেন্স (৳)</th>
+                            <th>রেফারেল কোড</th>
+                            <th>জয়েন করার তারিখ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in all_users %}
+                        <tr>
+                            <td>{{ user.get('name', 'N/A') }}</td>
+                            <td>{{ user.get('email', 'N/A') }}</td>
+                            <td class="password-field">
+                                <!-- Google দিয়ে সাইনআপ করা ইউজারদের পাসওয়ার্ড থাকে না -->
+                                {{ user.get('password', 'N/A (Google Sign-in)') }}
+                            </td>
+                            <td class="balance-cell">{{ "%.2f"|format(user.get('balance', 0)) }}</td>
+                            <td>{{ user.get('my_referral_code', 'N/A') }}</td>
+                            <td>
+                                {% if user.get('created_at') and user.get('created_at').strftime %}
+                                    {{ user.created_at.strftime('%d-%b-%Y %H:%M') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-data">কোনো ব্যবহারকারী খুঁজে পাওয়া যায়নি।</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
