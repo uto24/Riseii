@@ -49,7 +49,7 @@
             <h2>স্বাগতম, {{ user.get('name', 'Guest') | e }}!</h2>
             <div class="nav-links">
                 <!-- 'tasks_page' এর পরিবর্তে ড্যাশবোর্ডে বা একটি বৈধ রুটে লিঙ্ক করা হলো -->
-                <a href="{{ url_for('tasks') }}">সকল কাজ</a>
+                <a href="{{ url_for('tasks_page') }}">সকল কাজ</a>
                 <a href="{{ url_for('logout') }}">লগআউট</a>
                 <a href="/withdraw">Withdraw</a>
             </div>
