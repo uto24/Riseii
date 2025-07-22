@@ -56,26 +56,81 @@ def index():
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
     return render_template('index.html')
+# app.py -> signup ফাংশনটি আপডেট করুন
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if 'user_id' in session: return redirect(url_for('dashboard'))
+    
     if request.method == 'POST':
-        name, email, password = request.form['name'], request.form['email'], request.form['password']
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
         referrer_code = request.form.get('referrer_code', '').strip().upper()
+        
         try:
             user_record = auth.create_user(email=email, password=password, display_name=name)
+            
             user_data = {
                 'name': name, 'email': email, 'balance': 0.0,
-                'referred_by': referrer_code, 'my_referral_code': generate_referral_code(),
+                'referred_by': referrer_code,
+                'my_referral_code': generate_referral_code(), # প্রতিটি নতুন ইউজারের জন্য একটি রেফারেল কোড তৈরি হচ্ছে
                 'created_at': firestore.SERVER_TIMESTAMP
             }
-            db.collection('users').document(user_record.uid).set(user_data)
+            user_doc_ref = db.collection('users').document(user_record.uid)
+            user_doc_ref.set(user_data)
+            
+            # --- ডিবাগিং এবং উন্নত রেফারেল লজিক ---
+            if referrer_code:
+                print(f"DEBUG: Attempting to find referrer with code: {referrer_code}")
+                
+                # কোয়েরি চালানো হচ্ছে
+                query = db.collection('users').where('my_referral_code', '==', referrer_code).limit(1).stream()
+                referrer_list = list(query)
+
+                if referrer_list:
+                    referrer_doc = referrer_list[0]
+                    print(f"DEBUG: Referrer found! User ID: {referrer_doc.id}")
+
+                    # --- বোনাস এবং হিস্টোরি যোগ করার কোড (আগের মতোই) ---
+                    referrer_ref = db.collection('users').document(referrer_doc.id)
+                    reward_amount = 10.0
+
+                    referrer_ref.update({'balance': firestore.Increment(reward_amount)})
+                    user_doc_ref.update({'balance': firestore.Increment(reward_amount)})
+
+                    db.collection('referrals').add({
+                        'referrer_id': referrer_doc.id, 'referred_id': user_record.uid,
+                        'referred_user_email': email, 'reward_amount': reward_amount,
+                        'timestamp': firestore.SERVER_TIMESTAMP
+                    })
+                    
+                    db.collection('balance_history').add({
+                        'user_id': referrer_doc.id, 'amount': reward_amount,
+                        'type': 'referral_bonus', 'description': f'Bonus for referring {email}',
+                        'timestamp': firestore.SERVER_TIMESTAMP
+                    })
+                    
+                    db.collection('balance_history').add({
+                        'user_id': user_record.uid, 'amount': reward_amount,
+                        'type': 'signup_referral_bonus', 'description': f'Bonus for joining with code {referrer_code}',
+                        'timestamp': firestore.SERVER_TIMESTAMP
+                    })
+                    
+                    flash('রেফারেলের জন্য আপনি এবং আপনার বন্ধু উভয়েই বোনাস পেয়েছেন!', 'info')
+                else:
+                    # যদি রেফারারকে খুঁজে পাওয়া না যায়
+                    print(f"DEBUG: No referrer found with code: {referrer_code}. No bonus given.")
+                    flash("রেজিস্ট্রেশন সফল হয়েছে, কিন্তু রেফারেল কোডটি সঠিক নয়।", "warning")
+
             flash('রেজিস্ট্রেশন সফল হয়েছে!', 'success')
             return redirect(url_for('login'))
+            
         except Exception as e:
             flash(f"একটি সমস্যা হয়েছে: {e}", "error")
             return redirect(url_for('signup'))
+
+    # ... (GET রিকোয়েস্টের কোড অপরিবর্তিত) ...
 
     config_data = {'firebase_api_key': os.getenv('FIREBASE_API_KEY'), 'firebase_auth_domain': os.getenv('FIREBASE_AUTH_DOMAIN'), 'firebase_project_id': os.getenv('FIREBASE_PROJECT_ID')}
     return render_template('signup.html', ref_code=request.args.get('ref', ''), config=config_data)
