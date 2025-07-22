@@ -3,49 +3,143 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>টাস্ক এডিট করুন</title>
-    <!-- ... (আগের CSS কোড) ... -->
+    <title>টাস্ক এডিট - {{ task.get('title', 'Unknown Task') }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        /* create_task.html বা manage_tasks.html থেকে CSS এখানে ব্যবহার করা যেতে পারে */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh;}
+        .container { max-width: 700px; width: 100%; }
+        .form-container { background: white; border-radius: 12px; padding: 30px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .form-container h2 { margin-top: 0; text-align: center; color: #1877f2; margin-bottom: 25px; font-size: 22px; word-break: break-all; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #606770; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 14px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 16px; font-family: inherit;
+        }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .extra-fields { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ccc; }
+        .btn-submit { width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 17px; margin-top: 10px; background-color: #28a745; color: white; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #218838; }
+        .back-link { display: block; text-align: center; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <a href="{{ url_for('manage_tasks') }}" class="back-link">← টাস্ক ম্যানেজমেন্টে ফিরে যান</a>
+        <a href="/{{ admin_path }}/manage-tasks" class="back-link"><i class="fa-solid fa-arrow-left"></i> টাস্ক ম্যানেজমেন্টে ফিরে যান</a>
+        
         <div class="form-container">
-            <h2>"{{ task.title }}" টাস্কটি এডিট করুন</h2>
+            <h2>"{{ task.get('title', 'Unknown Task') }}" টাস্কটি এডিট করুন</h2>
+            
             <form method="post">
                 <div class="form-group">
                     <label for="title">টাস্কের শিরোনাম</label>
-                    <input type="text" id="title" name="title" value="{{ task.title }}" required>
+                    <input type="text" id="title" name="title" value="{{ task.get('title', '') }}" required>
                 </div>
                 <div class="form-group">
                     <label for="description">টাস্কের বিবরণ</label>
-                    <textarea id="description" name="description" required>{{ task.description }}</textarea>
+                    <textarea id="description" name="description" required>{{ task.get('description', '') }}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="reward">পুরস্কারের পরিমাণ (টাকা)</label>
-                    <input type="number" id="reward" name="reward" value="{{ task.reward }}" step="0.01" required>
+                    <input type="number" id="reward" name="reward" value="{{ task.get('reward', 0) }}" step="0.01" required>
                 </div>
-                <div class="form-group">
-                    <label for="target_url">লক্ষ্য URL (Target URL)</label>
-                    <input type="text" id="target_url" name="target_url" value="{{ task.target_url }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="category">ক্যাটাগরি</label>
-                    <input type="text" id="category" name="category" value="{{ task.category }}" required>
-                </div>
+
+                <hr style="border: none; border-top: 1px dashed #ccc; margin: 30px 0;">
+
                 <div class="form-group">
                     <label for="task_type">টাস্কের ধরণ</label>
-                    <select id="task_type" name="task_type" required>
-                        <option value="screenshot_upload" {% if task.task_type == 'screenshot_upload' %}selected{% endif %}>Screenshot Upload</option>
-                        <option value="website_visit" {% if task.task_type == 'website_visit' %}selected{% endif %}>Website Visit</option>
+                    <select id="task_type" name="task_type" onchange="showExtraFields()" required>
+                        <option value="fb_post_screenshot" {% if task.task_type == 'fb_post_screenshot' %}selected{% endif %}>Facebook Post (Screenshot)</option>
+                        <option value="fb_page_like_screenshot" {% if task.task_type == 'fb_page_like_screenshot' %}selected{% endif %}>Facebook Page Like (Screenshot)</option>
+                        <option value="yt_watch_screenshot" {% if task.task_type == 'yt_watch_screenshot' %}selected{% endif %}>YouTube Watch (Screenshot)</option>
+                        <option value="ad_watch_timer" {% if task.task_type == 'ad_watch_timer' %}selected{% endif %}>Ad Watch (Timer)</option>
+                        <option value="website_visit_timer" {% if task.task_type == 'website_visit_timer' %}selected{% endif %}>Website Visit (Timer)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="icon_class">আইকন ক্লাস (Font Awesome)</label>
-                    <input type="text" id="icon_class" name="icon_class" value="{{ task.icon_class }}" required>
+
+                <!-- Extra fields for specific task types -->
+                <div id="fb_post_fields" class="extra-fields">
+                    <div class="form-group">
+                        <label for="caption">পোস্টের ক্যাপশন</label>
+                        <textarea name="caption">{{ task.get('caption', '') }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="image_url">পোস্টের ছবির URL</label>
+                        <input type="url" name="image_url" value="{{ task.get('image_url', '') }}">
+                    </div>
                 </div>
+
+                <div id="yt_watch_fields" class="extra-fields">
+                    <div class="form-group">
+                        <label for="yt_target_url">ইউটিউব ভিডিওর URL</label>
+                        <input type="url" name="yt_target_url" value="{{ task.get('target_url', '') }}">
+                    </div>
+                </div>
+                
+                <div id="fb_page_like_fields" class="extra-fields">
+                    <div class="form-group">
+                        <label for="fb_page_url">ফেসবুক পেইজের URL</label>
+                        <input type="url" name="fb_page_url" value="{{ task.get('target_url', '') }}">
+                    </div>
+                </div>
+
+                <div id="ad_watch_fields" class="extra-fields">
+                    <div class="form-group">
+                        <label for="ad_target_url">বিজ্ঞাপনের লিঙ্ক (URL)</label>
+                        <input type="url" name="ad_target_url" value="{{ task.get('target_url', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="timer_duration">টাইমারের সময় (সেকেন্ড)</label>
+                        <input type="number" name="timer_duration" value="{{ task.get('timer_duration', 30) }}">
+                    </div>
+                </div>
+                
+                <div id="website_visit_fields" class="extra-fields">
+                    <div class="form-group">
+                        <label for="website_url">ওয়েবসাইটের URL</label>
+                        <input type="url" name="website_url" value="{{ task.get('target_url', '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="website_timer_duration">টাইমারের সময় (সেকেন্ড)</label>
+                        <input type="number" name="website_timer_duration" value="{{ task.get('timer_duration', 60) }}">
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-submit">আপডেট করুন</button>
             </form>
         </div>
     </div>
+
+    <script>
+        function showExtraFields() {
+            // Hide all extra fields
+            document.querySelectorAll('.extra-fields').forEach(function(field) {
+                field.style.display = 'none';
+            });
+
+            const taskType = document.getElementById('task_type').value;
+            let fieldsToShowId = '';
+
+            if (taskType === 'fb_post_screenshot') {
+                fieldsToShowId = 'fb_post_fields';
+            } else if (taskType === 'yt_watch_screenshot') {
+                fieldsToShowId = 'yt_watch_fields';
+            } else if (taskType === 'ad_watch_timer') {
+                fieldsToShowId = 'ad_watch_fields';
+            } else if (taskType === 'fb_page_like_screenshot') {
+                fieldsToShowId = 'fb_page_like_fields';
+            } else if (taskType === 'website_visit_timer') {
+                fieldsToShowId = 'website_visit_fields';
+            }
+            
+            if (fieldsToShowId) {
+                document.getElementById(fieldsToShowId).style.display = 'block';
+            }
+        }
+
+        // Call the function on page load to show fields for the current task type
+        document.addEventListener('DOMContentLoaded', showExtraFields);
+    </script>
+
 </body>
 </html>
