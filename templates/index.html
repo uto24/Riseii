@@ -81,13 +81,7 @@
   height: 90px;            /* বিজ্ঞাপনের উচ্চতা অনুযায়ী উচ্চতা সেট করে */
   margin: 10px 0;          /* উপরে ও নিচে কিছুটা জায়গা রাখে */
 }
-    </style>
-</head>
-<body>
 
-	
-    <style>
-        
 
         /* --- HEADER STYLES --- */
         .site-header {
@@ -257,114 +251,10 @@
         .menu-toggle.active .bar:nth-child(3) {
             transform: translateY(-9.5px) rotate(-45deg);
         }
-    </style>
-    <!-- ======================= HEADER START ======================= -->
-     <header class="site-header">
-        <div class="header-container">
-            <!-- Logo -->
-            <div class="logo">
-                <a href="#">Riseii</a>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav>
-                <ul class="nav-menu" id="nav-menu">
-                    <li><a href="/">হোম</a></li>
-                    <li><a href="/how">কিভাবে কাজ করে</a></li>
-                    <li><a href="/error">আমাদের সম্পর্কে</a></li>
-                    <li><a href="/error">যোগাযোগ</a></li>
-                    <li class="login-btn"><a href="/login">লগইন/রেজিস্টার</a></li>
-                </ul>
-            </nav>
-
-            <!-- Mobile Menu Toggle Button -->
-            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-                <div class="hamburger">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                </div>
-            </button>
-        </div>
-    </header>
-    <!-- ======================== HEADER END ======================== -->
-
-    <!-- This script makes the mobile menu toggle work -->
-    <script>
-        const menuToggle = document.getElementById('menu-toggle');
-        const navMenu = document.getElementById('nav-menu');
-
-        menuToggle.addEventListener('click', () => {
-            // Toggle 'active' class on both menu and button
-            navMenu.classList.toggle('active');
-            menuToggle.classList.toggle('active');
-        });
-    </script>
-    
-    <!-- Other page content can go here -->
 
 
-    <div class="main-container">
-        <div class="notice-card">
-            <svg class="icon-upgrade" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
-            
-            <h1>আমরা আরও উন্নত হচ্ছি!</h1>
-            
-            <p class="notice-text">
-                আমাদের সাইটে আপনাকে স্বাগতম! আমরা বর্তমানে আমাদের পরিষেবা উন্নত করার জন্য কাজ করছি। <strong>চিন্তার কিছু নেই, সাইটের সমস্ত ফিচার সম্পূর্ণভাবে কার্যকর আছে।</strong> আমরা শুধু আপনার জন্য সবকিছু আরও দ্রুত, নিরাপদ এবং লাভজনক করে তুলছি। আমাদের সাথে থাকার জন্য ধন্যবাদ!
-            </p>
 
-            <!-- ======================================================= -->
-            <!--          ডাইনামিক বাটন সেকশন (নতুন পরিবর্তন)          -->
-            <!-- ======================================================= -->
-            <div class="action-buttons">
-                {% if is_logged_in %}
-                    <!-- যদি ইউজার লগইন করা থাকে -->
-                    <a href="{{ url_for('dashboard') }}" class="btn">
-                        <i class="fa-solid fa-user-circle" style="margin-right: 8px;"></i>আমার প্রোফাইল
-                    </a>
-                    <a href="{{ url_for('tasks_page') }}" class="btn btn-secondary">
-                        <i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজ করুন
-                    </a>
-                {% else %}
-                    <!-- যদি ইউজার লগইন করা না থাকে -->
-                    <a href="{{ url_for('login') }}" class="btn">লগইন করুন</a>
-                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">একাউন্ট খুলুন</a>
-                {% endif %}
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="site-content">
-                <h2>Riseii: অনলাইনে আয়ের সহজ পথ</h2>
-                <div class="features-list">
-                    <div class="feature-item">✅ ভিডিও দেখে আয় করুন</div>
-                    <div class="feature-item">✅ সহজ কাজ সম্পন্ন করুন</div>
-                    <div class="feature-item">✅ গেম খেলে পয়েন্ট জিতুন</div>
-                    <div class="feature-item">✅ বিকাশ/নগদে দ্রুত পেমেন্ট</div>
-                </div>
-            </div>
-        </div>    </div>
-              <!-- Responsive Ad Container Start -->
-<div class="responsive-ad-container">
-    <div class="earn" style="margin: 0;">
-    <script type="text/javascript">
-	atOptions = {
-		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
-       </div>
-</div><style>
-       
-
-        /* --- FOOTER STYLES --- */
+/* --- FOOTER STYLES --- */
         .site-footer {
             background-color: var(--primary-color);
             color: var(--text-secondary-color);
@@ -489,12 +379,118 @@
             color: #777;
         }
     </style>
+</head>
+<body>
+
+
+    <!-- ======================= HEADER START ======================= -->
+     <header class="site-header">
+        <div class="header-container">
+            <!-- Logo -->
+            <div class="logo">
+                <a href="#">Riseii</a>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav>
+                <ul class="nav-menu" id="nav-menu">
+                    <li><a href="/">হোম</a></li>
+                    <li><a href="/how">কিভাবে কাজ করে</a></li>
+                    <li><a href="/error">আমাদের সম্পর্কে</a></li>
+                    <li><a href="/error">যোগাযোগ</a></li>
+                    <li class="login-btn"><a href="/login" style="color: #000;">লগইন/রেজিস্টার</a></li>
+                </ul>
+            </nav>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </button>
+        </div>
+    </header>
+    <!-- ======================== HEADER END ======================== -->
+
+    <!-- This script makes the mobile menu toggle work -->
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const navMenu = document.getElementById('nav-menu');
+
+        menuToggle.addEventListener('click', () => {
+            // Toggle 'active' class on both menu and button
+            navMenu.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+    </script>
+    
+    <!-- Other page content can go here -->
+
+
+    <div class="main-container">
+        <div class="notice-card">
+            <svg class="icon-upgrade" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            
+            <h1>আমরা আরও উন্নত হচ্ছি!</h1>
+            
+            <p class="notice-text">
+                আমাদের সাইটে আপনাকে স্বাগতম! আমরা বর্তমানে আমাদের পরিষেবা উন্নত করার জন্য কাজ করছি। <strong>চিন্তার কিছু নেই, সাইটের সমস্ত ফিচার সম্পূর্ণভাবে কার্যকর আছে।</strong> আমরা শুধু আপনার জন্য সবকিছু আরও দ্রুত, নিরাপদ এবং লাভজনক করে তুলছি। আমাদের সাথে থাকার জন্য ধন্যবাদ!
+            </p>
+
+            <!-- ======================================================= -->
+            <!--          ডাইনামিক বাটন সেকশন (নতুন পরিবর্তন)          -->
+            <!-- ======================================================= -->
+            <div class="action-buttons">
+                {% if is_logged_in %}
+                    <!-- যদি ইউজার লগইন করা থাকে -->
+                    <a href="{{ url_for('dashboard') }}" class="btn">
+                        <i class="fa-solid fa-user-circle" style="margin-right: 8px;"></i>আমার প্রোফাইল
+                    </a>
+                    <a href="{{ url_for('tasks_page') }}" class="btn btn-secondary">
+                        <i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজ করুন
+                    </a>
+                {% else %}
+                    <!-- যদি ইউজার লগইন করা না থাকে -->
+                    <a href="{{ url_for('login') }}" class="btn">লগইন করুন</a>
+                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">একাউন্ট খুলুন</a>
+                {% endif %}
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="site-content">
+                <h2>Riseii: অনলাইনে আয়ের সহজ পথ</h2>
+                <div class="features-list">
+                    <div class="feature-item">✅ ভিডিও দেখে আয় করুন</div>
+                    <div class="feature-item">✅ সহজ কাজ সম্পন্ন করুন</div>
+                    <div class="feature-item">✅ গেম খেলে পয়েন্ট জিতুন</div>
+                    <div class="feature-item">✅ বিকাশ/নগদে দ্রুত পেমেন্ট</div>
+                </div>
+            </div>
+        </div>    </div>
+              <!-- Responsive Ad Container Start -->
+<div class="responsive-ad-container">
+    <div class="earn" style="margin: 0;">
+    <script type="text/javascript">
+	atOptions = {
+		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
+		'format' : 'iframe',
+		'height' : 60,
+		'width' : 468,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
+       </div>
+</div>
 <script async="async" data-cfasync="false" src="//pl27169522.profitableratecpm.com/931b52065fa559bab6440234ca2e2713/invoke.js"></script>
 <div id="container-931b52065fa559bab6440234ca2e2713"></div>
     <!-- Other page content goes here -->
 
-
-    <!-- ======================= FOOTER START ======================= -->
     <footer class="site-footer">
         <div class="footer-container">
             
@@ -541,15 +537,10 @@
                 </div>
             </div>
         </div>
-
-        <!-- Footer Bottom Bar -->
         <div class="footer-bottom">
             © 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।
         </div>
     </footer>
-    <!-- ======================== FOOTER END ======================== -->
-    
-    
-   
+  
 </body>
 </html>
