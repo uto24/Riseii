@@ -100,7 +100,7 @@ def manage_users():
             user_data['id'] = user_doc.id  # ইউজারের ইউনিক ডকুমেন্ট আইডি যোগ করা হচ্ছে
             all_users.append(user_data)
             
-        return render_template('template/users_list.html', all_users=all_users, admin_path=SECRET_ADMIN_PATH)
+        return render_template('users_list.html', all_users=all_users, admin_path=SECRET_ADMIN_PATH)
         
     except Exception as e:
         flash(f"ব্যবহারকারীদের তথ্য আনতে একটি সমস্যা হয়েছে: {e}", "error")
