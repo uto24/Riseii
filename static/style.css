@@ -18,11 +18,18 @@
             --border-color: #333;
         }
 
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
         /* --- BASIC BODY RESET (Optional, for demonstration) --- */
         body {
             margin: 0;
             font-family: 'Hind Siliguri', sans-serif;
             background-color: var(--bg-color);
+          color: #fff;
         }
 
         /* --- HEADER STYLES --- */
