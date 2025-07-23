@@ -49,12 +49,83 @@
             <h2>স্বাগতম, {{ user.get('name', 'Guest') | e }}!</h2>
             <div class="nav-links">
                 <!-- 'tasks_page' এর পরিবর্তে ড্যাশবোর্ডে বা একটি বৈধ রুটে লিঙ্ক করা হলো -->
-                <a href="{{ url_for('tasks_page') }}">সকল কাজ</a>
-                <a href="{{ url_for('logout') }}">লগআউট</a>
-                <a href="/withdraw">Withdraw</a>
+               . 
             </div>
         </div>
 	    
+    <style>
+    
+        .app-icon-grid {
+            /* 1. Use CSS Grid */
+            display: grid; 
+            
+            /* 2. The magic of responsiveness:
+               - repeat(): Creates as many columns as needed.
+               - auto-fit: Fits as many columns as possible in the available space. If an item doesn't fit, it wraps to the next line.
+               - minmax(120px, 1fr): Each column will have a minimum width of 120px and a maximum of 1 fraction of the available space (they will all be equal).
+            */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+
+            /* 3. Spacing between grid items */
+            gap: 1.5rem; 
+        }
+
+        .app-icon {
+            /* Arrange icon and title vertically */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            
+            /* Visuals */
+            padding: 1rem;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            text-decoration: none; /* Remove underline from link */
+            color: #333;
+            
+            /* Smooth transition for hover effect */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .app-icon:hover {
+            transform: translateY(-5px); /* Lifts the icon up */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .app-icon i { /* Styles for the Font Awesome icon */
+            font-size: 2.5rem; /* 40px */
+            margin-bottom: 0.75rem;
+            color: #007aff; /* A nice blue, like Apple's */
+        }
+
+        .app-icon-title {
+            font-size: 0.875rem; /* 14px */
+            font-weight: 500;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+
+    <!-- The Grid Container with its unique class -->
+    <div class="app-icon-grid">
+
+        <a href="/task" class="app-icon">
+            <i class="fa-solid fa-list-ul"></i>
+            <span class="app-icon-title">Tasks</span>
+        </a>
+        <a href="/withdraw" class="app-icon">
+        <i class="fa-solid fa-dollar-sign"></i>
+            <span class="app-icon-title">Withdraw</span>
+        </a>
+        <a href="/logout" class="app-icon">
+        <i class="fa-solid fa-right-from-bracket"></i>
+            <span class="app-icon-title">Logout</span>
+        </a>
+
+    </div>
 
         <!-- নোটিফিকেশন সিস্টেমটি আপাতত সরানো হলো, কারণ এর ব্যাকএন্ড লজিক নেই -->
         
