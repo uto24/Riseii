@@ -8,9 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+
+	    * {
+		    padding: 0;
+		    margin: 0;
+	    }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f0f2f5;
+           
         
             margin: 0;
             padding: 20px;
@@ -21,7 +26,8 @@
 		    display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            margin: 2%;
+		   
 	   }
         .signup-container {
             max-width: 400px;
