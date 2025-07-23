@@ -6,6 +6,7 @@
     <title>নতুন একাউন্ট খুলুন - টাস্ক অ্যাপ</title>
     <!-- Font Awesome for Google Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -115,7 +116,48 @@
         }
     </style>
 </head>
-<body>
+<body><!-- ======================= HEADER START ======================= -->
+    <header class="site-header">
+        <div class="header-container">
+            <!-- Logo -->
+            <div class="logo">
+                <a href="#">Riseii</a>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav>
+                <ul class="nav-menu" id="nav-menu">
+                    <li><a href="/">হোম</a></li>
+                    <li><a href="/how">কিভাবে কাজ করে</a></li>
+                    <li><a href="/error">আমাদের সম্পর্কে</a></li>
+                    <li><a href="/error">যোগাযোগ</a></li>
+                    <li class="login-btn"><a href="/login">লগইন/রেজিস্টার</a></li>
+                </ul>
+            </nav>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </button>
+        </div>
+    </header>
+    <!-- ======================== HEADER END ======================== -->
+
+    <!-- This script makes the mobile menu toggle work -->
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const navMenu = document.getElementById('nav-menu');
+
+        menuToggle.addEventListener('click', () => {
+            // Toggle 'active' class on both menu and button
+            navMenu.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+    </script>
 	<section class="signup">
     <div class="signup-container">
         <h2>নতুন একাউন্ট খুলুন</h2>
@@ -294,6 +336,61 @@ responsive-ad-container {
     margin: 10px 0;
     }
     </style>
+
+	<!-- ======================= FOOTER START ======================= -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <!-- Column 1: About -->
+            <div class="footer-column footer-about">
+                <a href="#" class="logo">Riseii</a>
+                <p>
+                    Riseii হলো একটি নির্ভরযোগ্য প্ল্যাটফর্ম যেখানে আপনি সহজ কাজ, ভিডিও দেখা এবং গেম খেলার মাধ্যমে অনলাইনে আয় করতে পারেন।
+                </p>
+            </div>
+
+            <!-- Column 2: Quick Links -->
+            <div class="footer-column footer-links">
+                <h4>গুরুত্বপূর্ণ লিঙ্ক</h4>
+                <ul>
+                    <li><a href="/error">আমাদের সম্পর্কে</a></li>
+                    <li><a href="/error">কিভাবে কাজ করে</a></li>
+                    <li><a href="/error">সচরাচর জিজ্ঞাস্য প্রশ্ন</a></li>
+                    <li><a href="/error">যোগাযোগ</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Legal -->
+            <div class="footer-column footer-links">
+                <h4>আইনি</h4>
+                <ul>
+                    <li><a href="/error">গোপনীয়তা নীতি</a></li>
+                    <li><a href="/error">শর্তাবলী</a></li>
+                    <li><a href="/error">পেমেন্ট পলিসি</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 4: Follow Us -->
+            <div class="footer-column footer-social">
+                <h4>Support</h4>
+                <div class="social-icons">
+                  
+                    <!-- Telegram -->
+                    <a href="#" aria-label="Telegram"><i class="fa-solid fa-phone"></i>
+          </a>
+                    <!-- YouTube -->
+                    <a href="#" aria-label="YouTube"><i class="fab fa-telegram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom Bar -->
+        <div class="footer-bottom">
+            © 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।
+        </div>
+    </footer>
+    <!-- ======================== FOOTER END ======================== -->
 
     <!-- Firebase SDK Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
