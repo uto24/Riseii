@@ -40,6 +40,18 @@
         .amount { font-weight: 600; color: #28a745; }
         .no-data { color: #8a8d91; text-align: center; padding: 30px; }
         @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } .header { flex-direction: column; gap: 10px; } .tab-button { padding: 10px 12px; font-size: 14px; } }
+
+responsive-ad-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 90px;
+    margin: 10px 0;
+}
+
     </style>
 </head>
 <body>
@@ -125,7 +137,7 @@
             <span class="app-icon-title">Logout</span>
         </a>
 
-    </div><br><br>
+    </div><br>
 
         <!-- নোটিফিকেশন সিস্টেমটি আপাতত সরানো হলো, কারণ এর ব্যাকএন্ড লজিক নেই -->
         
@@ -156,18 +168,6 @@
        </div>
 </div>
 
-<style>
-responsive-ad-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    height: 90px;
-    margin: 10px 0;
-    }
-</style>
         <div class="card">
             <div class="tab-nav">
                 <button class="tab-button active" onclick="openTab(event, 'taskHistory')"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজের ইতিহাস</button>
@@ -481,20 +481,6 @@ responsive-ad-container {
   </a>
 </div>
 
-<style>
-responsive-ad-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    height: 90px;
-    margin: 10px 0;
-    }
-
-	
-</style>
 
 	<!-- AdGuard DNS Blocker Detection Script - Start -->
 
