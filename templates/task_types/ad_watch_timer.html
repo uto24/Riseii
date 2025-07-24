@@ -28,13 +28,13 @@
             padding: 25px;
             margin-bottom: 25px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            text-align: center;
         }
         .card h2 {
             margin-top: 0;
             font-size: 24px;
             font-weight: 600;
             color: #1877f2;
+            text-align: center;
             border-bottom: 1px solid #e9ebee;
             padding-bottom: 15px;
             margin-bottom: 20px;
@@ -45,6 +45,12 @@
             font-weight: 600;
             color: #1c1e21;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .card h3 i {
+            margin-right: 10px;
+            color: #1877f2;
         }
         .task-description, ol li {
             line-height: 1.7;
@@ -76,6 +82,9 @@
         .btn-submit { background-color: #1877f2; color: white; margin-top: 10px; }
         .btn-submit:hover { background-color: #166fe5; transform: translateY(-2px); }
         
+        .timer-container {
+            text-align: center;
+        }
         .timer-display {
             font-size: 3em;
             font-weight: 700;
@@ -101,7 +110,7 @@
         <div class="card">
             <h2><i class="fa-solid fa-eye" style="margin-right: 10px;"></i>{{ task.title }}</h2>
             <p class="task-description">{{ task.description }}</p>
-            <p><strong>পুরস্কার:</strong> <span class="reward-tag">৳{{ "%.2f"|format(task.reward) }}</span></p>
+            <p style="text-align:center;"><strong>পুরস্কার:</strong> <span class="reward-tag">৳{{ "%.2f"|format(task.reward) }}</span></p>
         </div>
 
         <div class="card">
@@ -114,14 +123,17 @@
             </ol>
         </div>
 
-        <div class="card" style="text-align: center;">
+        <div class="card">
             <h3><i class="fa-solid fa-play"></i> কাজ শুরু করুন</h3>
             
             <button id="start-ad-btn" class="btn btn-visit">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> বিজ্ঞাপন দেখুন
             </button>
             
-            <div id="timer-container" style="display:none;">
+            <!-- 'about:blank' সমস্যা সমাধানের জন্য এই গোপন লিঙ্কটি ব্যবহার করা হবে -->
+            <a id="ad-link-anchor" href="{{ task.target_url }}" target="_blank" style="display: none;"></a>
+            
+            <div id="timer-container" class="timer-container" style="display:none;">
                 <p>অনুগ্রহ করে টাইমার শেষ হওয়া পর্যন্ত এই পেইজে অপেক্ষা করুন।</p>
                 <div id="timer-display" class="timer-display"></div>
                 <p id="timer-message" class="timer-message"></p>
@@ -135,18 +147,18 @@
 
     <script>
         const startBtn = document.getElementById('start-ad-btn');
+        const adLinkAnchor = document.getElementById('ad-link-anchor');
         const timerContainer = document.getElementById('timer-container');
         const timerDisplay = document.getElementById('timer-display');
         const timerMessage = document.getElementById('timer-message');
         const taskForm = document.getElementById('task-form');
         
-        const adUrl = "{{ task.target_url }}";
         // app.py থেকে timer_duration ভ্যালুটি নেওয়া হচ্ছে, ডিফল্ট ৩০ সেকেন্ড
-        const timerDuration = parseInt("{{ task.timer_duration or 30 }}", 10);
+        const timerDuration = parseInt("{{ task.get('timer_duration', 30) }}", 10);
 
         startBtn.addEventListener('click', function() {
-            // নতুন ট্যাবে বিজ্ঞাপন ওপেন করা
-            window.open(adUrl, '_blank');
+            // সমাধান: window.open এর পরিবর্তে <a> ট্যাগে একটি ভার্চুয়াল ক্লিক ট্রিগার করা
+            adLinkAnchor.click();
             
             // বাটন লুকিয়ে ফেলা এবং টাইমার দেখানো
             startBtn.disabled = true;
@@ -172,7 +184,7 @@
                     clearInterval(countdown);
                     timerDisplay.style.display = 'none';
                     timerMessage.innerHTML = '<i class="fa-solid fa-check-circle"></i> সময় শেষ! এখন আপনি কাজটি জমা দিতে পারেন।';
-                    taskForm.style.display = 'block'; // ফর্ম দেখানো
+                    taskForm.style.display = 'block'; // কাজ জমা দেওয়ার ফর্ম দেখানো
                 }
             }, 1000);
         });
