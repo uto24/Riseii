@@ -177,7 +177,7 @@ def manage_users():
         # মোট ব্যবহারকারীর সংখ্যা গণনা
         total_users = len(list(db.collection('users').stream()))
 
-        return render_template('admin/users_list.html', 
+        return render_template('users_list.html', 
                                all_users=all_users, 
                                total_users=total_users,
                                search_email=search_email,
