@@ -228,19 +228,43 @@
                 closeButton.addEventListener('click', () => { adContainer.style.display = 'none'; });
             }
 
-            // Ad blocker detection
-            (async function() {
-                const baitURL = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
-                const overlay = document.getElementById('adblocker-overlay');
-                try {
-                    await fetch(baitURL, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' });
-                } catch (error) {
-                    if (error instanceof TypeError && overlay) {
+    (function() {
+        // This function will try to fetch a resource from a known ad server.
+        // If it fails with a network error, it's highly likely a DNS blocker is active.
+        async function detectDnsAdBlocker() {
+            // A well-known domain that is on virtually all DNS ad-block lists.
+            const baitURL = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+
+            try {
+                // We use 'no-cors' mode to prevent CORS errors from being mistaken for network blocks.
+                // We only care if the request itself fails at the network level.
+                await fetch(baitURL, {
+                    method: 'HEAD', // HEAD is faster as it doesn't download the body
+                    mode: 'no-cors',
+                    cache: 'no-store' // Don't use a cached result
+                });
+                
+                // If the fetch succeeds (doesn't throw an error), no DNS blocker is active.
+                // console.log('DNS check: No blocker detected.');
+
+            } catch (error) {
+                // A 'TypeError: Failed to fetch' is the classic sign of a network-level block.
+                if (error instanceof TypeError) {
+                    // console.error('DNS check: Blocker detected!', error);
+                    const overlay = document.getElementById('dns-blocker-overlay');
+                    if (overlay) {
                         overlay.style.display = 'flex';
-                        document.body.style.overflow = 'hidden';
+                        document.body.style.overflow = 'hidden'; // Prevent scrolling
                     }
                 }
-            })();
+            }
+        }
+
+        // Run the detection check when the page content is loaded.
+        document.addEventListener('DOMContentLoaded', detectDnsAdBlocker);
+
+    })();
+           
         });
     </script>
 </body>
