@@ -3,158 +3,105 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ড্যাশবোর্ড - {{ user.name | e }}</title>
+    <title>ড্যাশবোর্ড - {{ user.get('name', 'Guest') | e }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    
+    <!-- ======================================================= -->
+    <!--                  সকল CSS কোড একসাথে                     -->
+    <!-- ======================================================= -->
     <style>
-        /* আপনার দেওয়া সম্পূর্ণ CSS কোড এখানে থাকবে */
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
-        body { font-family: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        
+        /* --- General Styles --- */
+        body { font-family: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; box-sizing: border-box; }
         .container { max-width: 850px; margin: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.07); margin-bottom: 25px; }
         .header h2 { margin: 0; color: #1c1e21; font-size: 22px; }
-        .nav-links a { color: #1877f2; text-decoration: none; font-weight: 600; margin-left: 20px; transition: color 0.2s; }
-        .nav-links a:hover { color: #166fe5; }
+        .nav-links a { color: #1877f2; text-decoration: none; font-weight: 600; margin-left: 20px; }
         .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.07); }
         .card-header { display: flex; align-items: center; font-size: 18px; font-weight: 600; color: #1c1e21; margin-bottom: 20px; }
         .card-header i { margin-right: 12px; color: #1877f2; font-size: 20px; width: 25px; text-align: center; }
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
         .balance-card .balance-amount { font-size: 2.8em; font-weight: 700; color: #28a745; margin: 5px 0 10px 0; }
         .referral-link { padding: 12px; background: #f0f2f5; border: 1px dashed #ced0d4; border-radius: 6px; word-wrap: break-word; user-select: all; font-family: 'Courier New', Courier, monospace; }
-        .all-tasks-link { display: block; text-align: center; margin-top: 20px; padding: 14px; background: #1877f2; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: background-color 0.2s; }
-        .all-tasks-link:hover { background-color: #166fe5; }
+        
+        /* --- App Icon Grid --- */
+        .app-icon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1.5rem; margin-bottom: 25px; }
+        .app-icon { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); text-decoration: none; color: #333; transition: all 0.2s ease-in-out; }
+        .app-icon:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); }
+        .app-icon i { font-size: 2.5rem; margin-bottom: 0.75rem; color: #007aff; }
+        .app-icon-title { font-size: 0.875rem; font-weight: 500; text-align: center; color: #555; }
+        
+        /* --- History Tabs --- */
         .tab-nav { display: flex; border-bottom: 2px solid #e9ebee; margin-bottom: 20px; }
-        .tab-button { padding: 10px 20px; cursor: pointer; background: none; border: none; font-size: 16px; font-weight: 600; color: #606770; position: relative; }
+        .tab-button { padding: 10px 15px; cursor: pointer; background: none; border: none; font-size: 16px; font-weight: 600; color: #606770; position: relative; }
         .tab-button.active { color: #1877f2; }
         .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #1877f2; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .history-table { width: 100%; border-collapse: collapse; }
         .history-table th, .history-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e9ebee; }
-        .history-table th { background-color: #f7f7f9; font-weight: 600; color: #606770; font-size: 14px; }
-        .history-table tr:last-child td { border-bottom: none; }
-        .history-table td { color: #3c4043; font-size: 15px; }
-        .status { font-weight: bold; padding: 4px 10px; border-radius: 15px; color: white; font-size: 12px; text-transform: uppercase; }
-        .status.pending { background-color: #ffc107; color: #333; }
-        .status.completed { background-color: #28a745; }
-        .status.rejected { background-color: #dc3545; }
+        .status { font-weight: bold; padding: 4px 10px; border-radius: 15px; color: white; font-size: 12px; }
+        .status.pending { background-color: #ffc107; color: #333; } .status.completed { background-color: #28a745; } .status.rejected { background-color: #dc3545; }
         .amount { font-weight: 600; color: #28a745; }
         .no-data { color: #8a8d91; text-align: center; padding: 30px; }
-        @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } .header { flex-direction: column; gap: 10px; } .tab-button { padding: 10px 12px; font-size: 14px; } }
 
-.responsive-ad-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    height: 90px;
-    margin: 10px 0;
-}
+        /* --- Banned User Styles --- */
+        .ban-warning-card { background-color: #fbe9e7; color: #c82333; border: 1px solid #ffcdd2; border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 25px; }
+        .banned .card, .banned .app-icon-grid a { pointer-events: none; opacity: 0.5; filter: grayscale(80%); }
+        .banned .header, .banned .nav-links a[href*="logout"] { opacity: 1; filter: none; pointer-events: auto; }
+        .banned .ban-warning-card { opacity: 1; filter: none; pointer-events: all; }
 
+        /* --- Ad Styles --- */
+        .responsive-ad-container { display: flex; justify-content: center; align-items: center; width: 100%; overflow: hidden; height: auto; min-height: 60px; margin: 20px 0; }
+        .adsterra-sticky-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #fff; z-index: 10000; box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center; padding: 5px 0; min-height: 50px; transform: translateY(100%); transition: transform 0.5s ease-in-out; }
+        .adsterra-sticky-footer.ad-visible { transform: translateY(0); }
+        .adsterra-ad-close { position: absolute; top: -15px; right: 15px; width: 30px; height: 30px; background-color: rgba(0,0,0,0.7); color: #fff; border: 2px solid #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; }
+
+        /* --- Telegram Widget --- */
+        .unique-telegram-widget { position: fixed; bottom: 25px; right: 25px; z-index: 9999; }
+        .unique-telegram-widget a { display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; background-color: #0088cc; color: #fff; border-radius: 50%; text-decoration: none; box-shadow: 2px 2px 10px rgba(0,0,0,0.2); animation: telegram-pulse 2s infinite; }
+        .unique-telegram-widget a:hover { transform: scale(1.1); animation: none; }
+        @keyframes telegram-pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0,136,204,0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0,136,204,0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0,136,204,0); } }
+
+        /* --- Ad Blocker Overlay --- */
+        #adblocker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(20, 20, 20, 0.98); z-index: 2147483647; display: none; justify-content: center; align-items: center; text-align: center; color: #fff; }
+        #adblocker-content { max-width: 650px; padding: 30px; }
+        #adblocker-content h1 { font-size: 2.2rem; color: #ff5722; }
+        #adblocker-content p { font-size: 1.1rem; line-height: 1.7; }
+
+        @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } .header { flex-direction: column; gap: 10px; } }
     </style>
 </head>
-<body>
+<body class="{{ 'banned' if is_banned }}">
     <div class="container">
         <div class="header">
-            <!-- এখানে user অবজেক্ট আছে কিনা চেক করা হচ্ছে, যা কোডকে আরও নিরাপদ করে -->
             <h2>স্বাগতম, {{ user.get('name', 'Guest') | e }}!</h2>
             <div class="nav-links">
-                <!-- 'tasks_page' এর পরিবর্তে ড্যাশবোর্ডে বা একটি বৈধ রুটে লিঙ্ক করা হলো -->
-              . 
+                <a href="{{ url_for('dashboard') }}">হোম</a>
+                <a href="{{ url_for('withdraw_page') }}">উইথড্র</a>
             </div>
         </div>
-	    
-    <style>
-    
-        .app-icon-grid {
-            /* 1. Use CSS Grid */
-            display: grid; 
-            
-            /* 2. The magic of responsiveness:
-               - repeat(): Creates as many columns as needed.
-               - auto-fit: Fits as many columns as possible in the available space. If an item doesn't fit, it wraps to the next line.
-               - minmax(120px, 1fr): Each column will have a minimum width of 120px and a maximum of 1 fraction of the available space (they will all be equal).
-            */
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-
-            /* 3. Spacing between grid items */
-            gap: 1.5rem; 
-        }
-
-        .app-icon {
-            /* Arrange icon and title vertically */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            
-            /* Visuals */
-            padding: 1rem;
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            text-decoration: none; /* Remove underline from link */
-            color: #333;
-            
-            /* Smooth transition for hover effect */
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-        .app-icon:hover {
-            transform: translateY(-5px); /* Lifts the icon up */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-        }
-
-        .app-icon i { /* Styles for the Font Awesome icon */
-            font-size: 2.5rem; /* 40px */
-            margin-bottom: 0.75rem;
-            color: #007aff; /* A nice blue, like Apple's */
-        }
-
-        .app-icon-title {
-            font-size: 0.875rem; /* 14px */
-            font-weight: 500;
-            text-align: center;
-            color: #555;
-        }
-    </style>
-
-    <!-- The Grid Container with its unique class -->
-    <div class="app-icon-grid">
-
-        <a href="/tasks" class="app-icon">
-            <i class="fa-solid fa-list-ul"></i>
-            <span class="app-icon-title">Tasks</span>
-        </a>
-        <a href="/withdraw" class="app-icon">
-        <i class="fa-solid fa-dollar-sign"></i>
-            <span class="app-icon-title">Withdraw</span>
-        </a>
-        <a href="/logout" class="app-icon">
-        <i class="fa-solid fa-right-from-bracket"></i>
-            <span class="app-icon-title">Logout</span>
-        </a>
-
-    </div><br>
-        <div class="responsive-ad-container">
-    <div class="earn" style="margin: 0;">
-    <script type="text/javascript">
-	atOptions = {
-		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
-       </div>
-</div>
-
-        <!-- নোটিফিকেশন সিস্টেমটি আপাতত সরানো হলো, কারণ এর ব্যাকএন্ড লজিক নেই -->
         
+        <!-- ব্যানড ইউজারের জন্য সতর্কবার্তা -->
+        {% if is_banned %}
+            <div class="ban-warning-card">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> আপনার একাউন্ট ব্যান করা হয়েছে</h3>
+                <p>আমাদের নীতিমালা লঙ্ঘন করার জন্য আপনার একাউন্টটি সীমাবদ্ধ করা হয়েছে। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।</p>
+            </div>
+        {% endif %}
+
+        <div class="app-icon-grid">
+            <a href="{{ url_for('tasks_page') }}" class="app-icon"><i class="fa-solid fa-list-ul"></i><span class="app-icon-title">Tasks</span></a>
+            <a href="{{ url_for('withdraw_page') }}" class="app-icon"><i class="fa-solid fa-dollar-sign"></i><span class="app-icon-title">Withdraw</span></a>
+            <a href="{{ url_for('logout') }}" class="app-icon"><i class="fa-solid fa-right-from-bracket"></i><span class="app-icon-title">Logout</span></a>
+        </div>
+
+        <div class="responsive-ad-container">
+            <script type="text/javascript"> atOptions = {'key' : 'f62367e86bf7296ea58f8b60f94e1218', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}}; </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
+        </div>
+
         <div class="grid-container">
             <div class="card balance-card">
                 <div class="card-header"><i class="fa-solid fa-wallet"></i><h3>আপনার ব্যালেন্স</h3></div>
@@ -164,60 +111,32 @@
                 <div class="card-header"><i class="fa-solid fa-share-nodes"></i><h3>রেফারেল প্রোগ্রাম</h3></div>
                 <p>বন্ধুদের রেফার করে আয় করুন।</p>
                 <p class="referral-link" title="Copy to clipboard">{{ referral_link }}</p>
-		    <p>Facke Reffer, একজনের একাধিক একাউন্ট Riseii এর Advence System ধরতে পারে ।  তাই একাউন্ট ডিজেবল হওয়ার আগেই একাধিক একাউন্ট পরিহার করুন!</p>
             </div>
         </div>
 
-        <div class="responsive-ad-container">
-    <div class="earn" style="margin: 0;">
-    <script type="text/javascript">
-	atOptions = {
-		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
-       </div>
-</div>
-
         <div class="card">
             <div class="tab-nav">
-                <button class="tab-button active" onclick="openTab(event, 'taskHistory')"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজের ইতিহাস</button>
-                <button class="tab-button" onclick="openTab(event, 'referralHistory')"><i class="fa-solid fa-users" style="margin-right: 8px;"></i>রেফারেল ইতিহাস</button>
-                <button class="tab-button" onclick="openTab(event, 'balanceHistory')"><i class="fa-solid fa-money-bill-transfer" style="margin-right: 8px;"></i>ব্যালেন্স ইতিহাস</button>
+                <button class="tab-button" onclick="openTab(event, 'taskHistory')"><i class="fa-solid fa-list-check"></i> কাজের ইতিহাস</button>
+                <button class="tab-button" onclick="openTab(event, 'referralHistory')"><i class="fa-solid fa-users"></i> রেফারেল ইতিহাস</button>
+                <button class="tab-button" onclick="openTab(event, 'balanceHistory')"><i class="fa-solid fa-money-bill-transfer"></i> ব্যালেন্স ইতিহাস</button>
             </div>
-
-            <!-- Task History Tab -->
-            <div id="taskHistory" class="tab-content active">
+            
+            <div id="taskHistory" class="tab-content">
                 {% if task_history %}
                     <table class="history-table">
                         <thead><tr><th>তারিখ</th><th>টাস্কের নাম</th><th>স্ট্যাটাস</th></tr></thead>
                         <tbody>
                         {% for task in task_history %}
                             <tr>
-                                <td>
-                                    <!-- Jinja Fix: Check if timestamp exists and is a datetime object -->
-                                    {% if task.get('submitted_at') and task.get('submitted_at').strftime %}
-                                        {{ task.submitted_at.strftime('%d-%b-%Y') }}
-                                    {% else %}
-                                        <span style="color:#999;">প্রসেসিং...</span>
-                                    {% endif %}
-                                </td>
+                                <td>{% if task.get('submitted_at') and task.get('submitted_at').strftime %}{{ task.submitted_at.strftime('%d-%b-%Y') }}{% else %}<span style="color:#999;">প্রসেসিং...</span>{% endif %}</td>
                                 <td>{{ task.get('task_title', 'Unknown Task') }}</td>
                                 <td><span class="status {{ task.get('status', 'unknown') }}">{{ task.get('status', 'N/A')|capitalize }}</span></td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-                {% else %}
-                    <p class="no-data">আপনি এখনো কোনো কাজ জমা দেননি।</p>
-                {% endif %}
+                {% else %}<p class="no-data">আপনি এখনো কোনো কাজ জমা দেননি।</p>{% endif %}
             </div>
-
-            <!-- Referral History Tab -->
             <div id="referralHistory" class="tab-content">
                 {% if my_referrals %}
                     <table class="history-table">
@@ -225,26 +144,15 @@
                         <tbody>
                         {% for ref in my_referrals %}
                             <tr>
-                                <td>
-                                    <!-- Jinja Fix: Check for timestamp -->
-                                    {% if ref.get('timestamp') and ref.get('timestamp').strftime %}
-                                        {{ ref.timestamp.strftime('%d-%b-%Y') }}
-                                    {% else %}
-                                        <span style="color:#999;">প্রসেসিং...</span>
-                                    {% endif %}
-                                </td>
+                                <td>{% if ref.get('timestamp') and ref.get('timestamp').strftime %}{{ ref.timestamp.strftime('%d-%b-%Y') }}{% else %}<span style="color:#999;">প্রসেসিং...</span>{% endif %}</td>
                                 <td>{{ ref.get('referred_user_email', 'N/A') }}</td>
                                 <td class="amount">৳ {{ "%.2f"|format(ref.get('reward_amount', 0)) }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-                {% else %}
-                    <p class="no-data">আপনি এখনো কাউকে সফলভাবে রেফার করেননি।</p>
-                {% endif %}
+                {% else %}<p class="no-data">আপনি এখনো কাউকে সফলভাবে রেফার করেননি।</p>{% endif %}
             </div>
-
-            <!-- Balance History Tab -->
             <div id="balanceHistory" class="tab-content">
                 {% if balance_history %}
                     <table class="history-table">
@@ -252,369 +160,78 @@
                         <tbody>
                         {% for entry in balance_history %}
                             <tr>
-                                <td>
-                                    <!-- Jinja Fix: Check for timestamp -->
-                                    {% if entry.get('timestamp') and entry.get('timestamp').strftime %}
-                                        {{ entry.timestamp.strftime('%d-%b-%y %H:%M') }}
-                                    {% else %}
-                                        <span style="color:#999;">প্রসেসিং...</span>
-                                    {% endif %}
-                                </td>
+                                <td>{% if entry.get('timestamp') and entry.get('timestamp').strftime %}{{ entry.timestamp.strftime('%d-%b-%y %H:%M') }}{% else %}<span style="color:#999;">প্রসেসিং...</span>{% endif %}</td>
                                 <td>{{ entry.get('description', 'No Description') }}</td>
                                 <td class="amount">+ ৳ {{ "%.2f"|format(entry.get('amount', 0)) }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-                {% else %}
-                    <p class="no-data">আপনার কোনো ব্যালেন্স লেনদেনের রেকর্ড নেই।</p>
-                {% endif %}
+                {% else %}<p class="no-data">আপনার কোনো ব্যালেন্স লেনদেনের রেকর্ড নেই।</p>{% endif %}
             </div>
         </div>
     </div>
-<div class="responsive-ad-container">
-    <div class="earn" style="margin: 0;">
-    <script type="text/javascript">
-	atOptions = {
-		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
-       </div>
-</div>
-
-
-	<!-- Adsterra Sticky Footer Ad Code - Start -->
-<style>
-    /* Main container for the sticky ad */
-    .adsterra-sticky-footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #f7f7f7; /* A light background to distinguish from content */
-        z-index: 10000; /* High z-index to stay on top */
-        box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 5px 0;
-        min-height: 60px; /* Minimum height to accommodate the ad and close button */
-        transform: translateY(100%); /* Initially hidden below the screen */
-        transition: transform 0.5s ease-in-out; /* Smooth slide-up animation */
-    }
-
-    /* Class to trigger the slide-up animation */
-    .adsterra-sticky-footer.ad-visible {
-        transform: translateY(0);
-    }
-
-    /* The area where the ad script will be placed */
-    .adsterra-ad-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
     
-    /* The close button for the ad */
-    .adsterra-ad-close {
-        position: absolute;
-        top: -15px; /* Positioned slightly above the ad bar */
-        right: 15px;
-        width: 30px;
-        height: 30px;
-        background-color: rgba(0, 0, 0, 0.7);
-        color: #ffffff;
-        border: 2px solid #ffffff;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: Arial, sans-serif;
-        font-size: 20px;
-        font-weight: bold;
-        cursor: pointer;
-        line-height: 1;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Hide on very small screens if needed */
-    @media (max-width: 320px) {
-        .adsterra-sticky-footer {
-            display: none; /* Example: hide on very narrow screens */
-        }
-    }
-</style>
-
-<div id="adsterraStickyFooter" class="adsterra-sticky-footer">
-    <!-- Close Button -->
-    <div id="adsterraAdClose" class="adsterra-ad-close" title="Close Ad">×</div>
-    
-    <!-- Ad Content Area -->
-    <div class="adsterra-ad-content">
-        <div class="responsive-ad-container">
-    <div class="earn" style="margin: 0;">
-    <script type="text/javascript">
-	atOptions = {
-		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
-       </div>
-</div>
+    <div id="adsterraStickyFooter" class="adsterra-sticky-footer">
+        <div id="adsterraAdClose" class="adsterra-ad-close" title="Close Ad">×</div>
+        <div class="adsterra-ad-content">
+            <script type="text/javascript"> atOptions = {'key' : 'f62367e86bf7296ea58f8b60f94e1218', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}}; </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
+        </div>
     </div>
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const adContainer = document.getElementById('adsterraStickyFooter');
-        const closeButton = document.getElementById('adsterraAdClose');
-
-        // Check if the elements exist on the page
-        if (!adContainer || !closeButton) {
-            return;
-        }
-
-        // --- Show the ad with a delay ---
-        // Ad will slide up after 3 seconds of page load
-        setTimeout(() => {
-            adContainer.classList.add('ad-visible');
-        }, 3000); // 3000ms = 3 seconds
-
-        // --- Close button functionality ---
-        closeButton.addEventListener('click', function() {
-            adContainer.style.display = 'none';
-        });
-    });
-</script>
-<!-- Adsterra Sticky Footer Ad Code - End --><style>
-  /* 
-    The main container for the widget. 
-    The unique class "unique-telegram-widget" prevents style conflicts.
-  */
-  .unique-telegram-widget {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 1000; /* Ensures it's on top of most other elements */
-  }
-
-  /* The link/button itself */
-  .unique-telegram-widget a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    background-color: #0088cc; /* Official Telegram blue */
-    color: #ffffff; /* Icon color */
-    border-radius: 50%;
-    text-decoration: none;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease-in-out;
     
-    /* The pulse animation */
-    animation: telegram-pulse 2s infinite;
-  }
-
-  /* The SVG icon inside the button */
-  .unique-telegram-widget svg {
-    width: 32px;
-    height: 32px;
-    fill: currentColor; /* Inherits the color from the 'a' tag */
-  }
-
-  /* Hover effect for the button */
-  .unique-telegram-widget a:hover {
-    transform: scale(1.1);
-    box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.3);
-    animation: none; /* Stop the pulse animation on hover */
-  }
-
-  /* The tooltip text that appears on hover */
-  .unique-telegram-widget .widget-tooltip {
-    position: absolute;
-    right: 75px; /* Position it to the left of the button */
-    padding: 6px 12px;
-    background-color: #212121;
-    color: #ffffff;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: sans-serif;
-    white-space: nowrap; /* Keep the text on one line */
-    
-    /* Initially hidden */
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
-  }
-
-  /* Show the tooltip on hover */
-  .unique-telegram-widget a:hover .widget-tooltip {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  /* The keyframes for the pulse animation */
-  @keyframes telegram-pulse {
-    0% {
-      transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.7);
-    }
-    70% {
-      transform: scale(1);
-      box-shadow: 0 0 0 10px rgba(0, 136, 204, 0);
-    }
-    100% {
-      transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(0, 136, 204, 0);
-    }
-  }
-</style>
-
-<div class="unique-telegram-widget">
-  <!-- 
-    IMPORTANT: Replace "YOUR_TELEGRAM_USERNAME" with your actual Telegram username.
-    The link opens in a new tab for better user experience.
-  -->
-  <a href="https://t.me/websitesupportr" target="_blank" rel="noopener noreferrer" aria-label="Chat on Telegram">
-    
-    <!-- Tooltip Text -->
-    <span class="widget-tooltip">Chat on Telegram</span>
-    
-    <!-- Embedded SVG Icon for Telegram -->
-    <i class="fab fa-telegram"></i>
-
-  </a>
-</div>
-
-
-	<!-- AdGuard DNS Blocker Detection Script - Start -->
-
-<!-- 1. The CSS for the full-screen blocking overlay -->
-<style>
-    #dns-blocker-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(20, 20, 20, 0.97); /* Dark overlay */
-        z-index: 2147483647; /* Highest z-index to be on top of everything */
-        display: none; /* Hidden by default */
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        color: #ffffff;
-        font-family: "Segoe UI", Arial, sans-serif;
-    }
-
-    #dns-blocker-content {
-        max-width: 650px;
-        padding: 30px;
-    }
-
-    #dns-blocker-content h1 {
-        font-size: 2.2rem;
-        color: #ff5722; /* Warning color */
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    #dns-blocker-content p {
-        font-size: 1.1rem;
-        line-height: 1.7;
-    }
-
-    #dns-blocker-content .highlight-dns {
-        font-weight: bold;
-        color: #ffeb3b; /* Highlight color */
-        background-color: rgba(255, 235, 59, 0.1);
-        padding: 2px 6px;
-        border-radius: 4px;
-    }
-</style>
-
-<!-- 2. The HTML for the overlay message -->
-<div id="dns-blocker-overlay">
-    <div id="dns-blocker-content">
-        <h1>নেটওয়ার্ক ফিল্টারিং শনাক্ত হয়েছে</h1>
-        <p>
-            মনে হচ্ছে আপনি <span class="highlight-dns">AdGuard DNS</span> বা একই ধরনের কোনো DNS-ভিত্তিক অ্যাড-ব্লকার ব্যবহার করছেন, যা আমাদের ওয়েবসাইটের কিছু অংশকে ব্লক করছে।
-        </p>
-        <p>
-            আমাদের ওয়েবসাইট সঠিকভাবে ব্যবহার করতে, অনুগ্রহ করে আপনার DNS সেটিংস পরিবর্তন করুন অথবা আমাদের সাইটটিকে আপনার ফিল্টার থেকে বাদ দিন (whitelist করুন) এবং পেজটি রিফ্রেশ করুন।
-        </p>
+    <div class="unique-telegram-widget">
+        <a href="https://t.me/websitesupportr" target="_blank" rel="noopener noreferrer" aria-label="Chat on Telegram">
+            <i class="fab fa-telegram fa-2x"></i>
+        </a>
     </div>
-</div>
 
-<!-- 3. The JavaScript logic for DNS blocker detection -->
-<script>
-    (function() {
-        // This function will try to fetch a resource from a known ad server.
-        // If it fails with a network error, it's highly likely a DNS blocker is active.
-        async function detectDnsAdBlocker() {
-            // A well-known domain that is on virtually all DNS ad-block lists.
-            const baitURL = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+    <div id="adblocker-overlay">
+        <div id="adblocker-content">
+            <h1>অ্যাড-ব্লকার শনাক্ত হয়েছে</h1>
+            <p>আমাদের ওয়েবসাইট সঠিকভাবে ব্যবহার করতে এবং সকল ফিচার উপভোগ করতে, অনুগ্রহ করে আপনার অ্যাড-ব্লকারটি নিষ্ক্রিয় করুন এবং পেজটি রিফ্রেশ করুন।</p>
+        </div>
+    </div>
 
-            try {
-                // We use 'no-cors' mode to prevent CORS errors from being mistaken for network blocks.
-                // We only care if the request itself fails at the network level.
-                await fetch(baitURL, {
-                    method: 'HEAD', // HEAD is faster as it doesn't download the body
-                    mode: 'no-cors',
-                    cache: 'no-store' // Don't use a cached result
-                });
-                
-                // If the fetch succeeds (doesn't throw an error), no DNS blocker is active.
-                // console.log('DNS check: No blocker detected.');
-
-            } catch (error) {
-                // A 'TypeError: Failed to fetch' is the classic sign of a network-level block.
-                if (error instanceof TypeError) {
-                    // console.error('DNS check: Blocker detected!', error);
-                    const overlay = document.getElementById('dns-blocker-overlay');
-                    if (overlay) {
-                        overlay.style.display = 'flex';
-                        document.body.style.overflow = 'hidden'; // Prevent scrolling
-                    }
-                }
-            }
-        }
-
-        // Run the detection check when the page content is loaded.
-        document.addEventListener('DOMContentLoaded', detectDnsAdBlocker);
-
-    })();
-</script>
-<!-- AdGuard DNS Blocker Detection Script - End -->
     <script>
-        // JavaScript for Tab functionality
+        // Tab functionality
         function openTab(evt, tabName) {
             let i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
+            for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
             tablinks = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
+            for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", ""); }
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
 
+        document.addEventListener("DOMContentLoaded", function() {
+            // Activate the first tab by default
+            const firstTab = document.querySelector('.tab-button');
+            if(firstTab) { firstTab.click(); }
 
-	    
+            // Sticky footer ad functionality
+            const adContainer = document.getElementById('adsterraStickyFooter');
+            const closeButton = document.getElementById('adsterraAdClose');
+            if (adContainer && closeButton) {
+                setTimeout(() => { adContainer.classList.add('ad-visible'); }, 3000);
+                closeButton.addEventListener('click', () => { adContainer.style.display = 'none'; });
+            }
+
+            // Ad blocker detection
+            (async function() {
+                const baitURL = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+                const overlay = document.getElementById('adblocker-overlay');
+                try {
+                    await fetch(baitURL, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' });
+                } catch (error) {
+                    if (error instanceof TypeError && overlay) {
+                        overlay.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            })();
+        });
     </script>
 </body>
 </html>
