@@ -35,6 +35,18 @@
             <p>নিচের বাটনে ক্লিক করে ওয়েবসাইটটি ভিজিট করুন। আপনাকে ৩০ সেকেন্ড অপেক্ষা করতে হবে। টাইমার শেষ হলে কাজটি জমা দেওয়ার বাটন আসবে।</p>
             <a id="visit-link" href="{{ task.target_url }}" target="_blank" class="visit-button">ওয়েবসাইট ভিজিট করুন</a>
             
+<style>
+responsive-ad-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 90px;
+    margin: 10px 0;
+    }
+    </style>
             <div id="timer"></div>
 
             <form id="task-form" method="post" style="display: none;">
