@@ -139,35 +139,84 @@ def signup():
 
 # app.py ফাইলের অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
-@app.route(f'/{SECRET_ADMIN_PATH}/users')
+# app.py -> manage_users ফাংশনটি প্রতিস্থাপন করুন
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users', methods=['GET'])
 def manage_users():
     """
-    সমস্ত ব্যবহারকারীর একটি তালিকা দেখায়।
+    সমস্ত ব্যবহারকারীর তালিকা দেখায় এবং ইমেইল দিয়ে সার্চ করার সুবিধা দেয়।
     """
     try:
-        # 'users' কালেকশন থেকে সমস্ত ডকুমেন্ট আনা হচ্ছে
-        # created_at অনুযায়ী সর্ট করা হচ্ছে যাতে নতুন ইউজাররা উপরে থাকে
-        users_query = db.collection('users').order_by('created_at', direction=firestore.Query.DESCENDING).stream()
+        search_email = request.args.get('search_email', '').strip()
+        
+        users_ref = db.collection('users')
+        
+        # যদি সার্চ করা হয়
+        if search_email:
+            users_query = users_ref.where('email', '==', search_email).stream()
+        else:
+            # যদি সার্চ করা না হয়, তাহলে সব ইউজারকে আনা হচ্ছে
+            users_query = users_ref.order_by('created_at', direction=firestore.Query.DESCENDING).limit(50).stream() # পারফরম্যান্সের জন্য লিমিট যোগ করা হলো
         
         all_users = []
         for user_doc in users_query:
             user_data = user_doc.to_dict()
-            user_data['id'] = user_doc.id  # ইউজারের ইউনিক ডকুমেন্ট আইডি যোগ করা হচ্ছে
-            all_users.append(user_data)
+            user_data['id'] = user_doc.id
             
-        return render_template('users_list.html', all_users=all_users, admin_path=SECRET_ADMIN_PATH)
+            # --- প্রতিটি ইউজারের রেফারেল সংখ্যা গণনা ---
+            referrals_query = db.collection('referrals').where('referrer_id', '==', user_doc.id)
+            # .stream() ব্যবহার না করে সরাসরি .get() ব্যবহার করে size প্রপার্টি নেওয়া যায় (ছোট ডেটাসেটের জন্য)
+            # কিন্তু বড় ডেটাসেটের জন্য এটি খরচসাপেক্ষ হতে পারে।
+            # একটি বিকল্প হলো 'users' ডকুমেন্টে একটি 'referral_count' ফিল্ড রাখা এবং রেফারেলের সময় সেটি আপডেট করা।
+            # எளிமையের জন্য আমরা এখন সরাসরি গণনা করছি।
+            referral_count = len(list(referrals_query.stream()))
+            user_data['referral_count'] = referral_count
+            
+            all_users.append(user_data)
+        
+        # মোট ব্যবহারকারীর সংখ্যা গণনা
+        total_users = len(list(db.collection('users').stream()))
+
+        return render_template('admin/users_list.html', 
+                               all_users=all_users, 
+                               total_users=total_users,
+                               search_email=search_email,
+                               admin_path=SECRET_ADMIN_PATH)
         
     except Exception as e:
-        flash(f"ব্যবহারকারীদের তথ্য আনতে একটি সমস্যা হয়েছে: {e}", "error")
-        # যদি কোনো এরর হয়, তাহলে অ্যাডমিন ড্যাশবোর্ডে ফেরত পাঠানো হবে
+        print(f"Error fetching users: {e}")
+        flash(f"ব্যবহারকারীদের তথ্য আনতে একটি সমস্যা হয়েছে।", "error")
         return redirect(url_for('admin_dashboard'))
-
+        
 @app.route('/login')
 def login():
     if 'user_id' in session: return redirect(url_for('dashboard'))
     config_data = {'firebase_api_key': os.getenv('FIREBASE_API_KEY'), 'firebase_auth_domain': os.getenv('FIREBASE_AUTH_DOMAIN'), 'firebase_project_id': os.getenv('FIREBASE_PROJECT_ID')}
     return render_template('login.html', config=config_data)
 
+# app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users/toggle-ban/<user_id>')
+def toggle_user_ban(user_id):
+    """
+    একজন ব্যবহারকারীকে ব্যান বা আন-ব্যান করে।
+    """
+    try:
+        user_ref = db.collection('users').document(user_id)
+        user_doc = user_ref.get()
+        if user_doc.exists:
+            current_status = user_doc.to_dict().get('status', 'active')
+            new_status = 'banned' if current_status == 'active' else 'active'
+            
+            user_ref.update({'status': new_status})
+            
+            flash(f"ব্যবহারকারীর স্ট্যাটাস সফলভাবে '{new_status}'-এ পরিবর্তন করা হয়েছে।", "success")
+        else:
+            flash("ব্যবহারকারীকে খুঁজে পাওয়া যায়নি।", "error")
+    except Exception as e:
+        flash(f"স্ট্যাটাস পরিবর্তন করার সময় একটি সমস্যা হয়েছে: {e}", "error")
+
+    return redirect(url_for('manage_users'))
 # app.py ফাইলের শেষে যোগ করুন
 
 # --- Custom Error Handler for 404 Not Found ---
@@ -358,55 +407,87 @@ def gase_page():
 
 
 
-
+# app.py ফাইলের ভেতরে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
+# ফাইলের উপরে from google.cloud.firestore_v1.base_query import FieldFilter ইম্পোর্ট করা ভালো
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    user_id = session['user_id']
-    user_doc = db.collection('users').document(user_id).get()
-    if not user_doc.exists:
-        session.clear()
-        return redirect(url_for('login'))
+    """
+    ব্যবহারকারীর ড্যাশবোর্ড দেখায়। এটি ব্যবহারকারীর তথ্য, নোটিফিকেশন,
+    এবং বিভিন্ন কাজের ইতিহাস Firestore থেকে এনে টেমপ্লেটে পাস করে।
+    """
+    try:
+        user_id = session['user_id']
+        user_ref = db.collection('users').document(user_id)
+        user_doc = user_ref.get()
+
+        # যদি কোনো কারণে ডাটাবেসে ইউজার না থাকে
+        if not user_doc.exists:
+            session.clear() # সেশন পরিষ্কার করে দেওয়া হচ্ছে
+            flash("আপনার একাউন্ট খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আবার লগইন করুন।", "error")
+            return redirect(url_for('login'))
+            
+        user = user_doc.to_dict()
         
-    user = user_doc.to_dict()
-    referral_link = url_for('signup', ref=user.get('my_referral_code'), _external=True)
+        # --- ব্যান স্ট্যাটাস চেক করা ---
+        is_banned = user.get('status') == 'banned'
 
-    # ১. Fetching notifications (আপনার কোডে এটি আছে)
-    notifications_query = db.collection('notifications').where('user_id', '==', user_id).where('is_read', '==', False).order_by('timestamp', direction=firestore.Query.DESCENDING)
-    notifications = [dict(doc.to_dict(), **{'id': doc.id}) for doc in notifications_query.stream()]
-    
-    # ২. Fetching task submission history (আপনার কোডে এটি আছে)
-    submissions_query = db.collection('task_submissions').where('user_id', '==', user_id).order_by('submitted_at', direction=firestore.Query.DESCENDING).limit(10).stream()
-    task_history = [doc.to_dict() for doc in submissions_query]
+        # রেফারেল লিঙ্ক তৈরি করা
+        referral_link = url_for('signup', ref=user.get('my_referral_code'), _external=True)
 
-    # --- নতুন করে যোগ করা অংশ ---
-    # ৩. Fetching Referral History
-    referrals_query = db.collection('referrals').where('referrer_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(10).stream()
-    my_referrals = [doc.to_dict() for doc in referrals_query]
+        # --- বিভিন্ন কালেকশন থেকে ডেটা আনা হচ্ছে ---
+        
+        # ১. অপঠিত নোটিফিকেশন আনা (is_read == False)
+        # এর জন্য Firestore Composite Index প্রয়োজন হবে
+        notifications_query = db.collection('notifications') \
+                                .where('user_id', '==', user_id) \
+                                .where('is_read', '==', False) \
+                                .order_by('timestamp', direction=firestore.Query.DESCENDING)
+        notifications = [dict(doc.to_dict(), **{'id': doc.id}) for doc in notifications_query.stream()]
+        
+        # ২. টাস্ক সাবমিশনের ইতিহাস আনা (সাম্প্রতিক ১০টি)
+        submissions_query = db.collection('task_submissions') \
+                                .where('user_id', '==', user_id) \
+                                .order_by('submitted_at', direction=firestore.Query.DESCENDING) \
+                                .limit(10)
+        task_history = [doc.to_dict() for doc in submissions_query.stream()]
 
-    # ৪. Fetching Balance History
-    balance_query = db.collection('balance_history').where('user_id', '==', user_id).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(10).stream()
-    balance_history = [doc.to_dict() for doc in balance_query]
-    # --- নতুন অংশ শেষ ---
+        # ৩. রেফারেল হিস্টোরি আনা (সাম্প্রতিক ১০টি)
+        referrals_query = db.collection('referrals') \
+                              .where('referrer_id', '==', user_id) \
+                              .order_by('timestamp', direction=firestore.Query.DESCENDING) \
+                              .limit(10)
+        my_referrals = [doc.to_dict() for doc in referrals_query.stream()]
 
-    # --- render_template এ নতুন ভেরিয়েবলগুলো যোগ করা ---
-    return render_template(
-        'dashboard.html', 
-        user=user, 
-        referral_link=referral_link, 
-        notifications=notifications, 
-        task_history=task_history,
-        my_referrals=my_referrals,      # <-- এই ভেরিয়েবলটি যোগ করা হয়েছে
-        balance_history=balance_history # <-- এই ভেরিয়েবলটিও যোগ করা হয়েছে
-    )
-    # app.py -> view_task ফাংশনটি ডিবাগিং এর জন্য পরিবর্তন করুন
+        # ৪. ব্যালেন্স হিস্টোরি আনা (সাম্প্রতিক ১০টি)
+        balance_query = db.collection('balance_history') \
+                            .where('user_id', '==', user_id) \
+                            .order_by('timestamp', direction=firestore.Query.DESCENDING) \
+                            .limit(10)
+        balance_history = [doc.to_dict() for doc in balance_query.stream()]
+        
+        # --- সমস্ত ডেটা টেমপ্লেটে পাঠানো হচ্ছে ---
+        return render_template(
+            'dashboard.html', 
+            user=user, 
+            is_banned=is_banned,
+            referral_link=referral_link, 
+            notifications=notifications, 
+            task_history=task_history,
+            my_referrals=my_referrals,
+            balance_history=balance_history
+        )
 
-# app.py ফাইলের ভেতরে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
-
-
-# app.py ফাইলের ভেতরে এই নতুন ফাংশনটি যোগ করুন
-
+    except Exception as e:
+        # যদি কোনো অপ্রত্যাশিত এরর হয় (যেমন, Firestore কানেকশন সমস্যা)
+        print(f"--- ERROR in /dashboard route ---")
+        print(f"Error for user_id: {session.get('user_id')}")
+        print(f"Error details: {e}")
+        print(f"---------------------------------")
+        flash("ড্যাশবোর্ড লোড করার সময় একটি সমস্যা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।", "error")
+        # এরর হলে লগআউট করে দেওয়া যেতে পারে অথবা একটি এরর পেইজে পাঠানো যেতে পারে
+        return redirect(url_for('login'))
 @app.route('/tasks')
 @login_required
 def tasks_page():
