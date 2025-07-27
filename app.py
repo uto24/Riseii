@@ -357,7 +357,7 @@ def withdraw_page():
     # এই কোয়েরিটি কার্যকর করার জন্য Firestore Index প্রয়োজন হতে পারে
     referrals_query = db.collection('referrals').where('referrer_id', '==', user_id)
     referral_count = len(list(referrals_query.stream()))
-    are_referrals_eligible = referral_count >= 2
+    are_referrals_eligible = referral_count >= 5
 
     # শর্ত ৩: অ্যাকাউন্টের বয়স
     account_created_at = user_data.get('created_at')
