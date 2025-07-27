@@ -239,6 +239,20 @@ def login():
 
 # app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
+@app.route(f'/{SECRET_ADMIN_PATH}/users/update-note/<user_id>', methods=['POST'])
+def update_admin_note(user_id):
+  
+    try:
+        data = request.get_json()
+        note_text = data.get('note', '')
+        
+        user_ref = db.collection('users').document(user_id)
+        user_ref.update({'admin_note': note_text})
+        
+        return jsonify({"status": "success", "message": "নোট সফলভাবে সেভ হয়েছে।"}), 200
+    except Exception as e:
+        print(f"Error updating note for user {user_id}: {e}")
+        return jsonify({"status": "error", "message": "নোট সেভ করার সময় সমস্যা হয়েছে।"}), 500
 @app.route(f'/{SECRET_ADMIN_PATH}/users/toggle-ban/<user_id>')
 def toggle_user_ban(user_id):
     """
