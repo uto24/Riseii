@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>গ্যাস ফি পেমেন্ট - টাস্ক অ্যাপ</title>
+    <title>পাসকী এবং গ্যাস ফি - টাস্ক অ্যাপ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
@@ -12,20 +12,27 @@
         .container { max-width: 700px; margin: auto; }
         .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
         .card h2 { margin-top: 0; font-size: 24px; text-align: center; color: #1877f2; border-bottom: 1px solid #e9ebee; padding-bottom: 15px; margin-bottom: 20px; }
-        .card h3 { font-size: 18px; font-weight: 600; color: #1c1e21; margin-bottom: 15px; }
+        .card h3 { font-size: 18px; font-weight: 600; color: #1c1e21; margin-bottom: 15px; display: flex; align-items: center; }
+        .card h3 i { margin-right: 10px; color: #1877f2; }
         p, li { line-height: 1.7; color: #3c4043; }
         
         .payment-info { background-color: #e9f5ff; padding: 20px; border-radius: 8px; border: 1px solid #b3e5fc; }
-        .payment-number-box { display: flex; justify-content: space-between; align-items: center; background-color: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; }
-        .payment-number { font-size: 1.5em; font-weight: 700; letter-spacing: 1px; }
+        .payment-number-box { display: flex; justify-content: space-between; align-items: center; background-color: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #ddd; }
+        .payment-number { font-size: 1.5em; font-weight: 700; letter-spacing: 1px; color: #d32f2f; }
         .copy-btn { background-color: #1877f2; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+        /* --- Passkey Info Section --- */
+        .passkey-info-box { background-color: #fffbe6; padding: 20px; border-radius: 8px; border: 1px solid #ffe58f; }
+        .passkey-info-box ul { padding-left: 20px; }
+        .passkey-info-box li { margin-bottom: 8px; }
+        .passkey-info-box strong { color: #1c1e21; }
 
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #606770; }
         .form-group input, .form-group select { width: 100%; padding: 14px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
         
-        .btn-submit { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 17px; background-color: #28a745; color: white; }
-        .btn-submit:disabled { background-color: #a8d9a1; cursor: not-allowed; }
+        .btn-submit { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 17px; background-color: #28a745; color: white; transition: background-color 0.2s; }
+        .btn-submit:hover { background-color: #218838; }
 
         .back-link { display: inline-block; margin-bottom: 20px; color: #1877f2; text-decoration: none; font-weight: 600; }
         .flash { padding: 1em; margin-bottom: 1em; border-radius: 6px; color: white; font-weight: 500; text-align: center; }
@@ -38,11 +45,26 @@
 
         <div class="card">
             <h2><i class="fa-solid fa-shield-halved" style="margin-right: 10px;"></i>পাসকী এবং গ্যাস ফি</h2>
-            <p>আপনার অ্যাকাউন্টের সর্বোচ্চ সুরক্ষা নিশ্চিত করতে এবং উইথড্র প্রক্রিয়া সম্পন্ন করতে, আপনাকে একটি এককালীন গ্যাস ফি প্রদান করতে হবে। সফল পেমেন্টের পর আপনার रजिस्टर्ड ইমেইলে একটি গোপন **পাসকী (Passkey)** পাঠানো হবে, যা প্রতিটি উইথড্রর সময় প্রয়োজন হবে।</p>
+            <p>আপনার অ্যাকাউন্টের সর্বোচ্চ সুরক্ষা নিশ্চিত করতে এবং উইথড্র প্রক্রিয়া সম্পন্ন করতে, আপনাকে একটি **এককালীন গ্যাস ফি** প্রদান করতে হবে। এটি আমাদের সিস্টেমকে সুরক্ষিত রাখতে এবং লেনদেন প্রক্রিয়াকে মসৃণ করতে সাহায্য করে।</p>
+        </div>
+
+        <!-- =============================================== -->
+        <!--         নতুন পাসকী সম্পর্কিত তথ্য সেকশন         -->
+        <!-- =============================================== -->
+        <div class="card">
+            <h3><i class="fa-solid fa-key"></i> পাসকী কী এবং কেন প্রয়োজন?</h3>
+            <div class="passkey-info-box">
+                <p>গ্যাস ফি সফলভাবে প্রদান করার পর, আপনার রেজিস্টার্ড ইমেইলে আমরা একটি **গোপন পাসকী (Passkey)** পাঠাবো।</p>
+                <ul>
+                    <li><strong>সর্বোচ্চ সুরক্ষা:</strong> এই পাসকীটি একটি অতিরিক্ত নিরাপত্তা স্তর হিসেবে কাজ করে। শুধুমাত্র আপনিই আপনার অ্যাকাউন্ট থেকে টাকা তুলতে পারবেন।</li>
+                    <li><strong>এককালীন ফি:</strong> গ্যাস ফি এবং পাসকী শুধুমাত্র একবারই নিতে হয়। পরবর্তী সকল উইথড্রর জন্য আপনি এই একই পাসকী ব্যবহার করতে পারবেন।</li>
+                    <li><strong>গোপনীয়তা:</strong> আপনার পাসকীটি অত্যন্ত গোপনীয়। এটি কারো সাথে শেয়ার করবেন না।</li>
+                </ul>
+            </div>
         </div>
 
         <div class="card">
-            <h3><i class="fa-solid fa-money-check-dollar" style="margin-right: 10px;"></i>পেমেন্ট নির্দেশনা (এককালীন: ২০৳)</h3>
+            <h3><i class="fa-solid fa-money-check-dollar"></i> পেমেন্ট নির্দেশনা (এককালীন: ২০৳)</h3>
             <div class="payment-info">
                 <p>নিচের নম্বরে **২০ টাকা** সেন্ড মানি করুন এবং তারপর আপনার পেমেন্টের তথ্য নিচের ফর্মে জমা দিন।</p>
                 <div class="payment-number-box">
@@ -51,16 +73,14 @@
                 </div>
             </div>
 
-            <hr style="margin: 25px 0; border-style: dashed;">
+            <hr style="margin: 25px 0; border: none; border-top: 1px dashed #ced0d4;">
 
             <h3>পেমেন্টের তথ্য জমা দিন</h3>
             
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
+                {% if messages %}{% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}{% endif %}
             {% endwith %}
 
             <form method="post">
