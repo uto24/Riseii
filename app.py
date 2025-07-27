@@ -58,33 +58,57 @@ def index():
     return render_template('index.html')
 # app.py -> signup ফাংশনটি আপডেট করুন
 
+# app.py ফাইলের ভেতরে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if 'user_id' in session: return redirect(url_for('dashboard'))
-    
+    """
+    ব্যবহারকারী নিবন্ধনের জন্য GET এবং POST রিকোয়েস্ট হ্যান্ডেল করে।
+    সফল রেফারেলের জন্য বোনাস এবং ইতিহাস রেকর্ড করে।
+    """
+    # যদি ইউজার ইতিমধ্যে লগইন করা থাকে, তাকে ড্যাশবোর্ডে পাঠানো হবে
+    if 'user_id' in session: 
+        return redirect(url_for('dashboard'))
+
+    # যখন ইউজার ফর্ম সাবমিট করবে
     if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
+        # ফর্ম থেকে সমস্ত তথ্য সংগ্রহ করা হচ্ছে
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password')
+        facebook_profile = request.form.get('facebook_profile', '').strip()
         referrer_code = request.form.get('referrer_code', '').strip().upper()
+
+        # প্রাথমিক ভ্যালিডেশন
+        if not all([name, email, password]):
+            flash("অনুগ্রহ করে নাম, ইমেইল এবং পাসওয়ার্ড পূরণ করুন।", "error")
+            return redirect(url_for('signup'))
         
         try:
-            user_record = auth.create_user(email=email, password=password, display_name=name)
+            # Firebase Authentication ব্যবহার করে নতুন ইউজার তৈরি
+            user_record = auth.create_user(
+                email=email,
+                password=password,
+                display_name=name
+            )
             
+            # Firestore-এ সেভ করার জন্য ইউজার ডেটা প্রস্তুত করা
             user_data = {
-                'name': name, 'email': email, 'balance': 0.0,
-                'referred_by': referrer_code,
-                'my_referral_code': generate_referral_code(), # প্রতিটি নতুন ইউজারের জন্য একটি রেফারেল কোড তৈরি হচ্ছে
+                'name': name, 
+                'email': email, 
+                'balance': 0.0,
+                'facebook_profile': facebook_profile,
+                'referred_by': referrer_code, 
+                'my_referral_code': generate_referral_code(),
                 'created_at': firestore.SERVER_TIMESTAMP
             }
             user_doc_ref = db.collection('users').document(user_record.uid)
             user_doc_ref.set(user_data)
             
-            # --- ডিবাগিং এবং উন্নত রেফারেল লজিক ---
+            # --- রেফারেল বোনাস এবং হিস্টোরি লজিক ---
             if referrer_code:
                 print(f"DEBUG: Attempting to find referrer with code: {referrer_code}")
                 
-                # কোয়েরি চালানো হচ্ছে
                 query = db.collection('users').where('my_referral_code', '==', referrer_code).limit(1).stream()
                 referrer_list = list(query)
 
@@ -92,50 +116,69 @@ def signup():
                     referrer_doc = referrer_list[0]
                     print(f"DEBUG: Referrer found! User ID: {referrer_doc.id}")
 
-                    # --- বোনাস এবং হিস্টোরি যোগ করার কোড (আগের মতোই) ---
                     referrer_ref = db.collection('users').document(referrer_doc.id)
-                    reward_amount = 10.0
+                    reward_amount = 10.0 # রেফারেল বোনাসের পরিমাণ
 
+                    # ১. রেফারার এবং নতুন ইউজারকে বোনাস দিন
                     referrer_ref.update({'balance': firestore.Increment(reward_amount)})
                     user_doc_ref.update({'balance': firestore.Increment(reward_amount)})
 
+                    # ২. `referrals` কালেকশনে রেকর্ড তৈরি করুন
                     db.collection('referrals').add({
-                        'referrer_id': referrer_doc.id, 'referred_id': user_record.uid,
-                        'referred_user_email': email, 'reward_amount': reward_amount,
+                        'referrer_id': referrer_doc.id, 
+                        'referred_id': user_record.uid,
+                        'referred_user_email': email, 
+                        'reward_amount': reward_amount,
                         'timestamp': firestore.SERVER_TIMESTAMP
                     })
                     
+                    # ৩. রেফারারের জন্য `balance_history` তৈরি করুন
                     db.collection('balance_history').add({
-                        'user_id': referrer_doc.id, 'amount': reward_amount,
-                        'type': 'referral_bonus', 'description': f'Bonus for referring {email}',
+                        'user_id': referrer_doc.id, 
+                        'amount': reward_amount,
+                        'type': 'referral_bonus', 
+                        'description': f'Bonus for referring {email}',
                         'timestamp': firestore.SERVER_TIMESTAMP
                     })
                     
+                    # ৪. নতুন ইউজারের জন্য `balance_history` তৈরি করুন
                     db.collection('balance_history').add({
-                        'user_id': user_record.uid, 'amount': reward_amount,
-                        'type': 'signup_referral_bonus', 'description': f'Bonus for joining with code {referrer_code}',
+                        'user_id': user_record.uid, 
+                        'amount': reward_amount,
+                        'type': 'signup_referral_bonus', 
+                        'description': f'Bonus for joining with code {referrer_code}',
                         'timestamp': firestore.SERVER_TIMESTAMP
                     })
                     
                     flash('রেফারেলের জন্য আপনি এবং আপনার বন্ধু উভয়েই বোনাস পেয়েছেন!', 'info')
                 else:
-                    # যদি রেফারারকে খুঁজে পাওয়া না যায়
                     print(f"DEBUG: No referrer found with code: {referrer_code}. No bonus given.")
                     flash("রেজিস্ট্রেশন সফল হয়েছে, কিন্তু রেফারেল কোডটি সঠিক নয়।", "warning")
 
-            flash('রেজিস্ট্রেশন সফল হয়েছে!', 'success')
+            flash('রেজিস্ট্রেশন সফল হয়েছে! এখন লগইন করুন।', 'success')
             return redirect(url_for('login'))
             
+        except auth.EmailAlreadyExistsError:
+            flash("এই ইমেইল দিয়ে ইতিমধ্যে একটি একাউন্ট খোলা আছে।", "error")
+            return redirect(url_for('signup'))
         except Exception as e:
-            flash(f"একটি সমস্যা হয়েছে: {e}", "error")
+            print(f"ERROR during signup: {e}")
+            flash(f"নিবন্ধনের সময় একটি অপ্রত্যাশিত সমস্যা হয়েছে।", "error")
             return redirect(url_for('signup'))
 
-    # ... (GET রিকোয়েস্টের কোড অপরিবর্তিত) ...
-
-    config_data = {'firebase_api_key': os.getenv('FIREBASE_API_KEY'), 'firebase_auth_domain': os.getenv('FIREBASE_AUTH_DOMAIN'), 'firebase_project_id': os.getenv('FIREBASE_PROJECT_ID')}
-    return render_template('signup.html', ref_code=request.args.get('ref', ''), config=config_data)
-
-
+    # GET রিকোয়েস্টের জন্য (যখন পেইজটি প্রথম লোড হয়)
+    is_logged_in = 'user_id' in session
+    config_data = {
+        'firebase_api_key': os.getenv('FIREBASE_API_KEY'),
+        'firebase_auth_domain': os.getenv('FIREBASE_AUTH_DOMAIN'),
+        'firebase_project_id': os.getenv('FIREBASE_PROJECT_ID')
+    }
+    return render_template(
+        'signup.html', 
+        ref_code=request.args.get('ref', ''), 
+        config=config_data, 
+        is_logged_in=is_logged_in
+    )
 
 # app.py ফাইলের অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
