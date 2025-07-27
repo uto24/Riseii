@@ -6,23 +6,30 @@
     <title>সকল ব্যবহারকারী - অ্যাডমিন প্যানেল</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        /* আগের CSS কোড এখানে থাকবে */
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; }
+        .container { max-width: 1400px; margin: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; }
         .back-link { color: #1877f2; text-decoration: none; font-weight: 600; }
         .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .stats-and-search { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
         .stats-box { font-size: 1.2rem; font-weight: 600; }
         .search-box { display: flex; gap: 10px; }
-        .search-box input { padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        .search-box input { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
         .search-box button { padding: 10px 15px; border: none; background: #1877f2; color: white; border-radius: 6px; cursor: pointer; }
-        .user-table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        .user-table th, .user-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e9ebee; }
-        .user-table .status-banned { color: #dc3545; font-weight: bold; }
-        .actions a { text-decoration: none; color: white; padding: 6px 12px; border-radius: 5px; }
+        .user-table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        .user-table th, .user-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #e9ebee; vertical-align: middle; }
+        .user-table th { background-color: #f7f7f9; font-weight: 600; color: #606770; }
+        .user-table td { color: #3c4043; }
+        .status-banned { color: #dc3545; font-weight: bold; }
+        .actions a { text-decoration: none; color: white; padding: 6px 12px; border-radius: 5px; font-size: 14px; }
         .btn-ban { background-color: #dc3545; }
         .btn-unban { background-color: #28a745; }
+        
+        /* --- Admin Note Styles --- */
+        .admin-note-container { display: flex; align-items: center; gap: 8px; }
+        .admin-note-input { width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 6px; font-size: 13px; }
+        .admin-note-save-btn { background: #007bff; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .note-status { font-size: 12px; color: green; display: none; }
     </style>
 </head>
 <body>
@@ -42,7 +49,14 @@
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>নাম</th><th>ইমেইল</th><th>ব্যালেন্স (৳)</th><th>রেফারেল</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th>
+                            <th>নাম</th>
+                            <th>ইমেইল</th>
+                            <th>ফেসবুক</th>
+                            <th>ব্যালেন্স (৳)</th>
+                            <th>রেফারেল</th>
+                            <th>স্ট্যাটাস</th>
+                            <th style="width: 200px;">অ্যাডমিন নোট</th>
+                            <th style="width: 120px;">অ্যাকশন</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,6 +64,15 @@
                         <tr>
                             <td>{{ user.get('name', 'N/A') }}</td>
                             <td>{{ user.get('email', 'N/A') }}</td>
+                            <td>
+                                {% if user.get('facebook_profile') %}
+                                    <a href="{{ user.facebook_profile }}" target="_blank" title="Visit Profile">
+                                        <i class="fa-brands fa-facebook" style="color: #1877f2; font-size: 1.5rem;"></i>
+                                    </a>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
                             <td>{{ "%.2f"|format(user.get('balance', 0)) }}</td>
                             <td>{{ user.get('referral_count', 0) }}</td>
                             <td>
@@ -58,6 +81,13 @@
                                 {% else %}
                                     <span>Active</span>
                                 {% endif %}
+                            </td>
+                            <td>
+                                <div class="admin-note-container">
+                                    <input type="text" class="admin-note-input" data-userid="{{ user.id }}" value="{{ user.get('admin_note', '') }}" placeholder="নোট লিখুন...">
+                                    <button class="admin-note-save-btn" data-userid="{{ user.id }}">Save</button>
+                                </div>
+                                <small class="note-status" id="status-{{ user.id }}"></small>
                             </td>
                             <td class="actions">
                                 {% if user.get('status') == 'banned' %}
@@ -73,5 +103,51 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const saveButtons = document.querySelectorAll('.admin-note-save-btn');
+
+            saveButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-userid');
+                    const noteInput = document.querySelector(`.admin-note-input[data-userid='${userId}']`);
+                    const noteText = noteInput.value;
+                    const statusEl = document.getElementById(`status-${userId}`);
+
+                    // API তে POST রিকোয়েস্ট পাঠানো
+                    fetch(`/{{ admin_path }}/users/update-note/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ note: noteText }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            statusEl.textContent = 'Saved!';
+                            statusEl.style.color = 'green';
+                        } else {
+                            statusEl.textContent = 'Error!';
+                            statusEl.style.color = 'red';
+                        }
+                        
+                        statusEl.style.display = 'inline';
+                        setTimeout(() => {
+                            statusEl.style.display = 'none';
+                        }, 2000); // ২ সেকেন্ড পর মেসেজটি চলে যাবে
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        statusEl.textContent = 'Network Error!';
+                        statusEl.style.color = 'red';
+                        statusEl.style.display = 'inline';
+                    });
+                });
+            });
+        });
+    </script>
+
 </body>
 </html>
