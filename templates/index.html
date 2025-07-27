@@ -7,540 +7,234 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+
     <style>
         :root {
-            --bg-color: #121212;
-            --primary-color: #1f1f1f;
-            --accent-color: #00ffc6;
-            --text-color: #e0e0e0;
-            --text-secondary-color: #a0a0a0;
-            --border-color: #333;
+            --primary-blue: #007aff;
+            --dark-blue: #0d1a2e;
+            --bg-light: #f8f9fa;
+            --border-color: #e5e7eb;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --white: #ffffff;
         }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color); color: var(--text-color); }
-        .main-container { display: flex; flex-direction: column; align-items: center; justify-content: center;  text-align: center; padding: 2rem; box-sizing: border-box; }
-        .notice-card { background-color: var(--primary-color); border-radius: 12px; padding: 2.5rem; max-width: 650px; width: 100%; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border-top: 4px solid var(--accent-color); }
-        .icon-upgrade { width: 60px; height: 60px; color: var(--accent-color); margin-bottom: 1rem; animation: pulse 2s infinite ease-in-out; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
-        h1 { font-size: 2.2rem; font-weight: 700; margin: 0 0 0.5rem 0; background: linear-gradient(90deg, #ffffff, #aafff0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .notice-text { font-size: 1.1rem; color: var(--text-secondary-color); line-height: 1.7; margin-bottom: 2rem; }
-        strong { color: var(--accent-color); font-weight: 600; }
-        .divider { height: 1px; background: var(--border-color); margin: 2rem auto; width: 80%; }
-        .site-content h2 { font-size: 1.5rem; font-weight: 600; color: var(--text-color); margin-bottom: 1.5rem; }
-        .features-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; text-align: left; }
-        .feature-item { background-color: #252525; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-color); font-size: 1rem; font-weight: 500; }
-        .footer { margin-top: 2rem; font-size: 0.9rem; color: #666; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--white); color: var(--text-dark); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .section { padding: 80px 0; }
+        .text-center { text-align: center; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; border: 1px solid transparent; }
+        .btn-dark { background-color: var(--dark-blue); color: var(--white); }
+        .btn-dark:hover { background-color: #2c3e50; }
+        .btn-light { background: var(--white); color: var(--dark-blue); border-color: var(--border-color); }
+        .btn-light:hover { background-color: var(--bg-light); }
         
-        /* --- নতুন বাটন স্টাইল --- */
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-        }
-        .btn {
-            text-decoration: none;
-            color: var(--bg-color);
-            background-color: var(--accent-color);
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            border: 2px solid var(--accent-color);
-        }
-        .btn:hover {
-            background-color: transparent;
-            color: var(--accent-color);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 255, 198, 0.1);
-        }
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--accent-color);
-        }
-        .btn-secondary:hover {
-            background-color: var(--accent-color);
-            color: var(--bg-color);
-        }
+        /* Header */
+        .header { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); }
+        .navbar { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary-blue); text-decoration: none; }
+        .nav-menu { list-style: none; display: flex; align-items: center; gap: 2.5rem; }
+        .nav-menu a { text-decoration: none; color: var(--text-dark); font-weight: 500; }
+        .nav-actions { display: flex; gap: 16px; }
+        .menu-toggle { display: none; background: none; border: none; font-size: 24px; color: var(--text-dark); cursor: pointer; }
+
+        /* Hero Section */
+        .hero { padding-top: 64px; }
+        .hero h1 { font-size: 48px; font-weight: 700; line-height: 1.2; margin-bottom: 24px; }
+        .hero p { font-size: 18px; color: var(--text-light); max-width: 600px; margin: 0 auto 32px; }
+        .hero-actions { display: flex; justify-content: center; gap: 16px; }
+        .hero-image { max-width: 100%; margin-top: 64px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
         
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            .notice-card { padding: 1.5rem; }
-            .notice-text { font-size: 1rem; }
-            .action-buttons { flex-direction: column; }
-        }
+        /* Features & Testimonials */
+        .section-tag { display: inline-block; background-color: #E0F2FE; color: var(--primary-blue); padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+        .section-title { font-size: 32px; margin-bottom: 16px; }
+        .section-subtitle { max-width: 600px; margin: 0 auto 48px; color: var(--text-light); }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+        .feature-card, .testimonial-card { background-color: var(--bg-light); padding: 32px; border-radius: 16px; text-align: left; }
+        .testimonial-author { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
+        .testimonial-author img { width: 48px; height: 48px; border-radius: 50%; }
 
-		.responsive-ad-container {
-  display: flex;
-  justify-content: center; /* বিজ্ঞাপনটিকে মাঝখানে আনে */
-  align-items: center;
-  width: 100%;             /* কন্টেইনারকে পুরো চওড়া করে */
-  max-width: 100%;         /* নিশ্চিত করে যেন স্ক্রিনের বাইরে না যায় */
-  overflow: hidden;        /* বিজ্ঞাপনের বাড়তি অংশ লুকিয়ে ফেলে */
-  height: 90px;            /* বিজ্ঞাপনের উচ্চতা অনুযায়ী উচ্চতা সেট করে */
-  margin: 10px 0;          /* উপরে ও নিচে কিছুটা জায়গা রাখে */
-}
-
-
-        /* --- HEADER STYLES --- */
-        .site-header {
-            background-color: var(--primary-color);
-            padding: 0 2rem;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            position: sticky; /* হেডারকে স্ক্রলিং এর সাথে উপরে আটকে রাখবে */
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* --- LOGO STYLES --- */
-        .logo a {
-            text-decoration: none;
-            color: var(--accent-color);
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        /* --- NAVIGATION MENU STYLES (Desktop) --- */
-        .nav-menu {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            margin: 0;
-            padding: 0;
-            gap: 2rem;
-        }
-
-        .nav-menu li a {
-            text-decoration: none;
-            color: var(--text-color);
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 5px 0;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-menu li a:hover {
-            color: var(--accent-color);
-        }
-
-        /* Underline effect on hover */
-        .nav-menu li a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -2px;
-            left: 0;
-            background-color: var(--accent-color);
-            transition: width 0.3s ease;
-        }
-
-        .nav-menu li a:hover::after {
-            width: 100%;
-        }
+        /* CTA Section */
+        .cta-section { background: var(--dark-blue); color: var(--white); border-radius: 24px; padding: 80px 40px; }
+        .cta-section h2 { font-size: 36px; }
         
-        /* --- LOGIN BUTTON STYLE --- */
-        .login-btn a {
-            background-color: var(--accent-color);
-            color: #121212;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-        
-        .login-btn a:hover {
-            background-color: #fff;
-            color: #121212;
-        }
-        .login-btn a:hover::after { /* login বাটনে আন্ডারলাইন ইফেক্ট লাগবে না */
-            width: 0;
-        }
+        /* Footer */
+        .footer { background-color: var(--dark-blue); color: #9CA3AF; padding-top: 80px; }
+        .footer-main { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 48px; padding-bottom: 64px; }
+        .social-icons { display: flex; gap: 16px; margin-top: 24px; }
+        .social-icons a { display: inline-flex; justify-content: center; align-items: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); color: var(--white); text-decoration: none; }
+        .footer-links h4 { color: var(--white); font-weight: 600; margin-bottom: 24px; }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 16px; }
+        .footer-links a { color: #9CA3AF; text-decoration: none; }
+        .footer-bottom { padding: 32px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
 
-
-        /* --- MOBILE MENU TOGGLE BUTTON --- */
-        .menu-toggle {
-            display: none; /* By default hidden on desktop */
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-        }
-
-        .menu-toggle .hamburger {
-            width: 30px;
-            height: 22px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .menu-toggle .bar {
-            width: 100%;
-            height: 3px;
-            background-color: var(--text-color);
-            border-radius: 2px;
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* --- RESPONSIVE STYLES (Mobile View) --- */
         @media (max-width: 768px) {
-            .site-header {
-                padding: 0 1.5rem;
-            }
-
-            .menu-toggle {
-                display: flex; /* Show the toggle button on mobile */
-            }
-
-            .nav-menu {
-                position: absolute;
-                top: 70px; /* Header height */
-                left: 0;
-                width: 100%;
-                background-color: var(--primary-color);
-                flex-direction: column;
-                align-items: center;
-                gap: 0;
-                overflow: hidden;
-                max-height: 0; /* Initially hidden */
-                transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
-                border-bottom: 1px solid var(--border-color);
-            }
-            
-            .nav-menu.active {
-                max-height: 400px; /* A large enough height to show all items */
-                padding: 1rem 0;
-            }
-
-            .nav-menu li {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .nav-menu li a {
-                display: block;
-                padding: 1rem 0;
-                font-size: 1.1rem;
-            }
-            
-            .nav-menu .login-btn {
-                margin-top: 1rem;
-            }
-        }
-        
-        /* --- ANIMATION FOR HAMBURGER TO 'X' --- */
-        .menu-toggle.active .bar:nth-child(1) {
-            transform: translateY(9.5px) rotate(45deg);
-        }
-        .menu-toggle.active .bar:nth-child(2) {
-            opacity: 0;
-        }
-        .menu-toggle.active .bar:nth-child(3) {
-            transform: translateY(-9.5px) rotate(-45deg);
-        }
-
-
-
-/* --- FOOTER STYLES --- */
-        .site-footer {
-            background-color: var(--primary-color);
-            color: var(--text-secondary-color);
-            padding-top: 4rem;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.95rem;
-        }
-
-        /* --- FOOTER MAIN CONTAINER (Grid Layout) --- */
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem 3rem;
-            display: grid;
-            gap: 2.5rem;
-            /* Responsive grid: creates columns that are at least 220px wide */
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        }
-
-        .footer-column h4 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-top: 0;
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-        
-        /* Underline for headings */
-        .footer-column h4::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -8px;
-            width: 40px;
-            height: 2px;
-            background-color: var(--accent-color);
-        }
-
-        /* --- ABOUT COLUMN --- */
-        .footer-about .logo {
-            color: var(--accent-color);
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            display: block;
-            text-decoration: none;
-        }
-        
-        .footer-about p {
-            line-height: 1.7;
-            margin: 0;
-        }
-
-        /* --- LINKS COLUMN --- */
-        .footer-links ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.8rem;
-        }
-
-        .footer-links a {
-            text-decoration: none;
-            color: var(--text-secondary-color);
-            transition: color 0.3s ease, padding-left 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent-color);
-            padding-left: 5px;
-        }
-        
-        .footer-links a::before {
-            content: '›';
-            margin-right: 8px;
-            color: var(--accent-color);
-        }
-
-        /* --- SOCIAL MEDIA COLUMN --- */
-        .social-icons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .social-icons a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            color: var(--text-secondary-color);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .social-icons a:hover {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            color: var(--bg-color);
-            transform: translateY(-3px);
-        }
-
-        .social-icons svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* --- FOOTER BOTTOM BAR --- */
-        .footer-bottom {
-            background-color: var(--bg-color);
-            text-align: center;
-            padding: 1.2rem 1rem;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            color: #777;
+            .menu-toggle { display: block; }
+            .nav-menu { display: none; position: absolute; top: 70px; left: 0; width: 100%; background-color: var(--white); flex-direction: column; align-items: flex-start; padding: 24px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); gap: 0; }
+            .nav-menu.active { display: flex; }
+            .nav-menu li { width: 100%; }
+            .nav-menu a { display: block; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+            .nav-actions { display: none; }
+            .hero h1 { font-size: 36px; }
+            .grid-2, .grid-3, .footer-main { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-
     <!-- ======================= HEADER START ======================= -->
-     <header class="site-header">
-        <div class="header-container">
-            <!-- Logo -->
-            <div class="logo">
-                <a href="#">Riseii</a>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="{{ url_for('index') }}" class="logo"><i class="fas fa-bolt"></i> Riseii</a>
                 <ul class="nav-menu" id="nav-menu">
-                    <li><a href="/">হোম</a></li>
-                    <li><a href="/how">কিভাবে কাজ করে</a></li>
-                    <li><a href="/error">আমাদের সম্পর্কে</a></li>
-                    <li><a href="/error">যোগাযোগ</a></li>
-                    <li class="login-btn"><a href="/login" style="color: #000;">লগইন/রেজিস্টার</a></li>
+                    <li><a href="#features">ফিচার</a></li>
+                    <li><a href="#testimonials">মতামত</a></li>
+                    <li><a href="#">যোগাযোগ</a></li>
                 </ul>
-            </nav>
-
-            <!-- Mobile Menu Toggle Button -->
-            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-                <div class="hamburger">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
+                <div class="nav-actions">
+                    {% if is_logged_in %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light">ড্যাশবোর্ড</a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-dark">লগআউট</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-light">লগইন</a>
+                        <a href="{{ url_for('signup') }}" class="btn btn-dark">একাউন্ট খুলুন</a>
+                    {% endif %}
                 </div>
-            </button>
+                <button class="menu-toggle" id="menu-toggle"><i class="fas fa-bars"></i></button>
+            </nav>
         </div>
     </header>
     <!-- ======================== HEADER END ======================== -->
 
-    <!-- This script makes the mobile menu toggle work -->
-    <script>
-        const menuToggle = document.getElementById('menu-toggle');
-        const navMenu = document.getElementById('nav-menu');
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container text-center">
+                <h1>সহজ কাজ করে অনলাইনে আয় করুন</h1>
+                <p>Riseii হলো বাংলাদেশের একটি নির্ভরযোগ্য প্ল্যাটফর্ম যেখানে আপনি ভিডিও দেখা, ফেসবুক পেইজে লাইক দেওয়া এবং বিভিন্ন সহজ কাজ সম্পন্ন করে সহজেই অর্থ উপার্জন করতে পারেন।</p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('signup') }}" class="btn btn-dark">বিনামূল্যে শুরু করুন <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <img src="https://i.ibb.co/6PzJ1hW/saas-dashboard.png" alt="Riseii Platform Dashboard" class="hero-image">
+            </div>
+        </section>
 
-        menuToggle.addEventListener('click', () => {
-            // Toggle 'active' class on both menu and button
-            navMenu.classList.toggle('active');
-            menuToggle.classList.toggle('active');
-        });
-    </script>
+        <!-- Features Section -->
+        <section id="features" class="section text-center">
+            <div class="container">
+                <span class="section-tag">আমাদের সার্ভিস</span>
+                <h2 class="section-title">আপনার আয়ের জন্য প্রয়োজনীয় সবকিছু</h2>
+                <div class="grid-2">
+                    <div class="feature-card"><h3>বিভিন্ন ধরণের কাজ</h3><p>আপনার পছন্দ অনুযায়ী বিভিন্ন ধরণের কাজ (ফেসবুক, ইউটিউব, ওয়েবসাইট ভিজিট) থেকে বেছে নিন এবং আয় করুন।</p></div>
+                    <div class="feature-card"><h3>শক্তিশালী রেফারেল সিস্টেম</h3><p>আপনার বন্ধুদের আমন্ত্রণ জানিয়ে আয় করুন। প্রতিটি সফল রেফারেলের জন্য আপনি এবং আপনার বন্ধু উভয়েই বোনাস পাবেন।</p></div>
+                    <div class="feature-card"><h3>দ্রুত পেমেন্ট</h3><p>আপনার উপার্জিত অর্থ বিকাশ বা নগদের মাধ্যমে দ্রুত এবং নিরাপদে তুলে নিন। আমরা আপনার পেমেন্টকে গুরুত্ব দেই।</p></div>
+                    <div class="feature-card"><h3>নিরাপদ ও নির্ভরযোগ্য</h3><p>আপনার ডেটা এবং উপার্জন আমাদের কাছে সম্পূর্ণ সুরক্ষিত। আমরা একটি নির্ভরযোগ্য এবং স্বচ্ছ প্ল্যাটফর্ম প্রদানে প্রতিশ্রুতিবদ্ধ।</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section (নতুন কন্টেন্ট) -->
+        <section id="testimonials" class="section text-center" style="background-color: var(--bg-light);">
+            <div class="container">
+                <span class="section-tag">ব্যবহারকারীদের মতামত</span>
+                <h2 class="section-title">আমাদের ব্যবহারকারীরা যা বলেন</h2>
+                <div class="grid-3">
+                    <div class="testimonial-card">
+                        <p>"Riseii ব্যবহার করা খুবই সহজ। আমি অবসর সময়ে ছোট ছোট কাজ করে ভালো পরিমাণ আয় করেছি। পেমেন্টও খুব দ্রুত পেয়েছি।"</p>
+                        <div class="testimonial-author">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rahim Mia">
+                            <div><strong>রহিম মিয়া</strong><span>ছাত্র, ঢাকা</span></div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"রেফারেল সিস্টেমটা অসাধারণ! আমি আমার বন্ধুদের জয়েন করিয়েছি এবং আমরা সবাই বোনাস পেয়েছি। খুবই নির্ভরযোগ্য একটি সাইট।"</p>
+                        <div class="testimonial-author">
+                            <img src="https://randomuser.me/api/portraits/women/31.jpg" alt="Sadia Akter">
+                            <div><strong>সাদিয়া আক্তার</strong><span>গৃহিণী, চট্টগ্রাম</span></div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"আমি অনেক সাইটে কাজ করেছি, কিন্তু Riseii-এর মতো সহজ এবং দ্রুত পেমেন্ট আর কোথাও পাইনি। তাদের সাপোর্টও খুব ভালো।"</p>
+                        <div class="testimonial-author">
+                            <img src="https://randomuser.me/api/portraits/men/34.jpg" alt="Kamal Hossain">
+                            <div><strong>কামাল হোসেন</strong><span>ফ্রিল্যান্সার, খুলনা</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section (নতুন কন্টেন্ট) -->
+        <section class="section">
+            <div class="container">
+                <div class="cta-section text-center">
+                    <h2 style="color: var(--white);">আপনি কি প্রস্তুত?</h2>
+                    <p style="color: #D1D5DB;">আজই আপনার একাউন্ট খুলুন এবং আয় করা শুরু করুন। কোনো ক্রেডিট কার্ডের প্রয়োজন নেই।</p>
+                    <a href="{{ url_for('signup') }}" class="btn btn-light">একাউন্ট খুলুন</a>
+                </div>
+            </div>
+        </section>
+    </main>
     
-    <!-- Other page content can go here -->
-
-
-    <div class="main-container">
-        <div class="notice-card">
-            <svg class="icon-upgrade" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
-            
-            <h1>আমরা আরও উন্নত হচ্ছি!</h1>
-            
-            <p class="notice-text">
-                আমাদের সাইটে আপনাকে স্বাগতম! আমরা বর্তমানে আমাদের পরিষেবা উন্নত করার জন্য কাজ করছি। <strong>চিন্তার কিছু নেই, সাইটের সমস্ত ফিচার সম্পূর্ণভাবে কার্যকর আছে।</strong> আমরা শুধু আপনার জন্য সবকিছু আরও দ্রুত, নিরাপদ এবং লাভজনক করে তুলছি। আমাদের সাথে থাকার জন্য ধন্যবাদ!
-            </p>
-
-            <!-- ======================================================= -->
-            <!--          ডাইনামিক বাটন সেকশন (নতুন পরিবর্তন)          -->
-            <!-- ======================================================= -->
-            <div class="action-buttons">
-                {% if is_logged_in %}
-                    <!-- যদি ইউজার লগইন করা থাকে -->
-                    <a href="{{ url_for('dashboard') }}" class="btn">
-                        <i class="fa-solid fa-user-circle" style="margin-right: 8px;"></i>আমার প্রোফাইল
-                    </a>
-                    <a href="{{ url_for('tasks_page') }}" class="btn btn-secondary">
-                        <i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>কাজ করুন
-                    </a>
-                {% else %}
-                    <!-- যদি ইউজার লগইন করা না থাকে -->
-                    <a href="{{ url_for('login') }}" class="btn">লগইন করুন</a>
-                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">একাউন্ট খুলুন</a>
-                {% endif %}
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="site-content">
-                <h2>Riseii: অনলাইনে আয়ের সহজ পথ</h2>
-                <div class="features-list">
-                    <div class="feature-item">✅ ভিডিও দেখে আয় করুন</div>
-                    <div class="feature-item">✅ সহজ কাজ সম্পন্ন করুন</div>
-                    <div class="feature-item">✅ গেম খেলে পয়েন্ট জিতুন</div>
-                    <div class="feature-item">✅ বিকাশ/নগদে দ্রুত পেমেন্ট</div>
+    <!-- ======================= FOOTER START ======================= -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-main">
+                <div class="footer-about">
+                    <a href="#" class="logo" style="color: var(--white);"><i class="fas fa-bolt"></i> Riseii</a>
+                    <p style="margin-top: 1rem;">একটি নির্ভরযোগ্য প্ল্যাটফর্ম যেখানে আপনি সহজ কাজ করে অনলাইনে আয় করতে পারেন।</p>
+                    <div class="social-icons">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>প্রোডাক্ট</h4>
+                    <ul>
+                        <li><a href="#features">ফিচার</a></li>
+                        <li><a href="#">কিভাবে কাজ করে</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>কোম্পানি</h4>
+                    <ul>
+                        <li><a href="#">আমাদের সম্পর্কে</a></li>
+                        <li><a href="#">শর্তাবলী</a></li>
+                    </ul>
+                </div>
+                 <div class="footer-links">
+                    <h4>সাপোর্ট</h4>
+                    <ul>
+                        <li><a href="#">যোগাযোগ</a></li>
+                        <li><a href="#">সচরাচর জিজ্ঞাস্য প্রশ্ন</a></li>
+                    </ul>
                 </div>
             </div>
-        </div>    </div>
-              <!-- Responsive Ad Container Start -->
-<div class="responsive-ad-container">
-    <div class="earn" style="margin: 0;">
-    <script type="text/javascript">
-	atOptions = {
-		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
-       </div>
-</div>
-<script async="async" data-cfasync="false" src="//pl27169522.profitableratecpm.com/931b52065fa559bab6440234ca2e2713/invoke.js"></script>
-<div id="container-931b52065fa559bab6440234ca2e2713"></div>
-    <!-- Other page content goes here -->
-
-    <footer class="site-footer">
-        <div class="footer-container">
-            
-            <!-- Column 1: About -->
-            <div class="footer-column footer-about">
-                <a href="#" class="logo">Riseii</a>
-                <p>
-                    Riseii হলো একটি নির্ভরযোগ্য প্ল্যাটফর্ম যেখানে আপনি সহজ কাজ, ভিডিও দেখা এবং গেম খেলার মাধ্যমে অনলাইনে আয় করতে পারেন।
-                </p>
+            <div class="footer-bottom">
+                <p>© 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।</p>
             </div>
-
-            <!-- Column 2: Quick Links -->
-            <div class="footer-column footer-links">
-                <h4>গুরুত্বপূর্ণ লিঙ্ক</h4>
-                <ul>
-                    <li><a href="/error">আমাদের সম্পর্কে</a></li>
-                    <li><a href="/error">কিভাবে কাজ করে</a></li>
-                    <li><a href="/error">সচরাচর জিজ্ঞাস্য প্রশ্ন</a></li>
-                    <li><a href="/error">যোগাযোগ</a></li>
-                </ul>
-            </div>
-
-            <!-- Column 3: Legal -->
-            <div class="footer-column footer-links">
-                <h4>আইনি</h4>
-                <ul>
-                    <li><a href="/error">গোপনীয়তা নীতি</a></li>
-                    <li><a href="/error">শর্তাবলী</a></li>
-                    <li><a href="/error">পেমেন্ট পলিসি</a></li>
-                </ul>
-            </div>
-
-            <!-- Column 4: Follow Us -->
-            <div class="footer-column footer-social">
-                <h4>Support</h4>
-                <div class="social-icons">
-                  
-                    <!-- Telegram -->
-                    <a href="#" aria-label="Telegram"><i class="fa-solid fa-phone"></i>
-          </a>
-                    <!-- YouTube -->
-                    <a href="#" aria-label="YouTube"><i class="fab fa-telegram"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            © 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।
         </div>
     </footer>
-  
+    <!-- ======================== FOOTER END ======================== -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.getElementById('menu-toggle');
+            const navMenu = document.getElementById('nav-menu');
+            if(menuToggle && navMenu) {
+                menuToggle.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
