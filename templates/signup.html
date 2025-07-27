@@ -3,468 +3,175 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>নতুন একাউন্ট খুলুন - টাস্ক অ্যাপ</title>
-    <!-- Font Awesome for Google Icon -->
+    <title>নতুন একাউন্ট খুলুন - Riseii</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #1a1a1a; color: #e0e0e0; }
+        
+        /* --- Header Styles --- */
+        .site-header { background-color: #212121; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 100; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto; }
+        .logo a { color: #00ffc6; text-decoration: none; font-size: 1.8rem; font-weight: 700; }
+        .nav-menu { list-style: none; display: flex; gap: 1.5rem; align-items: center; }
+        .nav-menu a { color: #e0e0e0; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+        .nav-menu a:hover { color: #00ffc6; }
+        .action-btn a { background-color: #00ffc6; color: #121212; padding: 8px 16px; border-radius: 6px; }
 
-	 
+        /* --- Main Content Section --- */
+        .main-content { padding: 3rem 1rem; }
+        .signup-section { display: flex; justify-content: center; align-items: center; }
+        .signup-container { max-width: 450px; width: 100%; background: #2a2a2a; padding: 30px 40px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); text-align: center; border: 1px solid #333; }
+        .signup-container h2 { color: #fff; font-size: 24px; margin-bottom: 25px; }
+        .flash { padding: 1em; margin-bottom: 1em; border-radius: 6px; color: white; font-weight: 500; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #ccc; }
+        .form-group input { width: 100%; padding: 14px; border: 1px solid #444; border-radius: 6px; font-size: 16px; background-color: #333; color: #fff; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 17px; margin-top: 10px; transition: background-color 0.2s; }
+        .btn-primary { background-color: #00ffc6; color: #121212; }
+        .btn-google { background-color: #4285F4; color: white; }
+        .divider { text-align: center; border-bottom: 1px solid #444; line-height: 0.1em; margin: 25px 0; color: #888; }
+        .divider span { background: #2a2a2a; padding: 0 10px; }
+        .login-link { margin-top: 25px; font-size: 15px; }
+        .login-link a { color: #00ffc6; text-decoration: none; font-weight: 600; }
 
-	   .signup{
-		    display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 2%;
-		   
-	   }
-        .signup-container {
-            max-width: 400px;
-            width: 100%;
-            background: #333;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
-		color: #fff;
-        }
-        .signup-container h2 {
-            color: #e0e0e0;
-            font-size: 24px;
-            margin-bottom: 25px;
-        }
+        /* --- Footer Styles --- */
+        .site-footer { background-color: #212121; padding: 2rem; text-align: center; color: #888; }
+        .footer-bottom { margin-top: 1rem; border-top: 1px solid #333; padding-top: 1rem; }
 
-	    
-        .flash {
-            padding: 1em;
-            margin-bottom: 1em;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-        }
-        .flash.success { background-color: #42b72a; }
-        .flash.error { background-color: #fa3e3e; }
-        .flash.info { background-color: #1877f2; }
-        .form-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #ddd;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #dddfe2;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 17px;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-        .btn-primary {
-            background-color: #42b72a;
-            color: white;
-        }
-        .btn-primary:disabled {
-            background-color: #a8d9a1;
-            cursor: not-allowed;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background-color: #36a420;
-        }
-        .btn-google {
-            background-color: #4285F4;
-            color: white;
-        }
-        .btn-google:hover {
-            background-color: #3367D6;
-        }
-        .divider {
-            text-align: center;
-            border-bottom: 1px solid #dadde1;
-            line-height: 0.1em;
-            margin: 25px 0;
-            color: #8a8d91;
-        }
-        .divider span {
-            background: #fff;
-            padding: 0 10px;
-        }
-        .login-link {
-            margin-top: 25px;
-            font-size: 15px;
-        }
-        .login-link a {
-            color: #1877f2;
-            text-decoration: none;
-            font-weight: 600;
-        }
+        /* --- Ad & Widget Styles --- */
+        .ad-container { display: flex; justify-content: center; align-items: center; width: 100%; max-width: 468px; margin: 20px auto; overflow: hidden; }
+        .unique-telegram-widget { position: fixed; bottom: 30px; right: 30px; z-index: 1000; }
+        .unique-telegram-widget a { display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; background-color: #0088cc; color: #fff; border-radius: 50%; text-decoration: none; animation: telegram-pulse 2s infinite; box-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
+        @keyframes telegram-pulse { 0%{transform:scale(.95);box-shadow:0 0 0 0 rgba(0,136,204,.7)}70%{transform:scale(1);box-shadow:0 0 0 10px rgba(0,136,204,0)}100%{transform:scale(.95);box-shadow:0 0 0 0 rgba(0,136,204,0)} }
     </style>
 </head>
-<body><!-- ======================= HEADER START ======================= -->
+<body>
     <header class="site-header">
         <div class="header-container">
-            <!-- Logo -->
-            <div class="logo">
-                <a href="#">Riseii</a>
-            </div>
-
-            <!-- Navigation Menu -->
+            <div class="logo"><a href="{{ url_for('index') }}">Riseii</a></div>
             <nav>
-                <ul class="nav-menu" id="nav-menu">
-                    <li><a href="/">হোম</a></li>
-                    <li><a href="/how">কিভাবে কাজ করে</a></li>
-                    <li><a href="/error">আমাদের সম্পর্কে</a></li>
-                    <li><a href="/error">যোগাযোগ</a></li>
-                    <li class="login-btn"><a href="/login">লগইন/রেজিস্টার</a></li>
+                <ul class="nav-menu">
+                    <li><a href="{{ url_for('index') }}">হোম</a></li>
+                    {% if is_logged_in %}
+                        <li class="action-btn"><a href="{{ url_for('dashboard') }}">ড্যাশবোর্ড</a></li>
+                    {% else %}
+                        <li class="action-btn"><a href="{{ url_for('login') }}">লগইন</a></li>
+                    {% endif %}
                 </ul>
             </nav>
-
-            <!-- Mobile Menu Toggle Button -->
-            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-                <div class="hamburger">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                </div>
-            </button>
         </div>
     </header>
-    <!-- ======================== HEADER END ======================== -->
 
-    <!-- This script makes the mobile menu toggle work -->
-    <script>
-        const menuToggle = document.getElementById('menu-toggle');
-        const navMenu = document.getElementById('nav-menu');
+    <main class="main-content">
+        <section class="signup-section">
+            <div class="signup-container">
+                <h2>নতুন একাউন্ট খুলুন</h2>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}{% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}{% endif %}
+                {% endwith %}
+                <div id="client-message" class="flash" style="display: none;"></div>
 
-        menuToggle.addEventListener('click', () => {
-            // Toggle 'active' class on both menu and button
-            navMenu.classList.toggle('active');
-            menuToggle.classList.toggle('active');
-        });
-    </script>
-	<section class="signup">
-    <div class="signup-container">
-        <h2>নতুন একাউন্ট খুলুন</h2>
+                <form id="signup-form" method="post" action="{{ url_for('signup') }}">
+                    <div class="form-group">
+                        <label for="name">আপনার নাম</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">ইমেইল</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label>
+                        <input type="password" id="password" name="password" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="facebook_profile">আপনার ফেসবুক প্রোফাইল লিঙ্ক (ঐচ্ছিক)</label>
+                        <input type="url" id="facebook_profile" name="facebook_profile" placeholder="https://facebook.com/your.profile">
+                    </div>
+                    <div class="form-group">
+                        <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
+                        <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
+                    </div>
+                    <button type="submit" id="signup-button" class="btn btn-primary">একাউন্ট খুলুন</button>
+                </form>
+                
+                <div class="divider"><span>অথবা</span></div>
 
-        <!-- Flash messages for server-side notifications -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <!-- Client-side error/status message -->
-        <div id="client-message" class="flash" style="display: none;"></div>
-
-        <!-- Email/Password Signup Form -->
-        <form id="signup-form" method="post" action="{{ url_for('signup') }}">
-            <div class="form-group">
-                <label for="name">আপনার নাম</label>
-                <input type="text" id="name" name="name" required>
+                <button id="google-signup-btn" class="btn btn-google"><i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান</button>
+                <div class="login-link">একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></div>
             </div>
-            <div class="form-group">
-                <label for="email">ইমেইল</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label>
-                <input type="password" id="password" name="password" required minlength="6">
-            </div>
-            <div class="form-group">
-                <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
-                <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
-            </div>
-            <button type="submit" id="signup-button" class="btn btn-primary">একাউন্ট খুলুন</button>
-        </form>
-        
-        <div class="divider"><span>অথবা</span></div>
+        </section>
 
-        <!-- Google Signup Button -->
-        <button id="google-signup-btn" class="btn btn-google">
-            <i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান
-        </button>
-
-        <div class="login-link">
-            একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a>
+        <div class="ad-container">
+            <script type="text/javascript"> atOptions={'key':'f62367e86bf7296ea58f8b60f94e1218','format':'iframe','height':60,'width':468,'params':{}}; </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
         </div>
+    </main>
+
+    <div class="unique-telegram-widget">
+      <a href="https://t.me/m_forum_support" target="_blank" rel="noopener noreferrer" aria-label="Chat on Telegram"><i class="fab fa-telegram fa-2x"></i></a>
     </div>
-<!-- START: Animated Telegram Support Widget -->
-<style>
-  /* 
-    The main container for the widget. 
-    The unique class "unique-telegram-widget" prevents style conflicts.
-  */
-  .unique-telegram-widget {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 1000; /* Ensures it's on top of most other elements */
-  }
-
-  /* The link/button itself */
-  .unique-telegram-widget a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    background-color: #0088cc; /* Official Telegram blue */
-    color: #ffffff; /* Icon color */
-    border-radius: 50%;
-    text-decoration: none;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease-in-out;
     
-    /* The pulse animation */
-    animation: telegram-pulse 2s infinite;
-  }
-
-  /* The SVG icon inside the button */
-  .unique-telegram-widget svg {
-    width: 32px;
-    height: 32px;
-    fill: currentColor; /* Inherits the color from the 'a' tag */
-  }
-
-  /* Hover effect for the button */
-  .unique-telegram-widget a:hover {
-    transform: scale(1.1);
-    box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.3);
-    animation: none; /* Stop the pulse animation on hover */
-  }
-
-  /* The tooltip text that appears on hover */
-  .unique-telegram-widget .widget-tooltip {
-    position: absolute;
-    right: 75px; /* Position it to the left of the button */
-    padding: 6px 12px;
-    background-color: #212121;
-    color: #ffffff;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: sans-serif;
-    white-space: nowrap; /* Keep the text on one line */
-    
-    /* Initially hidden */
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
-  }
-
-  /* Show the tooltip on hover */
-  .unique-telegram-widget a:hover .widget-tooltip {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  /* The keyframes for the pulse animation */
-  @keyframes telegram-pulse {
-    0% {
-      transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.7);
-    }
-    70% {
-      transform: scale(1);
-      box-shadow: 0 0 0 10px rgba(0, 136, 204, 0);
-    }
-    100% {
-      transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(0, 136, 204, 0);
-    }
-  }
-</style>
-
-<div class="unique-telegram-widget">
-  <!-- 
-    IMPORTANT: Replace "YOUR_TELEGRAM_USERNAME" with your actual Telegram username.
-    The link opens in a new tab for better user experience.
-  -->
-  <a href="https://t.me/m_forum_support" target="_blank" rel="noopener noreferrer" aria-label="Chat on Telegram">
-    
-    <!-- Tooltip Text -->
-    <span class="widget-tooltip">Chat on Telegram</span>
-    
-    <!-- Embedded SVG Icon for Telegram -->
-    <i class="fab fa-telegram"></i>
-
-  </a>
-</div>
-<!-- END: Animated Telegram Support Widget -->
-	</section>
-<div class="responsive-ad-container">
-    <div class="earn" style="margin: 0;">
-    <script type="text/javascript">
-	atOptions = {
-		'key' : 'f62367e86bf7296ea58f8b60f94e1218',
-		'format' : 'iframe',
-		'height' : 60,
-		'width' : 468,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
-       </div>
-</div>
-
-<style>
-responsive-ad-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    height: 90px;
-    margin: 10px 0;
-    }
-    </style>
-
-	<!-- ======================= FOOTER START ======================= -->
     <footer class="site-footer">
-        <div class="footer-container">
-            
-            <!-- Column 1: About -->
-            <div class="footer-column footer-about">
-                <a href="#" class="logo">Riseii</a>
-                <p>
-                    Riseii হলো একটি নির্ভরযোগ্য প্ল্যাটফর্ম যেখানে আপনি সহজ কাজ, ভিডিও দেখা এবং গেম খেলার মাধ্যমে অনলাইনে আয় করতে পারেন।
-                </p>
-            </div>
-
-            <!-- Column 2: Quick Links -->
-            <div class="footer-column footer-links">
-                <h4>গুরুত্বপূর্ণ লিঙ্ক</h4>
-                <ul>
-                    <li><a href="/error">আমাদের সম্পর্কে</a></li>
-                    <li><a href="/error">কিভাবে কাজ করে</a></li>
-                    <li><a href="/error">সচরাচর জিজ্ঞাস্য প্রশ্ন</a></li>
-                    <li><a href="/error">যোগাযোগ</a></li>
-                </ul>
-            </div>
-
-            <!-- Column 3: Legal -->
-            <div class="footer-column footer-links">
-                <h4>আইনি</h4>
-                <ul>
-                    <li><a href="/error">গোপনীয়তা নীতি</a></li>
-                    <li><a href="/error">শর্তাবলী</a></li>
-                    <li><a href="/error">পেমেন্ট পলিসি</a></li>
-                </ul>
-            </div>
-
-            <!-- Column 4: Follow Us -->
-            <div class="footer-column footer-social">
-                <h4>Support</h4>
-                <div class="social-icons">
-                  
-                    <!-- Telegram -->
-                    <a href="#" aria-label="Telegram"><i class="fa-solid fa-phone"></i>
-          </a>
-                    <!-- YouTube -->
-                    <a href="#" aria-label="YouTube"><i class="fab fa-telegram"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer Bottom Bar -->
-        <div class="footer-bottom">
-            © 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।
-        </div>
+        <div class="footer-bottom">© 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।</div>
     </footer>
-    <!-- ======================== FOOTER END ======================== -->
 
-    <!-- Firebase SDK Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    
     <script>
-        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "{{ config.firebase_api_key }}",
             authDomain: "{{ config.firebase_auth_domain }}",
-            projectId: "{{ config.firebase_project_id }}",
-            messagingSenderId: "{{ config.firebase_messaging_sender_id }}",
-            appId: "{{ config.firebase_app_id }}"
+            projectId: "{{ config.firebase_project_id }}"
         };
-
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-
-        // --- DOM Elements ---
         const signupForm = document.getElementById('signup-form');
         const signupButton = document.getElementById('signup-button');
         const googleButton = document.getElementById('google-signup-btn');
         const clientMessage = document.getElementById('client-message');
 
-        // --- Helper Function to show messages ---
         function showMessage(text, type = 'error') {
             clientMessage.textContent = text;
             clientMessage.className = `flash ${type}`;
             clientMessage.style.display = 'block';
         }
         
-        // --- Event listener to intercept form submission for loading state ---
-        // This is for the standard email/password form
         signupForm.addEventListener('submit', function() {
             signupButton.disabled = true;
             signupButton.textContent = 'প্রসেসিং...';
         });
 
-        // --- Event Listener for Google Sign-Up ---
         googleButton.addEventListener('click', function() {
             const provider = new firebase.auth.GoogleAuthProvider();
             const referrerCode = document.getElementById('referrer_code').value;
-
             auth.signInWithPopup(provider)
                 .then(result => result.user.getIdToken())
                 .then(idToken => {
-                    // Send token and referrer code to the server
-                    return fetch('/api/auth/google', {
+                    return fetch('/api/set_session', { // Updated to use set_session which handles new users
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            idToken: idToken,
-                            referrerCode: referrerCode
-                        })
+                        body: JSON.stringify({ idToken: idToken, referrerCode: referrerCode })
                     });
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // Redirect to dashboard on successful signup/login
                         window.location.href = data.redirect_url;
                     } else {
-                        throw new Error(data.message || 'Server-side error during Google Sign-Up.');
+                        throw new Error(data.message || 'Google Sign-Up failed.');
                     }
                 })
                 .catch(error => {
-                    console.error("Google Sign-Up Error: ", error);
-                    let friendlyMessage = 'Google দিয়ে সাইন আপ করা সম্ভব হয়নি।';
-                    if (error.code === 'auth/popup-closed-by-user') {
-                        friendlyMessage = 'আপনি সাইন আপ পপ-আপটি বন্ধ করে দিয়েছেন।';
-                    }
-                    showMessage(friendlyMessage, 'error');
+                    showMessage(error.message, 'error');
                 });
         });
-
     </script>
 </body>
-</html>
+	</html>
