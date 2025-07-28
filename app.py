@@ -182,6 +182,54 @@ def signup():
 
 # app.py ফাইলের অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
+
+
+# app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users/delete/<user_id>', methods=['POST'])
+def delete_user(user_id):
+    """
+    একজন ব্যবহারকারীকে Firebase Authentication এবং Firestore উভয় জায়গা থেকে ডিলিট করে।
+    """
+    try:
+        # Firebase Authentication থেকে ইউজার ডিলিট
+        auth.delete_user(user_id)
+        
+        # Firestore থেকে ইউজারের ডকুমেন্ট ডিলিট
+        db.collection('users').document(user_id).delete()
+        
+        # (ঐচ্ছিক) ইউজারের সম্পর্কিত অন্যান্য ডেটাও ডিলিট করা যেতে পারে, যেমন task_submissions
+        
+        flash(f"ব্যবহারকারী (ID: {user_id}) সফলভাবে ডিলিট করা হয়েছে।", "success")
+    except Exception as e:
+        flash(f"ব্যবহারকারী ডিলিট করার সময় একটি সমস্যা হয়েছে: {e}", "error")
+    
+    return redirect(url_for('manage_users'))
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users/update-balance/<user_id>', methods=['POST'])
+def update_user_balance(user_id):
+    """
+    AJAX রিকোয়েস্টের মাধ্যমে একজন ইউজারের ব্যালেন্স আপডেট করে।
+    """
+    try:
+        data = request.get_json()
+        new_balance = float(data.get('balance', 0))
+        
+        user_ref = db.collection('users').document(user_id)
+        user_ref.update({'balance': new_balance})
+        
+        # (ঐচ্ছিক) ব্যালেন্স হিস্টোরিতে একটি অ্যাডমিন অ্যাডজাস্টমেন্ট এন্ট্রি যোগ করা যেতে পারে
+        db.collection('balance_history').add({
+            'user_id': user_id,
+            'amount': new_balance,
+            'type': 'admin_adjustment',
+            'description': 'Balance updated by admin.',
+            'timestamp': firestore.SERVER_TIMESTAMP
+        })
+        
+        return jsonify({"status": "success", "message": "ব্যালেন্স সফলভাবে আপডেট হয়েছে।"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": "ব্যালেন্স আপডেট করার সময় সমস্যা হয়েছে।"}), 500
 # app.py -> manage_users ফাংশনটি প্রতিস্থাপন করুন
 
 @app.route(f'/{SECRET_ADMIN_PATH}/users', methods=['GET'])
