@@ -34,8 +34,8 @@
         /* Header */
         .site-header { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); }
         .header-container { display: flex; justify-content: space-between; align-items: center; height: 70px; }
-        .logo  a { font-size: 24px; font-weight: 700; color: var(--primary-blue); text-decoration: none; }
-        .nav-menu { list-style: none; display: flex; align-items: center; gap: 2.5rem; }
+        .logo a { font-size: 24px; font-weight: 700; color: var(--primary-blue); text-decoration: none; margin-left: 2%; }
+        .nav-menu { list-style: none; display: flex; align-items: center; gap: 2.5rem; margin-right: 2%; }
         .nav-menu a { text-decoration: none; color: var(--text-dark); font-weight: 500; }
        .action-btn { display: flex; gap: 16px; }
         .menu-toggle { display: none; background: none; border: none; font-size: 24px; color: var(--text-dark); cursor: pointer; }
@@ -74,9 +74,9 @@
                 <ul class="nav-menu">
                     <li><a href="{{ url_for('index') }}">হোম</a></li>
                     {% if is_logged_in %}
-                        <li class="action-btn"><a href="{{ url_for('dashboard') }}">ড্যাশবোর্ড</a></li>
+                        <li class="action-btn btn-dark"><a href="{{ url_for('dashboard') }}">ড্যাশবোর্ড</a></li>
                     {% else %}
-                        <li class="action-btn"><a href="{{ url_for('signup') }}">একাউন্ট খুলুন</a></li>
+                        <li class="action-btn btn-dark"><a href="{{ url_for('signup') }}">একাউন্ট খুলুন</a></li>
                     {% endif %}
                 </ul>
             </nav>
