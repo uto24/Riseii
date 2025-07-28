@@ -93,38 +93,145 @@
                     <div class="form-group">
                         <label for="facebook_profile">আপনার ফেসবুক প্রোফাইল লিঙ্ক (ঐচ্ছিক)</label>
                         <input type="url" id="facebook_profile" name="facebook_profile" placeholder="https://facebook.com/your.profile">
-                    </div>
-                    <div class="form-group">
-                        <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
-                        <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
-                    </div>
-                    <button type="submit" id="signup-button" class="btn btn-primary">একাউন্ট খুলুন</button>
-                </form>
-                
-                <div class="divider"><span>অথবা</span></div>
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>নতুন একাউন্ট খুলুন - Riseii</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-                <button id="google-signup-btn" class="btn btn-google"><i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান</button>
-                <div class="login-link">একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></div>
-            </div>
-        </section>
+    <style>
+        :root {
+            --primary-blue: #007aff;
+            --dark-blue: #0d1a2e;
+            --bg-light: #f8f9fa;
+            --border-color: #e5e7eb;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --white: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--dark-blue); color: var(--text-light); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        
+        /* --- Header --- */
+        .header { background-color: rgba(13, 26, 46, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .navbar { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--white); text-decoration: none; }
+        .nav-actions { display: flex; gap: 16px; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; border: 1px solid transparent; }
+        .btn-primary { background-color: var(--primary-blue); color: var(--white); }
+        .btn-light { background: rgba(255,255,255,0.1); color: var(--white); border-color: rgba(255,255,255,0.2); }
+        
+        /* --- Signup Section --- */
+        .main-content { display: flex; justify-content: center; align-items: center; padding: 60px 20px; }
+        .signup-container { max-width: 450px; width: 100%; background: #1a202c; padding: 40px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .signup-container h2 { color: var(--white); font-size: 28px; margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #a0aec0; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #4a5568; border-radius: 8px; font-size: 16px; background-color: #2d3748; color: var(--white); }
+        .btn-signup { width: 100%; background: var(--primary-blue); color: var(--white); padding: 14px; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-google { width: 100%; background: var(--white); color: var(--text-dark); padding: 14px; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .divider { text-align: center; color: #718096; margin: 25px 0; }
+        .login-link { margin-top: 25px; }
+        .login-link a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
+        .flash { padding: 1rem; margin-bottom: 1rem; border-radius: 8px; color: var(--white); }
 
-        <div class="ad-container">
-            <script type="text/javascript"> atOptions={'key':'f62367e86bf7296ea58f8b60f94e1218','format':'iframe','height':60,'width':468,'params':{}}; </script>
-            <script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
+        /* --- Footer --- */
+        .footer { background-color: var(--dark-blue); color: #9CA3AF; padding-top: 80px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-main { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 48px; padding-bottom: 64px; }
+        .footer-links h4 { color: var(--white); }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 16px; }
+        .footer-links a { color: #9CA3AF; text-decoration: none; }
+        .footer-bottom { padding: 32px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
+
+        @media (max-width: 768px) {
+            .footer-main { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================= HEADER START ======================= -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="{{ url_for('index') }}" class="logo"><i class="fas fa-bolt"></i> Riseii</a>
+                <div class="nav-actions">
+                    {% if is_logged_in %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light">ড্যাশবোর্ড</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-light">লগইন</a>
+                    {% endif %}
+                </div>
+            </nav>
+        </div>
+    </header>
+    <!-- ======================== HEADER END ======================== -->
+
+    <main class="main-content">
+        <div class="signup-container">
+            <h2>নতুন একাউন্ট খুলুন</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}{% for category, message in messages %}
+                    <div class="flash {{ 'bg-success' if category == 'success' else 'bg-danger' }}">{{ message }}</div>
+                {% endfor %}{% endif %}
+            {% endwith %}
+            <div id="client-message" class="flash" style="display: none;"></div>
+
+            <form id="signup-form" method="post" action="{{ url_for('signup') }}">
+                <div class="form-group">
+                    <label for="name">আপনার নাম</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">ইমেইল</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">পাসওয়ার্ড</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="facebook_profile">ফেসবুক প্রোফাইল লিঙ্ক (ঐচ্ছিক)</label>
+                    <input type="url" id="facebook_profile" name="facebook_profile" placeholder="https://facebook.com/your.profile">
+                </div>
+                <div class="form-group">
+                    <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
+                    <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
+                </div>
+                <button type="submit" id="signup-button" class="btn-signup">একাউন্ট খুলুন</button>
+            </form>
+            
+            <p class="divider">অথবা</p>
+
+            <button id="google-signup-btn" class="btn-google"><i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান</button>
+            <p class="login-link">একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></p>
         </div>
     </main>
-
-    <div class="unique-telegram-widget">
-      <a href="https://t.me/m_forum_support" target="_blank" rel="noopener noreferrer" aria-label="Chat on Telegram"><i class="fab fa-telegram fa-2x"></i></a>
-    </div>
     
-    <footer class="site-footer">
-        <div class="footer-bottom">© 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।</div>
+    <!-- ======================= FOOTER START ======================= -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।</p>
+            </div>
+        </div>
     </footer>
+    <!-- ======================== FOOTER END ======================== -->
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script>
+        // আপনার সম্পূর্ণ JavaScript কোড এখানে থাকবে
+        // ... (আগের উত্তর থেকে কপি করুন)
+    
         const firebaseConfig = {
             apiKey: "{{ config.firebase_api_key }}",
             authDomain: "{{ config.firebase_auth_domain }}",
