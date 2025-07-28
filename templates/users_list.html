@@ -4,37 +4,74 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>সকল ব্যবহারকারী - অ্যাডমিন প্যানেল</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 1400px; margin: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; }
-        .back-link { color: #1877f2; text-decoration: none; font-weight: 600; }
-        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        :root {
+            --bg-dark: #1a1b20;
+            --primary-dark: #2a2b30;
+            --border-dark: #353740;
+            --text-light: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-green: #28a745;
+            --accent-red: #dc3545;
+            --accent-blue: #007bff;
+            --accent-yellow: #ffc107;
+            --accent-cyan: #00ffc6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-dark); color: var(--text-light); margin: 0; padding: 20px; }
+        .container { max-width: 1600px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary-dark); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); margin-bottom: 25px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .back-link { color: var(--accent-cyan); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .card { background: var(--primary-dark); border: 1px solid var(--border-dark); border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .stats-and-search { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
         .stats-box { font-size: 1.2rem; font-weight: 600; }
+        .stats-box strong { color: var(--accent-cyan); }
         .search-box { display: flex; gap: 10px; }
-        .search-box input { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        .search-box button { padding: 10px 15px; border: none; background: #1877f2; color: white; border-radius: 6px; cursor: pointer; }
-        .user-table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        .user-table th, .user-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #e9ebee; vertical-align: middle; }
-        .user-table th { background-color: #f7f7f9; font-weight: 600; color: #606770; }
-        .user-table td { color: #3c4043; }
-        .status-banned { color: #dc3545; font-weight: bold; }
-        .actions a { text-decoration: none; color: white; padding: 6px 12px; border-radius: 5px; font-size: 14px; }
-        .btn-ban { background-color: #dc3545; }
-        .btn-unban { background-color: #28a745; }
+        .search-box input { padding: 10px; border: 1px solid var(--border-dark); border-radius: 6px; background: var(--bg-dark); color: var(--text-light); font-size: 14px; }
+        .search-box button { padding: 10px 15px; border: none; background: var(--accent-blue); color: white; border-radius: 6px; cursor: pointer; }
         
-        /* --- Admin Note Styles --- */
-        .admin-note-container { display: flex; align-items: center; gap: 8px; }
-        .admin-note-input { width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 6px; font-size: 13px; }
-        .admin-note-save-btn { background: #007bff; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .note-status { font-size: 12px; color: green; display: none; }
+        .table-wrapper { overflow-x: auto; }
+        .user-table { width: 100%; border-collapse: collapse; min-width: 1400px; }
+        .user-table th, .user-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-dark); vertical-align: middle; white-space: nowrap; }
+        .user-table th { font-weight: 600; color: var(--text-secondary); text-transform: uppercase; font-size: 12px; }
+        .user-table td { color: var(--text-light); }
+        
+        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+        .status-active { background-color: var(--accent-green); color: white; }
+        .status-banned { background-color: var(--accent-red); color: white; }
+        
+        .balance-cell, .admin-note-container { display: flex; align-items: center; gap: 8px; }
+        .balance-input, .admin-note-input { width: 100%; background: var(--bg-dark); color: var(--text-light); border: 1px solid var(--border-dark); border-radius: 4px; padding: 6px; font-size: 13px; }
+        .balance-input { width: 90px; }
+        .save-btn { font-size: 12px; background: var(--accent-blue); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        .note-status { font-size: 12px; color: var(--accent-green); display: none; }
+        
+        .actions { display: flex; gap: 8px; }
+        .actions a, .actions button { text-decoration: none; color: white; padding: 6px 12px; border-radius: 5px; font-size: 13px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-ban { background-color: #b91c1c; }
+        .btn-unban { background-color: #166534; }
+        .btn-delete { background-color: #4b5563; }
+        .flash { /* ... */ }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"><h1>সকল ব্যবহারকারীর তালিকা</h1><a href="/{{ admin_path }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> অ্যাডমিন ড্যাশবোর্ডে ফিরে যান</a></div>
+        <div class="header">
+            <h1>সকল ব্যবহারকারীর তালিকা</h1>
+            <a href="/{{ admin_path }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> অ্যাডমিন ড্যাশবোর্ডে ফিরে যান</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
+        {% endwith %}
         
         <div class="card">
             <div class="stats-and-search">
@@ -45,7 +82,7 @@
                 </form>
             </div>
 
-            <div style="overflow-x: auto;">
+            <div class="table-wrapper">
                 <table class="user-table">
                     <thead>
                         <tr>
@@ -55,8 +92,8 @@
                             <th>ব্যালেন্স (৳)</th>
                             <th>রেফারেল</th>
                             <th>স্ট্যাটাস</th>
-                            <th style="width: 200px;">অ্যাডমিন নোট</th>
-                            <th style="width: 120px;">অ্যাকশন</th>
+                            <th style="width: 220px;">অ্যাডমিন নোট</th>
+                            <th style="width: 200px;">অ্যাকশন</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,28 +110,32 @@
                                     N/A
                                 {% endif %}
                             </td>
-                            <td>{{ "%.2f"|format(user.get('balance', 0)) }}</td>
+                            <td class="balance-cell">
+                                <input type="number" class="balance-input" data-userid="{{ user.id }}" value="{{ user.get('balance', 0) | round(2) }}" step="0.01">
+                                <button class="save-btn balance-save-btn" data-userid="{{ user.id }}">Save</button>
+                            </td>
                             <td>{{ user.get('referral_count', 0) }}</td>
                             <td>
-                                {% if user.get('status') == 'banned' %}
-                                    <span class="status-banned">Banned</span>
-                                {% else %}
-                                    <span>Active</span>
-                                {% endif %}
+                                <span class="status-badge {{ 'status-active' if user.get('status') != 'banned' else 'status-banned' }}">
+                                    {{ 'Active' if user.get('status') != 'banned' else 'Banned' }}
+                                </span>
                             </td>
                             <td>
                                 <div class="admin-note-container">
                                     <input type="text" class="admin-note-input" data-userid="{{ user.id }}" value="{{ user.get('admin_note', '') }}" placeholder="নোট লিখুন...">
-                                    <button class="admin-note-save-btn" data-userid="{{ user.id }}">Save</button>
+                                    <button class="save-btn admin-note-save-btn" data-userid="{{ user.id }}">Save</button>
                                 </div>
                                 <small class="note-status" id="status-{{ user.id }}"></small>
                             </td>
                             <td class="actions">
                                 {% if user.get('status') == 'banned' %}
-                                    <a href="/{{ admin_path }}/users/toggle-ban/{{ user.id }}" class="btn-unban">Unban</a>
+                                    <a href="/{{ admin_path }}/users/toggle-ban/{{ user.id }}" class="btn-unban"><i class="fa-solid fa-unlock"></i> Unban</a>
                                 {% else %}
-                                    <a href="/{{ admin_path }}/users/toggle-ban/{{ user.id }}" class="btn-ban">Ban</a>
+                                    <a href="/{{ admin_path }}/users/toggle-ban/{{ user.id }}" class="btn-ban"><i class="fa-solid fa-ban"></i> Ban</a>
                                 {% endif %}
+                                <form action="/{{ admin_path }}/users/delete/{{ user.id }}" method="post" style="display:inline;" onsubmit="return confirm('আপনি কি নিশ্চিতভাবে এই ব্যবহারকারীকে স্থায়ীভাবে ডিলিট করতে চান? এটি আর ফেরত আনা যাবে না।');">
+                                    <button type="submit" class="btn-delete"><i class="fa-solid fa-trash-can"></i> Delete</button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}
@@ -106,48 +147,55 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const saveButtons = document.querySelectorAll('.admin-note-save-btn');
+            function handleApiRequest(url, body, statusEl) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    statusEl.textContent = data.status === 'success' ? 'Saved!' : 'Error!';
+                    statusEl.style.color = data.status === 'success' ? 'var(--accent-green)' : 'var(--accent-red)';
+                    statusEl.style.display = 'inline';
+                    setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusEl.textContent = 'Network Error!';
+                    statusEl.style.color = 'var(--accent-red)';
+                    statusEl.style.display = 'inline';
+                });
+            }
 
-            saveButtons.forEach(button => {
+            // Admin Note Save Logic
+            document.querySelectorAll('.admin-note-save-btn').forEach(button => {
                 button.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-userid');
+                    const userId = this.dataset.userid;
                     const noteInput = document.querySelector(`.admin-note-input[data-userid='${userId}']`);
-                    const noteText = noteInput.value;
                     const statusEl = document.getElementById(`status-${userId}`);
+                    handleApiRequest(`/{{ admin_path }}/users/update-note/${userId}`, { note: noteInput.value }, statusEl);
+                });
+            });
 
-                    // API তে POST রিকোয়েস্ট পাঠানো
-                    fetch(`/{{ admin_path }}/users/update-note/${userId}`, {
+            // Balance Save Logic
+            document.querySelectorAll('.balance-save-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.dataset.userid;
+                    const balanceInput = document.querySelector(`.balance-input[data-userid='${userId}']`);
+                    // কোনো স্ট্যাটাস এলিমেন্ট না থাকলে একটি ডামি এলিমেন্ট ব্যবহার করা যেতে পারে অথবা alert ব্যবহার করা যায়।
+                    // alert একটি সহজ সমাধান।
+                    fetch(`/{{ admin_path }}/users/update-balance/${userId}`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ note: noteText }),
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ balance: parseFloat(balanceInput.value) }),
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            statusEl.textContent = 'Saved!';
-                            statusEl.style.color = 'green';
-                        } else {
-                            statusEl.textContent = 'Error!';
-                            statusEl.style.color = 'red';
-                        }
-                        
-                        statusEl.style.display = 'inline';
-                        setTimeout(() => {
-                            statusEl.style.display = 'none';
-                        }, 2000); // ২ সেকেন্ড পর মেসেজটি চলে যাবে
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        statusEl.textContent = 'Network Error!';
-                        statusEl.style.color = 'red';
-                        statusEl.style.display = 'inline';
-                    });
+                    .then(res => res.json())
+                    .then(data => alert(data.message))
+                    .catch(err => alert('An error occurred.'));
                 });
             });
         });
     </script>
-
 </body>
 </html>
