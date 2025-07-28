@@ -197,16 +197,7 @@
     <header class="site-header">
         <div class="header-container">
             <div class="logo"><a href="{{ url_for('index') }}">Riseii</a></div>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="{{ url_for('index') }}">হোম</a></li>
-                    {% if is_logged_in %}
-                        <li class="action-btn "><a href="{{ url_for('dashboard') }}" class="btn-dark">ড্যাশবোর্ড</a></li>
-                    {% else %}
-                        <li class="action-btn "><a href="{{ url_for('signup') }} class="btn-dark"">একাউন্ট খুলুন</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
+         
         </div>
     </header>
 
