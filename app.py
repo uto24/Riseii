@@ -405,7 +405,7 @@ def withdraw_page():
     # এই কোয়েরিটি কার্যকর করার জন্য Firestore Index প্রয়োজন হতে পারে
     referrals_query = db.collection('referrals').where('referrer_id', '==', user_id)
     referral_count = len(list(referrals_query.stream()))
-    are_referrals_eligible = referral_count >= 5
+    are_referrals_eligible = referral_count >= 2
 
     # শর্ত ৩: অ্যাকাউন্টের বয়স
     account_created_at = user_data.get('created_at')
@@ -415,7 +415,7 @@ def withdraw_page():
         if hasattr(account_created_at, 'tzinfo') and account_created_at.tzinfo:
             account_created_at = account_created_at.replace(tzinfo=None)
         
-        three_days_ago = datetime.now() - timedelta(days=3)
+        three_days_ago = datetime.now() - timedelta(days=1)
         is_account_old_enough = account_created_at < three_days_ago
 
     # সমস্ত শর্ত পূরণ হয়েছে কিনা তা চেক করা
