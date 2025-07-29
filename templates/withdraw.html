@@ -191,12 +191,12 @@ responsive-ad-container {
                 
                 <div class="eligibility-item {{ 'pass' if eligibility.are_referrals_eligible else 'fail' }}">
                     <i class="fas {{ 'fa-check-circle' if eligibility.are_referrals_eligible else 'fa-times-circle' }}"></i>
-                    <span>কমপক্ষে 5টি রেফারেল (আপনার আছে: {{ eligibility.referral_count }}টি)</span>
+                    <span>কমপক্ষে 2টি রেফারেল (আপনার আছে: {{ eligibility.referral_count }}টি)</span>
                 </div>
 
                 <div class="eligibility-item {{ 'pass' if eligibility.is_account_old_enough else 'fail' }}">
                     <i class="fas {{ 'fa-check-circle' if eligibility.is_account_old_enough else 'fa-times-circle' }}"></i>
-                    <span>কমপক্ষে 3 দিন পুরোনো একাউন্ট (আপনার একাউন্ট খোলা হয়েছে: {{ eligibility.account_created_at }})</span>
+                    <span>কমপক্ষে 1 দিন পুরোনো একাউন্ট (আপনার একাউন্ট খোলা হয়েছে: {{ eligibility.account_created_at }})</span>
                 </div>
             </div>
 
