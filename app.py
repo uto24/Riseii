@@ -186,98 +186,6 @@ def signup():
 
 # app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
-@app.route(f'/{SECRET_ADMIN_PATH}/users/delete/<user_id>', methods=['POST'])
-def delete_user(user_id):
-    """
-    একজন ব্যবহারকারীকে Firebase Authentication এবং Firestore উভয় জায়গা থেকে ডিলিট করে।
-    """
-    try:
-        # Firebase Authentication থেকে ইউজার ডিলিট
-        auth.delete_user(user_id)
-        
-        # Firestore থেকে ইউজারের ডকুমেন্ট ডিলিট
-        db.collection('users').document(user_id).delete()
-        
-        # (ঐচ্ছিক) ইউজারের সম্পর্কিত অন্যান্য ডেটাও ডিলিট করা যেতে পারে, যেমন task_submissions
-        
-        flash(f"ব্যবহারকারী (ID: {user_id}) সফলভাবে ডিলিট করা হয়েছে।", "success")
-    except Exception as e:
-        flash(f"ব্যবহারকারী ডিলিট করার সময় একটি সমস্যা হয়েছে: {e}", "error")
-    
-    return redirect(url_for('manage_users'))
-
-@app.route(f'/{SECRET_ADMIN_PATH}/users/update-balance/<user_id>', methods=['POST'])
-def update_user_balance(user_id):
-    """
-    AJAX রিকোয়েস্টের মাধ্যমে একজন ইউজারের ব্যালেন্স আপডেট করে।
-    """
-    try:
-        data = request.get_json()
-        new_balance = float(data.get('balance', 0))
-        
-        user_ref = db.collection('users').document(user_id)
-        user_ref.update({'balance': new_balance})
-        
-        # (ঐচ্ছিক) ব্যালেন্স হিস্টোরিতে একটি অ্যাডমিন অ্যাডজাস্টমেন্ট এন্ট্রি যোগ করা যেতে পারে
-        db.collection('balance_history').add({
-            'user_id': user_id,
-            'amount': new_balance,
-            'type': 'admin_adjustment',
-            'description': 'Balance updated by admin.',
-            'timestamp': firestore.SERVER_TIMESTAMP
-        })
-        
-        return jsonify({"status": "success", "message": "ব্যালেন্স সফলভাবে আপডেট হয়েছে।"}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": "ব্যালেন্স আপডেট করার সময় সমস্যা হয়েছে।"}), 500
-# app.py -> manage_users ফাংশনটি প্রতিস্থাপন করুন
-
-@app.route(f'/{SECRET_ADMIN_PATH}/users', methods=['GET'])
-def manage_users():
-    """
-    সমস্ত ব্যবহারকারীর তালিকা দেখায় এবং ইমেইল দিয়ে সার্চ করার সুবিধা দেয়।
-    """
-    try:
-        search_email = request.args.get('search_email', '').strip()
-        
-        users_ref = db.collection('users')
-        
-        # যদি সার্চ করা হয়
-        if search_email:
-            users_query = users_ref.where('email', '==', search_email).stream()
-        else:
-            # যদি সার্চ করা না হয়, তাহলে সব ইউজারকে আনা হচ্ছে
-            users_query = users_ref.order_by('created_at', direction=firestore.Query.DESCENDING).limit(50).stream() # পারফরম্যান্সের জন্য লিমিট যোগ করা হলো
-        
-        all_users = []
-        for user_doc in users_query:
-            user_data = user_doc.to_dict()
-            user_data['id'] = user_doc.id
-            
-            # --- প্রতিটি ইউজারের রেফারেল সংখ্যা গণনা ---
-            referrals_query = db.collection('referrals').where('referrer_id', '==', user_doc.id)
-            # .stream() ব্যবহার না করে সরাসরি .get() ব্যবহার করে size প্রপার্টি নেওয়া যায় (ছোট ডেটাসেটের জন্য)
-            # কিন্তু বড় ডেটাসেটের জন্য এটি খরচসাপেক্ষ হতে পারে।
-            # একটি বিকল্প হলো 'users' ডকুমেন্টে একটি 'referral_count' ফিল্ড রাখা এবং রেফারেলের সময় সেটি আপডেট করা।
-            # எளிமையের জন্য আমরা এখন সরাসরি গণনা করছি।
-            referral_count = len(list(referrals_query.stream()))
-            user_data['referral_count'] = referral_count
-            
-            all_users.append(user_data)
-        
-        # মোট ব্যবহারকারীর সংখ্যা গণনা
-        total_users = len(list(db.collection('users').stream()))
-
-        return render_template('users_list.html', 
-                               all_users=all_users, 
-                               total_users=total_users,
-                               search_email=search_email,
-                               admin_path=SECRET_ADMIN_PATH)
-        
-    except Exception as e:
-        print(f"Error fetching users: {e}")
-        flash(f"ব্যবহারকারীদের তথ্য আনতে একটি সমস্যা হয়েছে।", "error")
-        return redirect(url_for('admin_dashboard'))
         
 @app.route('/login')
 def login():
@@ -285,22 +193,82 @@ def login():
     config_data = {'firebase_api_key': os.getenv('FIREBASE_API_KEY'), 'firebase_auth_domain': os.getenv('FIREBASE_AUTH_DOMAIN'), 'firebase_project_id': os.getenv('FIREBASE_PROJECT_ID')}
     return render_template('login.html', config=config_data)
 
-# app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
+# ==============================================================================
+#           COMPLETE USER MANAGEMENT ROUTES FOR ADMIN PANEL
+# ==============================================================================
 
-@app.route(f'/{SECRET_ADMIN_PATH}/users/update-note/<user_id>', methods=['POST'])
-def update_admin_note(user_id):
-  
+# --- Helper Function for calculating time difference ---
+# from datetime import datetime -- ফাইলের উপরে এটি ইম্পোর্ট করা আছে কিনা নিশ্চিত করুন
+def time_ago(dt):
+    """
+    একটি datetime অবজেক্টকে 'X days ago', 'X hours ago' ইত্যাদি ফরম্যাটে পরিণত করে।
+    """
+    if not dt:
+        return "N/A"
+    # সময়কে timezone-aware থেকে naive-এ রূপান্তর (যাতে datetime.now() এর সাথে তুলনা করা যায়)
+    if hasattr(dt, 'tzinfo') and dt.tzinfo:
+        dt = dt.replace(tzinfo=None)
+    
+    now = datetime.now()
+    diff = now - dt
+    
+    if diff.days > 365:
+        return f"{diff.days // 365} year{'s' if diff.days // 365 > 1 else ''} ago"
+    if diff.days > 30:
+        return f"{diff.days // 30} month{'s' if diff.days // 30 > 1 else ''} ago"
+    if diff.days > 0:
+        return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
+    if diff.seconds >= 3600:
+        return f"{diff.seconds // 3600} hour{'s' if diff.seconds // 3600 > 1 else ''} ago"
+    if diff.seconds >= 60:
+        return f"{diff.seconds // 60} minute{'s' if diff.seconds // 60 > 1 else ''} ago"
+    return "Just now"
+
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users', methods=['GET'])
+def manage_users():
+    """
+    সমস্ত ব্যবহারকারীর তালিকা দেখায়, সার্চিং, রেফারেল গণনা এবং অ্যাকাউন্টের বয়স সহ।
+    """
     try:
-        data = request.get_json()
-        note_text = data.get('note', '')
+        search_email = request.args.get('search_email', '').strip()
+        users_ref = db.collection('users')
         
-        user_ref = db.collection('users').document(user_id)
-        user_ref.update({'admin_note': note_text})
+        if search_email:
+            users_query = users_ref.where('email', '==', search_email).stream()
+        else:
+            users_query = users_ref.order_by('created_at', direction=firestore.Query.DESCENDING).limit(50).stream()
         
-        return jsonify({"status": "success", "message": "নোট সফলভাবে সেভ হয়েছে।"}), 200
+        all_users = []
+        for user_doc in users_query:
+            user_data = user_doc.to_dict()
+            user_data['id'] = user_doc.id
+            
+            # অ্যাকাউন্টের বয়স গণনা
+            created_at = user_data.get('created_at')
+            user_data['joined_ago'] = time_ago(created_at)
+            
+            # প্রতিটি ইউজারের রেফারেল সংখ্যা গণনা
+            referrals_query = db.collection('referrals').where('referrer_id', '==', user_doc.id)
+            user_data['referral_count'] = len(list(referrals_query.stream()))
+            
+            all_users.append(user_data)
+        
+        # মোট ব্যবহারকারীর সংখ্যা গণনা
+        total_users = db.collection('users').get()
+
+        return render_template('admin/users_list.html', 
+                               all_users=all_users, 
+                               total_users=len(total_users),
+                               search_email=search_email,
+                               admin_path=SECRET_ADMIN_PATH)
+        
     except Exception as e:
-        print(f"Error updating note for user {user_id}: {e}")
-        return jsonify({"status": "error", "message": "নোট সেভ করার সময় সমস্যা হয়েছে।"}), 500
+        print(f"Error in manage_users: {e}")
+        flash("ব্যবহারকারীদের তথ্য আনতে একটি সমস্যা হয়েছে। Firestore Index চেক করুন।", "error")
+        return redirect(url_for('admin_dashboard'))
+
+
 @app.route(f'/{SECRET_ADMIN_PATH}/users/toggle-ban/<user_id>')
 def toggle_user_ban(user_id):
     """
@@ -312,19 +280,76 @@ def toggle_user_ban(user_id):
         if user_doc.exists:
             current_status = user_doc.to_dict().get('status', 'active')
             new_status = 'banned' if current_status == 'active' else 'active'
-            
             user_ref.update({'status': new_status})
-            
             flash(f"ব্যবহারকারীর স্ট্যাটাস সফলভাবে '{new_status}'-এ পরিবর্তন করা হয়েছে।", "success")
         else:
             flash("ব্যবহারকারীকে খুঁজে পাওয়া যায়নি।", "error")
     except Exception as e:
         flash(f"স্ট্যাটাস পরিবর্তন করার সময় একটি সমস্যা হয়েছে: {e}", "error")
-
     return redirect(url_for('manage_users'))
-# app.py ফাইলের শেষে যোগ করুন
 
-# --- Custom Error Handler for 404 Not Found ---
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users/delete/<user_id>', methods=['POST'])
+def delete_user(user_id):
+    """
+    একজন ব্যবহারকারীকে Firebase Authentication এবং Firestore উভয় জায়গা থেকে ডিলিট করে।
+    """
+    try:
+        auth.delete_user(user_id)
+        db.collection('users').document(user_id).delete()
+        flash(f"ব্যবহারকারী (ID: {user_id}) সফলভাবে ডিলিট করা হয়েছে।", "success")
+    except Exception as e:
+        flash(f"ব্যবহারকারী ডিলিট করার সময় একটি সমস্যা হয়েছে: {e}", "error")
+    return redirect(url_for('manage_users'))
+
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users/update-note/<user_id>', methods=['POST'])
+def update_admin_note(user_id):
+    """
+    AJAX রিকোয়েস্টের মাধ্যমে একজন ইউজারের জন্য অ্যাডমিন নোট আপডেট করে।
+    """
+    try:
+        data = request.get_json()
+        note_text = data.get('note', '')
+        db.collection('users').document(user_id).update({'admin_note': note_text})
+        return jsonify({"status": "success", "message": "নোট সফলভাবে সেভ হয়েছে।"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": "নোট সেভ করার সময় সমস্যা হয়েছে।"}), 500
+
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users/update-balance/<user_id>', methods=['POST'])
+def update_user_balance(user_id):
+    """
+    AJAX রিকোয়েস্টের মাধ্যমে একজন ইউজারের ব্যালেন্স আপডেট করে।
+    """
+    try:
+        data = request.get_json()
+        new_balance = float(data.get('balance', 0))
+        db.collection('users').document(user_id).update({'balance': new_balance})
+        # (ঐচ্ছিক) ব্যালেন্স হিস্টোরিতে এন্ট্রি যোগ করা
+        db.collection('balance_history').add({
+            'user_id': user_id, 'amount': new_balance,
+            'type': 'admin_adjustment', 'description': 'Balance updated by admin.',
+            'timestamp': firestore.SERVER_TIMESTAMP
+        })
+        return jsonify({"status": "success", "message": "ব্যালেন্স সফলভাবে আপডেট হয়েছে।"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": "ব্যালেন্স আপডেট করার সময় সমস্যা হয়েছে।"}), 500
+
+
+@app.route(f'/{SECRET_ADMIN_PATH}/users/update-marking-status/<user_id>', methods=['POST'])
+def update_user_marking_status(user_id):
+    """
+    AJAX রিকোয়েস্টের মাধ্যমে একজন ইউজারের মার্কিং স্ট্যাটাস আপডেট করে।
+    """
+    try:
+        data = request.get_json()
+        marking_status = data.get('marking_status', '')
+        db.collection('users').document(user_id).update({'marking_status': marking_status})
+        return jsonify({"status": "success", "message": "মার্কিং স্ট্যাটাস সফলভাবে আপডেট হয়েছে।"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": "স্ট্যাটাস আপডেট করার সময় সমস্যা হয়েছে।"}), 500
+
 @app.errorhandler(404)
 def not_found_error(error):
   
