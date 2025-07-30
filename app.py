@@ -12,6 +12,33 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 
+def time_ago(dt):
+    """
+    একটি datetime অবজেক্টকে 'X days ago', 'X hours ago' ইত্যাদি ফরম্যাটে পরিণত করে।
+    """
+    if not dt:
+        return "N/A"
+    # সময়কে timezone-aware থেকে naive-এ রূপান্তর (যাতে datetime.now() এর সাথে তুলনা করা যায়)
+    if hasattr(dt, 'tzinfo') and dt.tzinfo:
+        dt = dt.replace(tzinfo=None)
+    
+    now = datetime.now()
+    diff = now - dt
+    
+    if diff.days > 365:
+        return f"{diff.days // 365} year{'s' if diff.days // 365 > 1 else ''} ago"
+    if diff.days > 30:
+        return f"{diff.days // 30} month{'s' if diff.days // 30 > 1 else ''} ago"
+    if diff.days > 0:
+        return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
+    if diff.seconds >= 3600:
+        return f"{diff.seconds // 3600} hour{'s' if diff.seconds // 3600 > 1 else ''} ago"
+    if diff.seconds >= 60:
+        return f"{diff.seconds // 60} minute{'s' if diff.seconds // 60 > 1 else ''} ago"
+    return "Just now"
+
+
+
 
 # --- অ্যাপ এবং Firebase ইনিশিয়ালাইজেশন ---
 load_dotenv()
@@ -199,31 +226,6 @@ def login():
 
 # --- Helper Function for calculating time difference ---
 # from datetime import datetime -- ফাইলের উপরে এটি ইম্পোর্ট করা আছে কিনা নিশ্চিত করুন
-def time_ago(dt):
-    """
-    একটি datetime অবজেক্টকে 'X days ago', 'X hours ago' ইত্যাদি ফরম্যাটে পরিণত করে।
-    """
-    if not dt:
-        return "N/A"
-    # সময়কে timezone-aware থেকে naive-এ রূপান্তর (যাতে datetime.now() এর সাথে তুলনা করা যায়)
-    if hasattr(dt, 'tzinfo') and dt.tzinfo:
-        dt = dt.replace(tzinfo=None)
-    
-    now = datetime.now()
-    diff = now - dt
-    
-    if diff.days > 365:
-        return f"{diff.days // 365} year{'s' if diff.days // 365 > 1 else ''} ago"
-    if diff.days > 30:
-        return f"{diff.days // 30} month{'s' if diff.days // 30 > 1 else ''} ago"
-    if diff.days > 0:
-        return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
-    if diff.seconds >= 3600:
-        return f"{diff.seconds // 3600} hour{'s' if diff.seconds // 3600 > 1 else ''} ago"
-    if diff.seconds >= 60:
-        return f"{diff.seconds // 60} minute{'s' if diff.seconds // 60 > 1 else ''} ago"
-    return "Just now"
-
 
 @app.route(f'/{SECRET_ADMIN_PATH}/users', methods=['GET'])
 def manage_users():
