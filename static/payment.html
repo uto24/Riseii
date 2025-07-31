@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পেমেন্ট ভেরিফিকেশন</title>
+    
+    <!-- Google Fonts: Hind Siliguri & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+    <style>
+        /* ================================================
+           স্টাইল এবং ডিজাইন
+           ================================================ */
+        :root {
+            --primary-color: #007BFF;
+            --error-color: #DC3545;
+            --bg-color: #F8F9FA;
+            --container-bg: #FFFFFF;
+            --text-dark: #212529;
+            --text-light: #6C757D;
+            --border-color: #DEE2E6;
+            --font-bn: 'Hind Siliguri', sans-serif;
+            --font-en: 'Poppins', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-bn);
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            padding: 32px;
+            overflow: hidden;
+        }
+
+        /* ফর্ম স্টাইল */
+        #payment-form-container h2 {
+            font-family: var(--font-en);
+            text-align: center;
+            margin-bottom: 24px;
+            color: var(--text-dark);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: var(--font-bn);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: var(--font-bn);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* ফলাফল প্রদর্শন স্টাইল */
+        .hidden {
+            display: none;
+        }
+
+        #result-container {
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            color: var(--error-color);
+            margin-bottom: 16px;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        #result-container h2 {
+            font-family: var(--font-en);
+            color: var(--error-color);
+            margin-bottom: 24px;
+        }
+
+        .info-summary {
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: left;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-summary p {
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
+        .info-summary p:last-child {
+            margin-bottom: 0;
+        }
+        .info-summary strong {
+            color: var(--text-light);
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .error-details {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            color: var(--error-color);
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .try-again-btn {
+            margin-top: 24px;
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--container-bg);
+            color: var(--text-dark);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .try-again-btn:hover {
+            background-color: var(--bg-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- পেমেন্ট ফর্ম -->
+        <div id="payment-form-container">
+            <h2>পেমেন্ট তথ্য জমা দিন</h2>
+            <form id="payment-form">
+                <div class="input-group">
+                    <label for="email">আপনার ইমেইল</label>
+                    <input type="email" id="email" placeholder="example@email.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="sender-number">সেন্ডার নম্বর</label>
+                    <input type="tel" id="sender-number" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন" required>
+                </div>
+                <div class="input-group">
+                    <label for="amount">টাকার পরিমাণ</label>
+                    <input type="number" id="amount" placeholder="কত টাকা পাঠিয়েছেন" required>
+                </div>
+                <div class="input-group">
+                    <label for="trx-id">লেনদেন আইডি (TrxID)</label>
+                    <input type="text" id="trx-id" placeholder="পেমেন্টের ট্রানজেকশন আইডি" required>
+                </div>
+                <div class="input-group">
+                    <label for="method">পেমেন্ট মাধ্যম</label>
+                    <select id="method" required>
+                        <option value="" disabled selected>একটি মাধ্যম বেছে নিন</option>
+                        <option value="বিকাশ">বিকাশ</option>
+                        <option value="নগদ">নগদ</option>
+                        <option value="রকেট">রকেট</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">সাবমিট করুন</button>
+            </form>
+        </div>
+
+        <!-- ফলাফল ও ত্রুটি বার্তা -->
+        <div id="result-container" class="hidden">
+            <div class="error-icon">
+                <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <h2>লেনদেন ত্রুটিপূর্ণ!</h2>
+            
+            <div class="info-summary">
+                <p><strong>ইমেইল:</strong> <span id="display-email"></span></p>
+                <p><strong>সেন্ডার নম্বর:</strong> <span id="display-number"></span></p>
+                <p><strong>পরিমাণ:</strong> <span id="display-amount"></span></p>
+                <p><strong>TrxID:</strong> <span id="display-trx-id"></span></p>
+                <p><strong>মাধ্যম:</strong> <span id="display-method"></span></p>
+            </div>
+            
+            <div class="error-details">
+                <p>Method Server Error: 505</p>
+            </div>
+            
+            <button id="try-again-btn" class="try-again-btn">পুনরায় চেষ্টা করুন</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // সকল প্রয়োজনীয় এলিমেন্ট সিলেক্ট করা
+            const paymentForm = document.getElementById('payment-form');
+            const paymentFormContainer = document.getElementById('payment-form-container');
+            const resultContainer = document.getElementById('result-container');
+            const tryAgainBtn = document.getElementById('try-again-btn');
+
+            // ফর্ম সাবমিট করার জন্য ইভেন্ট লিসেনার
+            paymentForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // পেজ রিলোড হওয়া বন্ধ করা
+
+                // ইনপুট ফিল্ড থেকে ডেটা সংগ্রহ করা
+                const email = document.getElementById('email').value;
+                const senderNumber = document.getElementById('sender-number').value;
+                const amount = document.getElementById('amount').value;
+                const trxId = document.getElementById('trx-id').value;
+                const method = document.getElementById('method').value;
+
+                // ফলাফল প্রদর্শনের জন্য ডেটা সেট করা
+                document.getElementById('display-email').innerText = email;
+                document.getElementById('display-number').innerText = senderNumber;
+                document.getElementById('display-amount').innerText = `৳${amount}`;
+                document.getElementById('display-trx-id').innerText = trxId;
+                document.getElementById('display-method').innerText = method;
+
+                // ফর্ম লুকিয়ে ফলাফল দেখানো
+                paymentFormContainer.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+            });
+            
+            // "পুনরায় চেষ্টা করুন" বাটনের জন্য ইভেন্ট লিসেনার
+            tryAgainBtn.addEventListener('click', function() {
+                // ফলাফল লুকিয়ে ফর্ম দেখানো
+                resultContainer.classList.add('hidden');
+                paymentFormContainer.classList.remove('hidden');
+
+                // ফর্মের সকল ইনপুট রিসেট করা
+                paymentForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>
