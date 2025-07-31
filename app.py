@@ -696,38 +696,62 @@ def view_task(task_id):
         return redirect(url_for('dashboard')) # পরিবর্তন: tasks_page এর পরিবর্তে dashboard
     
 # --- UNIQUE LINK ADMIN PANEL ---
+# app.py -> admin_dashboard ফাংশনটি প্যাজিনেশন সহ আপডেট করুন
+
 @app.route(f'/{SECRET_ADMIN_PATH}')
 def admin_dashboard():
-    # প্রথমে সব পেন্ডিং টাস্ক আনা হচ্ছে
-    pending_tasks_query = db.collection('task_submissions').where('status', '==', 'pending').order_by('submitted_at').stream()
-    
-    tasks_with_user_info = []
-    
-    # প্রতিটি টাস্কের জন্য ইউজারের তথ্য আনা হচ্ছে
-    for task_doc in pending_tasks_query:
-        task_data = task_doc.to_dict()
-        task_data['id'] = task_doc.id  # সাবমিশন ডকুমেন্ট আইডি
-
-        user_id = task_data.get('user_id')
-        if user_id:
-            try:
-                # টাস্কের সাথে সম্পর্কিত ইউজারের ডকুমেন্ট আনা হচ্ছে
-                user_info_doc = db.collection('users').document(user_id).get()
-                if user_info_doc.exists:
-                    # টাস্কের ডেটার সাথে ইউজারের নাম ও ইমেইল যোগ করা হচ্ছে
-                    task_data['user_info'] = user_info_doc.to_dict()
-                else:
-                    # যদি কোনো কারণে ইউজার খুঁজে পাওয়া না যায়
-                    task_data['user_info'] = {'name': 'Unknown User', 'email': 'N/A'}
-            except Exception as e:
-                print(f"Could not fetch user {user_id}: {e}")
-                task_data['user_info'] = {'name': 'Error Fetching', 'email': 'N/A'}
-        else:
-            task_data['user_info'] = {'name': 'No User ID', 'email': 'N/A'}
-            
-        tasks_with_user_info.append(task_data)
+    try:
+        # প্যাজিনেশনের জন্য পৃষ্ঠা টোকেন URL থেকে নেওয়া হচ্ছে
+        page_token = request.args.get('page')
         
-    return render_template('admin_dashboard.html', pending_tasks=tasks_with_user_info, admin_path=SECRET_ADMIN_PATH)
+        # ডিফল্ট কোয়েরি (পেন্ডিং টাস্ক, পুরনো গুলো আগে)
+        query = db.collection('task_submissions').where('status', '==', 'pending').order_by('submitted_at', direction=firestore.Query.ASCENDING)
+        
+        # যদি এটি প্রথম পৃষ্ঠা না হয়, তাহলে আগের পৃষ্ঠার শেষ ডকুমেন্ট থেকে শুরু করা হবে
+        if page_token:
+            last_doc_snapshot = db.collection('task_submissions').document(page_token).get()
+            if last_doc_snapshot.exists:
+                query = query.start_after(last_doc_snapshot)
+        
+        # প্রতি পৃষ্ঠায় কতগুলো টাস্ক দেখানো হবে
+        tasks_per_page = 50
+        query = query.limit(tasks_per_page)
+
+        # কোয়েরি এক্সিকিউট করে ডকুমেন্টগুলো আনা হচ্ছে
+        docs = list(query.stream())
+        
+        tasks_with_user_info = []
+        for task_doc in docs:
+            task_data = task_doc.to_dict()
+            task_data['id'] = task_doc.id
+            
+            user_id = task_data.get('user_id')
+            if user_id:
+                user_info_doc = db.collection('users').document(user_id).get()
+                task_data['user_info'] = user_info_doc.to_dict() if user_info_doc.exists else {'name': 'Unknown User', 'email': 'N/A'}
+            else:
+                task_data['user_info'] = {'name': 'No User ID', 'email': 'N/A'}
+                
+            tasks_with_user_info.append(task_data)
+            
+        # পরবর্তী পৃষ্ঠার জন্য টোকেন তৈরি করা (যদি আরও ডেটা থাকে)
+        next_page_token = None
+        if len(docs) == tasks_per_page:
+            next_page_token = docs[-1].id # বর্তমান পৃষ্ঠার শেষ টাস্কের আইডি
+
+        return render_template(
+            'admin_dashboard.html', 
+            pending_tasks=tasks_with_user_info, 
+            next_page_token=next_page_token,
+            admin_path=SECRET_ADMIN_PATH
+        )
+        
+    except Exception as e:
+        print(f"Error in admin_dashboard: {e}")
+        flash("অ্যাডমিন ড্যাশবোর্ড লোড করতে একটি সমস্যা হয়েছে।", "error")
+        # কোনো এরর হলে একটি খালি তালিকা পাঠানো হচ্ছে
+        return render_template('admin_dashboard.html', pending_tasks=[], admin_path=SECRET_ADMIN_PATH)
+    
 @app.route(f'/{SECRET_ADMIN_PATH}/task/approve/<submission_id>')
 def approve_task(submission_id):
     submission_ref = db.collection('task_submissions').document(submission_id)
