@@ -53,8 +53,43 @@
         .banned .ban-warning-card { opacity: 1; filter: none; pointer-events: all; }
 
         /* --- Ad Styles --- */
-        .responsive-ad-container { display: flex; justify-content: center; align-items: center; width: 100%; overflow: hidden; height: auto; min-height: 60px; margin: 20px 0; }
-        .adsterra-sticky-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #fff; z-index: 10000; box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center; padding: 5px 0; min-height: 50px; transform: translateY(100%); transition: transform 0.5s ease-in-out; }
+       
+        .responsive-ad-container {
+            /* আপনার দেওয়া মূল স্টাইল */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+            height: 90px;
+            margin: 10px 0;
+            
+            /* নতুন যোগ করা স্টাইল */
+            background-color: #1a1a1a; /* কন্টেইনারের একটি হালকা ডার্ক রঙ */
+            color: #fff;
+            font-family: sans-serif;
+            font-size: 18px;
+            
+            /* ১. ডটেড বর্ডার */
+            border: 2px dotted #555; /* একটি হালকা ধূসর ডটেড বর্ডার */
+            
+            /* ২. গ্লোয়িং ইফেক্টের জন্য শ্যাডো */
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.4); /* একটি হালকা নীল গ্লো */
+            
+            /* সুন্দর দেখানোর জন্য বর্ডার-রেডিয়াস */
+            border-radius: 10px;
+            
+            /* হোভার অ্যানিমেশনের জন্য ট্রানজিশন */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* মাউস হোভার করলে ইফেক্ট আরও আকর্ষণীয় হবে */
+        .responsive-ad-container:hover {
+            border-color: #888; /* বর্ডারের রঙ কিছুটা উজ্জ্বল হবে */
+            box-shadow: 0 0 25px rgba(0, 123, 255, 0.7); /* গ্লো আরও শক্তিশালী হবে */
+        }
+ .adsterra-sticky-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #fff; z-index: 10000; box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center; padding: 5px 0; min-height: 50px; transform: translateY(100%); transition: transform 0.5s ease-in-out; }
         .adsterra-sticky-footer.ad-visible { transform: translateY(0); }
         .adsterra-ad-close { position: absolute; top: -15px; right: 15px; width: 30px; height: 30px; background-color: rgba(0,0,0,0.7); color: #fff; border: 2px solid #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; }
 
@@ -107,6 +142,10 @@
                 <div class="card-header"><i class="fa-solid fa-wallet"></i><h3>আপনার ব্যালেন্স</h3></div>
                 <p class="balance-amount">৳ {{ "%.2f"|format(user.get('balance', 0)) }}</p>
             </div>
+              <div class="responsive-ad-container">
+            <script type="text/javascript"> atOptions = {'key' : 'f62367e86bf7296ea58f8b60f94e1218', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}}; </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/f62367e86bf7296ea58f8b60f94e1218/invoke.js"></script>
+        </div>
             <div class="card">
                 <div class="card-header"><i class="fa-solid fa-share-nodes"></i><h3>রেফারেল প্রোগ্রাম</h3></div>
                 <p>বন্ধুদের রেফার করে আয় করুন। প্রতি রেফারে ১০ টাকা বোনাস পাবে দুজনিই।  এ ছাড়া যাকে রেফার করা হয়েছে, সে যখন টাকা তুলবে, সেই টাকার ৫% আপনিও পাবেন। </p>
