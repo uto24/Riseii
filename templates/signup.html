@@ -94,19 +94,19 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
                 </div>
             </nav>
         </div>
-    </header>
-    <!-- ======================== HEADER END ======================== -->
 
     <style>
         /* ================================================
            স্টাইল এবং ডিজাইন
            ================================================ */
-        
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #F8F9FA;
+            color: #212529;
+        }
 
         /* পপ-আপ ওভারলে (অস্পষ্ট ব্যাকগ্রাউন্ড) */
         .popup-overlay {
-            
-
             position: fixed;
             top: 0;
             left: 0;
@@ -122,8 +122,6 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
-            
-            
         }
 
         .popup-overlay.active {
@@ -161,7 +159,7 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
         }
 
         .popup-header h2 {
-        
+            font-family: 'Poppins', sans-serif;
             font-size: 28px;
             color: #212529;
         }
@@ -188,8 +186,8 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
         
         .user-info-box p { display: flex; align-items: center; gap: 10px; font-weight: 500; }
         .user-info-box p:first-child { margin-bottom: 8px; }
-        .user-info-box p i { width: 20px; }
-    
+        .user-info-box p i { width: 20px; text-align: center;}
+        .user-info-box span { font-family: 'Poppins', sans-serif; font-weight: 600; }
         
         .rules-content h3 { font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .rules-content h3.rules-forbidden { color: #DC3545; }
@@ -202,17 +200,69 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
         
         .btn-proceed {
             width: 100%; padding: 14px; margin-top: 32px; border: none;
-            border-radius: 8px; background-color: #3bff00;
-            color: white; font-size: 18px; font-weight: 600;
+            border-radius: 8px; background-color: #007BFF;
+            color: white; font-size: 18px; font-weight: 600; font-family: 'Hind Siliguri', sans-serif;
             cursor: pointer; transition: background-color 0.3s;
         }
         .btn-proceed:hover { background-color: #0056b3; }
         
         /* ডেমোর জন্য পেজের মূল কন্টেন্ট */
         .page-content { padding: 40px; text-align: center; }
+
+
+        /* ================================================
+           Responsive Design
+           ================================================ */
+
+        /* ট্যাবলেট এবং ছোট ডিভাইসের জন্য */
+        @media (max-width: 768px) {
+            .popup-content {
+                padding: 24px;
+            }
+
+            .popup-header h2 {
+                font-size: 24px;
+            }
+
+            .popup-header .icon {
+                font-size: 40px;
+            }
+        }
+
+        /* মোবাইল ফোনের জন্য */
+        @media (max-width: 576px) {
+            .popup-content {
+                padding: 20px 16px;
+            }
+
+            .popup-header h2 {
+                font-size: 22px;
+            }
+            
+            .user-info-box p {
+                font-size: 14px;
+            }
+
+            .rules-content h3 {
+                font-size: 18px;
+            }
+
+            .rules-content li {
+                font-size: 15px;
+            }
+
+            .btn-proceed {
+                font-size: 16px;
+                padding: 12px;
+            }
+        }
         
     </style>
-
+    <!-- পেজের মূল কন্টেন্ট (উদাহরণস্বরূপ) -->
+    <div class="page-content">
+        <h1>আমার ওয়েবসাইট</h1>
+        <p>এটি ওয়েবসাইটের প্রধান কন্টেন্ট। পপ-আপটি এর উপরে প্রদর্শিত হবে।</p>
+    </div>
 
     <!-- সতর্কবার্তা পপ-আপ -->
     <div class="popup-overlay" id="warning-popup-overlay">
@@ -231,14 +281,14 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
             <div class="rules-content">
                 <h3 class="rules-forbidden"><i class="fas fa-ban"></i> যা করা কঠোরভাবে নিষিদ্ধ:</h3>
                 <ul>
-                    <li><i class="fas fa-times-circle"></i> <strong style="color: var(--danger-color);">ফেক রেফার করবেন না।</strong> আমাদের সিস্টেম স্বয়ংক্রিয়ভাবে ফেক রেফার শনাক্ত করতে পারে।</li>
+                    <li><i class="fas fa-times-circle"></i> <strong style="color: #DC3545;">ফেক রেফার করবেন না।</strong> আমাদের সিস্টেম স্বয়ংক্রিয়ভাবে ফেক রেফার শনাক্ত করতে পারে।</li>
                     <li><i class="fas fa-times-circle"></i> একজনের একাধিক একাউন্ট খোলা সম্পূর্ণ নিষিদ্ধ। ধরা পড়লে সকল একাউন্ট ব্লক করা হবে।</li>
                 </ul>
 
                 <h3 class="rules-allowed" style="margin-top: 24px;"><i class="fas fa-check-circle"></i> যা আপনাকে করতে উৎসাহিত করা হচ্ছে:</h3>
                 <ul>
                     <li><i class="fas fa-check-circle"></i> ভালোভাবে একটি মাত্র একাউন্ট খুলুন এবং সঠিকভাবে কাজ করুন।</li>
-                    <li><i class="fas fa-check-circle"></i> আপনার বন্ধুদের মাঝে <strong style="color: var(--success-color);">রিয়েল রেফার করুন</strong> এবং আপনার আয় বৃদ্ধি করুন।</li>
+                    <li><i class="fas fa-check-circle"></i> আপনার বন্ধুদের মাঝে <strong style="color: #28a745;">রিয়েল রেফার করুন</strong> এবং আপনার আয় বৃদ্ধি করুন।</li>
                 </ul>
             </div>
             
@@ -257,16 +307,13 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
             function getDeviceModel() {
                 const ua = navigator.userAgent;
                 if (/android/i.test(ua)) {
-                    // Android ডিভাইসের মডেল বের করার চেষ্টা
                     const match = ua.match(/;\s?([^;]+)\s?Build\//);
                     if (match && match[1]) {
                         return match[1];
                     }
                     return "Android Device";
                 }
-                if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
-                    return "Apple Device (iPhone/iPad)";
-                }
+                if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return "Apple Device (iPhone/iPad)";
                 if (/Windows Phone/i.test(ua)) return "Windows Phone";
                 if (/Macintosh|Mac OS X/i.test(ua)) return "Apple Mac";
                 if (/Windows/i.test(ua)) return "Windows PC";
@@ -276,10 +323,8 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
 
             // পপ-আপ দেখানোর ফাংশন
             function showPopup() {
-                // ডিভাইসের মডেল প্রদর্শন
                 document.getElementById('user-device').textContent = getDeviceModel();
 
-                // আইপি অ্যাড্রেস প্রদর্শন
                 fetch('https://api.ipify.org?format=json')
                     .then(response => response.json())
                     .then(data => {
@@ -300,18 +345,17 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
             // পেজ লোড হওয়ার সাথে সাথে পপ-আপ দেখানো
             showPopup();
 
-            // বাটন ও ওভারলেতে ইভেন্ট লিসেনার যোগ করা
             closeBtn.addEventListener('click', closePopup);
             proceedBtn.addEventListener('click', closePopup);
             
             popupOverlay.addEventListener('click', (event) => {
-                // যদি ওভারলের উপর ক্লিক করা হয় (কন্টেন্টের উপর নয়), তাহলে পপ-আপ বন্ধ হবে
                 if (event.target === popupOverlay) {
                     closePopup();
                 }
             });
         });
     </script>
+
     <main class="main-content">
         <div class="signup-container">
             <h2>নতুন একাউন্ট খুলুন</h2>
