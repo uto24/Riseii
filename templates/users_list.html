@@ -38,28 +38,26 @@
         
         .table-wrapper { overflow-x: auto; }
         .user-table { width: 100%; border-collapse: collapse; min-width: 1400px; }
-        .user-table th, .user-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-dark); vertical-align: middle; }
-        .user-table th { font-weight: 600; color: var(--text-secondary); text-transform: uppercase; font-size: 12px; white-space: nowrap; }
+        .user-table th, .user-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-dark); vertical-align: middle; white-space: nowrap; }
+        .user-table th { font-weight: 600; color: var(--text-secondary); text-transform: uppercase; font-size: 12px; }
         .user-table td { color: var(--text-light); }
         
-        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; white-space: nowrap; }
+        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
         .status-active { background-color: var(--accent-green); color: white; }
         .status-banned { background-color: var(--accent-red); color: white; }
         
         .balance-cell, .admin-note-container { display: flex; align-items: center; gap: 8px; }
-        .balance-input, .admin-note-input, .marking-status-select { background: var(--bg-dark); color: var(--text-light); border: 1px solid var(--border-dark); border-radius: 4px; padding: 6px; font-size: 13px; }
+        .balance-input, .admin-note-input { width: 100%; background: var(--bg-dark); color: var(--text-light); border: 1px solid var(--border-dark); border-radius: 4px; padding: 6px; font-size: 13px; }
         .balance-input { width: 90px; }
         .save-btn { font-size: 12px; background: var(--accent-blue); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
-        .note-status, .temp-status { font-size: 12px; color: var(--accent-green); white-space: nowrap; }
+        .note-status { font-size: 12px; color: var(--accent-green); display: none; }
         
-        .actions { display: flex; gap: 8px; align-items: center; }
-        .actions a, .actions button { text-decoration: none; color: white; padding: 6px 12px; border-radius: 5px; font-size: 13px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .actions { display: flex; gap: 8px; }
+        .actions a, .actions button { text-decoration: none; color: white; padding: 6px 12px; border-radius: 5px; font-size: 13px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         .btn-ban { background-color: #b91c1c; }
         .btn-unban { background-color: #166534; }
         .btn-delete { background-color: #4b5563; }
-        .flash { padding: 1rem; margin-bottom: 1rem; text-align: center; border-radius: 8px; color: white; }
-        .flash.success { background-color: var(--accent-green); }
-        .flash.error { background-color: var(--accent-red); }
+        .flash { /* ... */ }
     </style>
 </head>
 <body>
@@ -88,39 +86,46 @@
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>নাম</th><th>ইমেইল</th><th>ফেসবুক</th><th>ব্যালেন্স (৳)</th><th>রেফারেল</th>
-                            <th>অ্যাকাউন্টের বয়স</th><th>মার্কিং স্ট্যাটাস</th><th style="width: 220px;">অ্যাডমিন নোট</th><th style="width: 210px;">অ্যাকশন</th>
+                            <th>নাম</th>
+                            <th>ইমেইল</th>
+                            <th>ফেসবুক</th>
+                            <th>ব্যালেন্স (৳)</th>
+                            <th>রেফারেল</th>
+                            <th>স্ট্যাটাস</th>
+                            <th style="width: 220px;">অ্যাডমিন নোট</th>
+                            <th style="width: 200px;">অ্যাকশন</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for user in all_users %}
-                        <tr data-userid="{{ user.id }}">
+                        <tr>
                             <td>{{ user.get('name', 'N/A') }}</td>
                             <td>{{ user.get('email', 'N/A') }}</td>
-                            <td>{% if user.get('facebook_profile') %}<a href="{{ user.facebook_profile }}" target="_blank" title="Visit Profile"><i class="fa-brands fa-facebook" style="font-size: 1.5rem;"></i></a>{% else %}N/A{% endif %}</td>
+                            <td>
+                                {% if user.get('facebook_profile') %}
+                                    <a href="{{ user.facebook_profile }}" target="_blank" title="Visit Profile">
+                                        <i class="fa-brands fa-facebook" style="color: #1877f2; font-size: 1.5rem;"></i>
+                                    </a>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
                             <td class="balance-cell">
-                                <input type="number" class="balance-input" value="{{ user.get('balance', 0) | round(2) }}" step="0.01">
-                                <button class="save-btn balance-save-btn">Save</button>
+                                <input type="number" class="balance-input" data-userid="{{ user.id }}" value="{{ user.get('balance', 0) | round(2) }}" step="0.01">
+                                <button class="save-btn balance-save-btn" data-userid="{{ user.id }}">Save</button>
                             </td>
                             <td>{{ user.get('referral_count', 0) }}</td>
-                            <td>{{ user.get('joined_ago', 'N/A') }}</td>
                             <td>
-                                <select class="marking-status-select">
-                                    <option value="" {% if not user.get('marking_status') %}selected{% endif %}>-- স্ট্যাটাস --</option>
-                                    <option value="Need to Verify" {% if user.get('marking_status') == 'Need to Verify' %}selected{% endif %}>Need to Verify</option>
-                                    <option value="Verified" {% if user.get('marking_status') == 'Verified' %}selected{% endif %}>Verified</option>
-                                    <option value="Send Requested" {% if user.get('marking_status') == 'Send Requested' %}selected{% endif %}>Send Requested</option>
-                                    <option value="Call Back" {% if user.get('marking_status') == 'Call Back' %}selected{% endif %}>Call Back</option>
-                                    <option value="Welcome SMS" {% if user.get('marking_status') == 'Welcome SMS' %}selected{% endif %}>Welcome SMS</option>
-                                    <option value="Deposited" {% if user.get('marking_status') == 'Deposited' %}selected{% endif %}>Deposited</option>
-                                </select>
+                                <span class="status-badge {{ 'status-active' if user.get('status') != 'banned' else 'status-banned' }}">
+                                    {{ 'Active' if user.get('status') != 'banned' else 'Banned' }}
+                                </span>
                             </td>
                             <td>
                                 <div class="admin-note-container">
-                                    <input type="text" class="admin-note-input" value="{{ user.get('admin_note', '') }}" placeholder="নোট লিখুন...">
-                                    <button class="save-btn admin-note-save-btn">Save</button>
+                                    <input type="text" class="admin-note-input" data-userid="{{ user.id }}" value="{{ user.get('admin_note', '') }}" placeholder="নোট লিখুন...">
+                                    <button class="save-btn admin-note-save-btn" data-userid="{{ user.id }}">Save</button>
                                 </div>
-                                <small class="note-status"></small>
+                                <small class="note-status" id="status-{{ user.id }}"></small>
                             </td>
                             <td class="actions">
                                 {% if user.get('status') == 'banned' %}
@@ -142,10 +147,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            function handleUserUpdate(userId, url, body, successMessage) {
-                const userRow = document.querySelector(`tr[data-userid='${userId}']`);
-                let statusEl = userRow.querySelector('.note-status'); // Use a common status element
-                
+            function handleApiRequest(url, body, statusEl) {
                 fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -153,13 +155,8 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === 'success') {
-                        statusEl.textContent = successMessage;
-                        statusEl.style.color = 'var(--accent-green)';
-                    } else {
-                        statusEl.textContent = 'Error!';
-                        statusEl.style.color = 'var(--accent-red)';
-                    }
+                    statusEl.textContent = data.status === 'success' ? 'Saved!' : 'Error!';
+                    statusEl.style.color = data.status === 'success' ? 'var(--accent-green)' : 'var(--accent-red)';
                     statusEl.style.display = 'inline';
                     setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
                 })
@@ -171,28 +168,34 @@
                 });
             }
 
-            document.querySelectorAll('.user-table tbody tr').forEach(row => {
-                const userId = row.dataset.userid;
-                
-                // Admin Note Save Logic
-                row.querySelector('.admin-note-save-btn').addEventListener('click', function() {
-                    const noteText = row.querySelector('.admin-note-input').value;
-                    handleUserUpdate(userId, `/{{ admin_path }}/users/update-note/${userId}`, { note: noteText }, 'Note Saved!');
+            // Admin Note Save Logic
+            document.querySelectorAll('.admin-note-save-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.dataset.userid;
+                    const noteInput = document.querySelector(`.admin-note-input[data-userid='${userId}']`);
+                    const statusEl = document.getElementById(`status-${userId}`);
+                    handleApiRequest(`/{{ admin_path }}/users/update-note/${userId}`, { note: noteInput.value }, statusEl);
                 });
-                
-                // Balance Save Logic
-                row.querySelector('.balance-save-btn').addEventListener('click', function() {
-                    const newBalance = parseFloat(row.querySelector('.balance-input').value);
-                    handleUserUpdate(userId, `/{{ admin_path }}/users/update-balance/${userId}`, { balance: newBalance }, 'Balance Saved!');
-                });
-                
-                // Marking Status Change Logic
-                row.querySelector('.marking-status-select').addEventListener('change', function() {
-                    const newStatus = this.value;
-                    handleUserUpdate(userId, `/{{ admin_path }}/users/update-marking-status/${userId}`, { marking_status: newStatus }, 'Status Updated!');
+            });
+
+            // Balance Save Logic
+            document.querySelectorAll('.balance-save-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.dataset.userid;
+                    const balanceInput = document.querySelector(`.balance-input[data-userid='${userId}']`);
+                    // কোনো স্ট্যাটাস এলিমেন্ট না থাকলে একটি ডামি এলিমেন্ট ব্যবহার করা যেতে পারে অথবা alert ব্যবহার করা যায়।
+                    // alert একটি সহজ সমাধান।
+                    fetch(`/{{ admin_path }}/users/update-balance/${userId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ balance: parseFloat(balanceInput.value) }),
+                    })
+                    .then(res => res.json())
+                    .then(data => alert(data.message))
+                    .catch(err => alert('An error occurred.'));
                 });
             });
         });
     </script>
 </body>
-                </html>
+</html>
