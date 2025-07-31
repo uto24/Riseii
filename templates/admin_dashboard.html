@@ -4,96 +4,102 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>অ্যাডমিন ড্যাশবোর্ড</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap');
-        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        :root {
+            --bg-dark: #1a1b20; --primary-dark: #2a2b30; --border-dark: #353740;
+            --text-light: #e0e0e0; --text-secondary: #a0a0a0; --accent-green: #28a745;
+            --accent-red: #dc3545; --accent-blue: #007bff; --accent-cyan: #00ffc6;
+        }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-dark); color: var(--text-light); margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; }
-        .header h1 { margin: 0; color: #1c1e21; font-size: 24px; }
-        .nav-links a { text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: background-color 0.2s; margin-left: 10px;}
-        .btn-create { background-color: #1877f2; color: white; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary-dark); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); margin-bottom: 25px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-links a { text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; }
+        .btn-create { background-color: var(--accent-blue); color: white; }
         .btn-manage { background-color: #6c757d; color: white; }
-        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow-x: auto; }
-        .card h2 { margin-top: 0; font-size: 20px; color: #1877f2; border-bottom: 1px solid #e9ebee; padding-bottom: 15px; margin-bottom: 20px; }
+        .btn-users { background-color: #ffc107; color: #333; }
+        .card { background: var(--primary-dark); border: 1px solid var(--border-dark); border-radius: 12px; padding: 25px; margin-bottom: 25px; }
+        .card h2 { margin-top: 0; font-size: 20px; color: var(--accent-cyan); }
+        .table-wrapper { overflow-x: auto; }
         .task-table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        .task-table th, .task-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e9ebee; }
-        .task-table th { background-color: #f7f7f9; font-weight: 600; color: #606770; }
-        .task-table td { color: #3c4043; vertical-align: middle; }
-        .user-info { display: flex; flex-direction: column; }
+        .task-table th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-dark); }
         .user-info .name { font-weight: 600; }
-        .user-info .email { font-size: 13px; color: #606770; }
+        .user-info .email { font-size: 13px; color: var(--text-secondary); }
         .action-links a { display: inline-block; padding: 6px 12px; border-radius: 5px; color: white; text-decoration: none; font-weight: 600; margin-right: 10px; font-size: 14px; }
-        .action-links .approve { background-color: #28a745; }
-        .action-links .reject { background-color: #dc3545; }
-        .screenshot-link { display: inline-block; padding: 5px 10px; background: #e4e6eb; border-radius: 5px; text-decoration: none; color: #1c1e21; font-weight: 500; }
-        .no-data { color: #8a8d91; text-align: center; padding: 30px; }
-        .flash { padding: 1em; margin-bottom: 1em; border-radius: 6px; color: white; font-weight: 500; text-align: center; }
-        .flash.success { background-color: #42b72a; } .flash.error { background-color: #fa3e3e; } .flash.info { background-color: #1877f2; }
+        .approve { background-color: var(--accent-green); } .reject { background-color: var(--accent-red); }
+        .screenshot-link { text-decoration: none; color: var(--accent-cyan); font-weight: 500; }
+        .pagination-controls { margin-top: 25px; text-align: center; }
+        .btn-load-more { background-color: var(--accent-cyan); color: var(--bg-dark); font-weight: 700; text-decoration: none; padding: 12px 30px; border-radius: 8px; }
+        .flash { /* ... */ }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fa-solid fa-user-shield" style="margin-right: 10px;"></i>অ্যাডমিন প্যানেল</h1>
+            <h1><i class="fa-solid fa-user-shield"></i> অ্যাডমিন প্যানেল</h1>
             <div class="nav-links">
-                <a href="/{{ admin_path }}/manage-tasks" class="btn-manage">টাস্ক ম্যানেজ করুন</a>
-                <a href="/{{ admin_path }}/create-task" class="btn-create">নতুন টাস্ক তৈরি করুন</a>
+                <a href="/{{ admin_path }}/users" class="btn-users">সকল ব্যবহারকারী</a>
+                <a href="/{{ admin_path }}/manage-tasks" class="btn-manage">টাস্ক ম্যানেজ</a>
+                <a href="/{{ admin_path }}/create-task" class="btn-create">নতুন টাস্ক</a>
             </div>
         </div>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
         {% endwith %}
 
         <div class="card">
-            <h2><i class="fa-solid fa-hourglass-half" style="margin-right: 10px;"></i>পেন্ডিং টাস্ক সাবমিশন</h2>
-            {% if pending_tasks %}
-                <table class="task-table">
-                    <thead>
-                        <tr>
-                            <th>তারিখ</th>
-                            <th>ইউজার</th>
-                            <th>টাস্ক</th>
-                            <th>প্রুফ</th>
-                            <th>অ্যাকশন</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for task in pending_tasks %}
-                        <tr>
-                            <td>{{ task.submitted_at.strftime('%d-%b-%Y %H:%M') if task.submitted_at else 'N/A' }}</td>
-                            <td>
-                                <div class="user-info">
-                                    <!-- অ্যাডভান্সড: ইউজারের নাম ও ইমেইল দেখানো হচ্ছে -->
-                                    <span class="name">{{ task.user_info.name }}</span>
-                                    <span class="email">{{ task.user_info.email }}</span>
-                                </div>
-                            </td>
-                            <td>{{ task.task_title }}</td>
-                            <td>
-                                <!-- সঠিক সমাধান: task.proof.screenshot_url ব্যবহার করা হচ্ছে -->
-                                {% if task.proof and task.proof.screenshot_url %}
-                                    <a href="{{ task.proof.screenshot_url }}" class="screenshot-link" target="_blank">স্ক্রিনশট দেখুন</a>
-                                {% else %}
-                                    <span>No Proof</span>
-                                {% endif %}
-                            </td>
-                            <td class="action-links">
-                                <a href="/{{ admin_path }}/task/approve/{{ task.id }}" class="approve">Approve</a>
-                                <a href="/{{ admin_path }}/task/reject/{{ task.id }}" class="reject">Reject</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="no-data">বর্তমানে কোনো পেন্ডিং টাস্ক নেই।</p>
-            {% endif %}
+            <h2><i class="fa-solid fa-hourglass-half"></i> পেন্ডিং টাস্ক সাবমিশন</h2>
+            <div class="table-wrapper">
+                {% if pending_tasks %}
+                    <table class="task-table">
+                        <thead><tr><th>তারিখ</th><th>ইউজার</th><th>টাস্ক</th><th>প্রুফ</th><th>অ্যাকশন</th></tr></thead>
+                        <tbody>
+                        {% for task in pending_tasks %}
+                            <tr>
+                                <td>{{ task.submitted_at.strftime('%d-%b-%Y %H:%M') if task.submitted_at else 'N/A' }}</td>
+                                <td>
+                                    <div class="user-info">
+                                        <span class="name">{{ task.user_info.name }}</span>
+                                        <span class="email">{{ task.user_info.email }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ task.task_title }}</td>
+                                <td>
+                                    {% if task.proof and task.proof.screenshot_url %}
+                                        <a href="{{ task.proof.screenshot_url }}" class="screenshot-link" target="_blank">স্ক্রিনশট দেখুন</a>
+                                    {% else %}
+                                        <span>No Proof</span>
+                                    {% endif %}
+                                </td>
+                                <td class="action-links">
+                                    <a href="/{{ admin_path }}/task/approve/{{ task.id }}" class="approve">Approve</a>
+                                    <a href="/{{ admin_path }}/task/reject/{{ task.id }}" class="reject">Reject</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">বর্তমানে কোনো পেন্ডিং টাস্ক নেই।</p>
+                {% endif %}
+            </div>
+
+            <!-- প্যাজিনেশন বাটন -->
+            <div class="pagination-controls">
+                {% if next_page_token %}
+                    <a href="{{ url_for('admin_dashboard', page=next_page_token) }}" class="btn-load-more">
+                        আরও পুরনো টাস্ক দেখুন <i class="fa-solid fa-arrow-down"></i>
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </body>
