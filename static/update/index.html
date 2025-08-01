@@ -183,12 +183,132 @@
             <h1>সর্বশেষ আপডেট</h1>
             <p>আমাদের প্ল্যাটফর্মের নতুন ফিচার এবং পরিবর্তনসমূহ দেখুন।</p>
         </header>
+<style>
+        .light-notice-board {
+            /* ভেরিয়েবলগুলো এখানে ডিফাইন করা হয়েছে */
+            --notice-bg: #FFFFFF;
+            --notice-border: #E5E7EB;
+            --notice-glow: rgba(0, 123, 255, 0.1);
+            --notice-text-main: #1F2937;
+            --notice-text-secondary: #6B7280;
+            --notice-link-color: #007BFF;
+            --font-bn: 'Hind Siliguri', sans-serif;
 
-        <!-- পিন করা নোটিশ -->
-        <div class="pinned-notice">
-            <h3><i class="fas fa-thumbtack"></i> গুরুত্বপূর্ণ ঘোষণা</h3>
-            <p>নতুন ব্যবহারকারীদের জন্য সাইন-আপ ফিচারটি সাময়িকভাবে বন্ধ আছে। আপডেট পেতে আমাদের Website এর এই পেজে যুক্ত থাকুন!</p>
+            
+            background-color: var(--notice-bg);
+            border: 1px solid var(--notice-border);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px; /* আপনার প্রয়োজন অনুযায়ী পরিবর্তন করুন */
+            margin: 40px auto; /* ডেমোর জন্য সেন্টারে রাখা হয়েছে */
+            box-shadow: 0 4px 25px var(--notice-glow);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .light-notice-board:hover {
+            box-shadow: 0 8px 30px rgba(0, 123, 255, 0.15);
+        }
+
+        .notice-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--notice-border);
+        }
+
+        .notice-header .icon {
+            color: var(--notice-link-color);
+            font-size: 24px;
+        }
+
+        .notice-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--notice-text-main);
+        }
+
+        .notice-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notice-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--notice-border);
+        }
+
+        .notice-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .notice-item .icon {
+            color: var(--notice-text-secondary);
+            font-size: 16px;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .notice-text {
+            color: var(--notice-text-main);
+            line-height: 1.7;
+        }
+
+        .notice-text a {
+            color: var(--notice-link-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: text-decoration 0.3s;
+        }
+
+        .notice-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <!-- লাইট থিম নোটিশ বোর্ড শুরু -->
+    <div class="light-notice-board">
+        <div class="notice-header">
+            <span class="icon"><i class="fas fa-bell"></i></span>
+            <h3>নোটিশ বোর্ড</h3>
         </div>
+        <ul class="notice-list">
+            
+            <!-- নোটিশ আইটেম ১ -->
+            <li class="notice-item">
+                <span class="icon"><i class="fas fa-bullhorn"></i></span>
+                <p class="notice-text">
+            যেকোনো সমস্যায় আমাদের  <a href="https://www.facebook.com/riseii.support"> ফেসবুক আইডি </a> এবং <a href="https://t.me/websitesupportr">টেলিগ্রামে</a> মেসেজ করতে পারেন!
+                </p>
+            </li>
+              <!-- নোটিশ আইটেম ১ -->
+            <li class="notice-item">
+                <span class="icon"><i class="fas fa-bullhorn"></i></span>
+                <p class="notice-text">
+                    ভুয়া রেফার এবং একজনরেই একাধিক একাউন্ট থাকলে, আপনার একাউন্ট একাউন্টটি ব্যান হবে, এবং সকল টাকা বাজেয়াপ্ত করা হবে ।  ভালোভাবে কাজ করুন, ভুয়া রেফার করবেন না  .
+                </p>
+            </li>
+            <!-- নোটিশ আইটেম ২ -->
+
+               <!-- নোটিশ আইটেম ১ -->
+           <!-- নোটিশ আইটেম ১ -->
+            <li class="notice-item">
+                <span class="icon"><i class="fas fa-bullhorn"></i></span>
+                <p class="notice-text">
+                  সবাইকে Riseii এর    <a href="https://www.facebook.com/riseii.support">ফেসবুক আইডিতে</a> গিয়ে মেসেজে যে ইমেইল দিলে একাউন্ট খুলেছেন সেটি পাঠিয়ে দিন ।  এবং যেকোনো সমস্যা এবং আপডেট Riseii Support আইডি থেকে দেওয়া হবে । Email Submit করে ২০ টাকা একাউন্টে বুঝে নিন!
+                </p>
+            </li>
+            <!-- নোটিশ আইটেম ২ -->
+            <!-- নোটিশ আইটেম ২ -->
+            
+        </ul>
+    </div>
 
         <main class="update-feed">
             <!-- আপডেট কার্ড ১ -->
