@@ -247,7 +247,7 @@ def manage_users():
             users_query = users_ref.where('email', '==', search_email).stream()
         else:
             # যদি সার্চ করা না হয়, তাহলে সব ইউজারকে আনা হচ্ছে
-            users_query = users_ref.order_by('created_at', direction=firestore.Query.DESCENDING).limit(500).stream() # পারফরম্যান্সের জন্য লিমিট যোগ করা হলো
+            users_query = users_ref.order_by('created_at', direction=firestore.Query.DESCENDING).limit(25).stream() # পারফরম্যান্সের জন্য লিমিট যোগ করা হলো
         
         all_users = []
         for user_doc in users_query:
