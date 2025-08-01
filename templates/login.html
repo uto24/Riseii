@@ -213,7 +213,123 @@
                 {% endfor %}{% endif %}
             {% endwith %}
             <div id="client-message" class="flash" style="display: none;"></div>
+            <style>
+        .short-notice-card {
+            --success-color: #28a745;
+            --bg-color: #FFFFFF;
+            --text-dark: #212529;
+            --text-light: #6C757D;
+            --border-color: #E5E7EB;
+            --font-bn: 'Hind Siliguri', sans-serif;
 
+            font-family: var(--font-bn);
+            background-color: var(--bg-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            max-width: 450px; /* আপনার প্রয়োজন অনুযায়ী পরিবর্তন করুন */
+            margin: 40px auto; /* ডেমোর জন্য সেন্টারে রাখা হয়েছে */
+            padding: 24px;
+            border-left: 5px solid var(--success-color);
+        }
+
+        .notice-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .notice-header .icon {
+            color: var(--success-color);
+            font-size: 24px;
+        }
+
+        .notice-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .notice-content p {
+            color: var(--text-light);
+            line-height: 1.7;
+            margin: 0;
+            margin-bottom: 20px;
+        }
+
+        .notice-footer {
+            text-align: right;
+        }
+
+        .copy-btn {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
+            font-family: var(--font-bn);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background-color: #f0f0f0;
+            color: var(--text-dark);
+        }
+        
+    </style>
+    <!-- শর্ট নোটিশ শুরু -->
+    <div class="short-notice-card">
+        <div class="notice-header">
+            <span class="icon"><i class="fas fa-check-circle"></i></span>
+            <h3>আপডেট সম্পন্ন হয়েছে</h3>
+        </div>
+        
+        <div class="notice-content">
+            <p id="notice-text">
+                সকলের অবগতির জন্য জানানো যাচ্ছে যে, আমাদের ওয়েবসাইটের রক্ষণাবেক্ষণের কাজ সফলভাবে সম্পন্ন হয়েছে। সাইটটি এখন ব্যবহারের জন্য পুরোপুরি প্রস্তুত। আপনাদের ধৈর্যের জন্য ধন্যবাদ।
+            </p>
+        </div>
+        
+        <div class="notice-footer">
+            <button id="copy-notice-btn" class="copy-btn">কপি করুন</button>
+        </div>
+    </div>
+    <!-- শর্ট নোটিশ শেষ -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyButton = document.getElementById('copy-notice-btn');
+            const textElement = document.getElementById('notice-text');
+
+            if (copyButton && textElement) {
+                copyButton.addEventListener('click', () => {
+                    const textToCopy = textElement.innerText;
+                    
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        // সফলভাবে কপি হলে বাটনের লেখা ও স্টাইল পরিবর্তন করা
+                        copyButton.innerText = 'কপি হয়েছে!';
+                        copyButton.style.backgroundColor = '#28a745';
+                        copyButton.style.color = '#FFFFFF';
+                        copyButton.style.borderColor = '#28a745';
+
+                        // ২ সেকেন্ড পর আবার আগের অবস্থায় ফিরিয়ে আনা
+                        setTimeout(() => {
+                            copyButton.innerText = 'কপি করুন';
+                            copyButton.style.backgroundColor = 'transparent';
+                            copyButton.style.color = '#6C757D';
+                            copyButton.style.borderColor = '#E5E7EB';
+                        }, 2000);
+                        
+                    }).catch(err => {
+                        console.error('কপি করতে সমস্যা হয়েছে: ', err);
+                        alert('দুঃখিত, কপি করা সম্ভব হয়নি।');
+                    });
+                });
+            }
+        });
+    </script>
             <form id="login-form">
                 <div class="form-group">
                     <label for="email">ইমেইল</label>
