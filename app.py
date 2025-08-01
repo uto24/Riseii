@@ -714,7 +714,7 @@ def admin_dashboard():
                 query = query.start_after(last_doc_snapshot)
         
         # প্রতি পৃষ্ঠায় কতগুলো টাস্ক দেখানো হবে
-        tasks_per_page = 50
+        tasks_per_page = 25
         query = query.limit(tasks_per_page)
 
         # কোয়েরি এক্সিকিউট করে ডকুমেন্টগুলো আনা হচ্ছে
