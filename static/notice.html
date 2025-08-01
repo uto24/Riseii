@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বড় আপডেট - নতুন ফিচারসমূহ</title>
+    
+    <!-- Google Fonts: Hind Siliguri & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+    <style>
+        /* ================================================
+           স্টাইল এবং ডিজাইন
+           ================================================ */
+        :root {
+            --gradient-start: #10B981;
+            --gradient-end: #3B82F6;
+            --primary-gradient: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            --dark-bg: #0D1117;
+            --card-bg: #161B22;
+            --text-main: #E6EDF3;
+            --text-secondary: #8B949E;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --font-bn: 'Hind Siliguri', sans-serif;
+            --font-en: 'Poppins', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-bn);
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .main-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header .icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            display: inline-block;
+            background-image: var(--primary-gradient);
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: pulse-icon 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-icon {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-family: var(--font-en);
+        }
+        
+        .header p {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .update-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .update-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .update-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gradient-end);
+        }
+
+        .update-card .card-icon {
+            font-size: 28px;
+            color: var(--gradient-start);
+            margin-bottom: 16px;
+        }
+
+        .update-card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .update-card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* কপি করার জন্য নোটিশ বক্স */
+        .copy-notice-box {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid var(--gradient-start);
+        }
+        .copy-notice-box p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+        .copy-notice-box .footer {
+            margin-top: 16px;
+            text-align: right;
+        }
+        .copy-btn {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
+            font-family: var(--font-bn);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover {
+            background-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .update-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 576px) {
+            .header h1 { font-size: 28px; }
+            .header p { font-size: 16px; }
+            .main-container { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="header">
+            <div class="icon"><i class="fas fa-bullhorn"></i></div>
+            <h1>বড় আপডেট এবং নতুন ফিচার</h1>
+            <p>আমাদের প্ল্যাটফর্মকে আরও উন্নত করতে আমরা কিছু অসাধারণ ফিচার যোগ করেছি।</p>
+        </div>
+
+        <div class="update-grid">
+            <div class="update-card">
+                <div class="card-icon"><i class="fas fa-credit-card"></i></div>
+                <h3>AI পেমেন্ট সাপ্লাই</h3>
+                <p>আমাদের নতুন AI সিস্টেম এখন স্বয়ংক্রিয়ভাবে পেমেন্ট যাচাই করবে এবং দ্রুততার সাথে আপনার একাউন্টে টাকা যোগ করবে।</p>
+            </div>
+            <div class="update-card">
+                <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
+                <h3>দ্রুত লোডিং স্পিড</h3>
+                <p>ওয়েবসাইটের প্রথম লোডিং টাইম ৫০% পর্যন্ত কমানো হয়েছে, যা আপনার কাজের অভিজ্ঞতাকে আরও মসৃণ করবে।</p>
+            </div>
+            <div class="update-card">
+                <div class="card-icon"><i class="fas fa-bug-slash"></i></div>
+                <h3>বাগ ফিক্সড</h3>
+                <p>আপনাদের দেওয়া রিপোর্ট অনুযায়ী, আমরা ছোট-বড় সকল বাগ এবং সমস্যা সমাধান করেছি।</p>
+            </div>
+            <div class="update-card">
+                <div class="card-icon"><i class="fas fa-user-secret"></i></div>
+                <h3>ফেক রেফার ডিটেক্টর</h3>
+                <p>আমাদের নতুন সিস্টেম এখন আরও কার্যকরভাবে ফেক রেফার শনাক্ত এবং ব্লক করতে সক্ষম।</p>
+            </div>
+             <div class="update-card">
+                <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
+                <h3>উন্নত নিরাপত্তা</h3>
+                <p>আপনার একাউন্ট এবং তথ্য সুরক্ষিত রাখতে আমরা সর্বাধুনিক নিরাপত্তা ব্যবস্থা যোগ করেছি।</p>
+            </div>
+             <div class="update-card">
+                <div class="card-icon"><i class="fas fa-plus-circle"></i></div>
+                <h3>এবং আরও অনেক কিছু!</h3>
+                <p>সাইটের পারফর্মেন্স এবং ইউজার ইন্টারফেসে আরও অনেক ছোট ছোট উন্নতি করা হয়েছে।</p>
+            </div>
+        </div>
+        
+        <div class="copy-notice-box">
+            <p id="shareable-notice">
+                📢 **বড় আপডেট!** 📢<br>
+                আমাদের সাইটে নতুন আপডেট এসেছে! এখন থাকছে AI পেমেন্ট সাপ্লাই, দ্রুত লোডিং স্পিড, উন্নত নিরাপত্তা এবং ফেক রেফার ডিটেক্টর। সকল বাগ ফিক্স করা হয়েছে। আপনার কাজের অভিজ্ঞতাকে সেরা করতে আমরা প্রতিজ্ঞাবদ্ধ।
+            </p>
+            <div class="footer">
+                <button id="copy-btn" class="copy-btn">নোটিশ কপি করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyButton = document.getElementById('copy-btn');
+            const noticeTextElement = document.getElementById('shareable-notice');
+
+            if (copyButton && noticeTextElement) {
+                copyButton.addEventListener('click', () => {
+                    // শুধু ভেতরের টেক্সট কপি করা হবে, HTML ট্যাগ নয়
+                    const textToCopy = noticeTextElement.innerText;
+                    
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        // সফলভাবে কপি হলে বাটনের লেখা ও স্টাইল পরিবর্তন করা
+                        copyButton.innerText = 'কপি হয়েছে!';
+                        copyButton.style.backgroundColor = '#10B981';
+                        copyButton.style.color = '#FFFFFF';
+                        copyButton.style.borderColor = '#10B981';
+
+                        // ২ সেকেন্ড পর আবার আগের অবস্থায় ফিরিয়ে আনা
+                        setTimeout(() => {
+                            copyButton.innerText = 'নোটিশ কপি করুন';
+                            copyButton.style.backgroundColor = 'transparent';
+                            copy-btn.style.color = 'var(--text-secondary)';
+                            copy-btn.style.borderColor = 'var(--border-color)';
+                        }, 2000);
+                        
+                    }).catch(err => {
+                        console.error('কপি করতে সমস্যা হয়েছে: ', err);
+                        alert('দুঃখিত, কপি করা সম্ভব হয়নি।');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
