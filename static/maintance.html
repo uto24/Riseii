@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>সাইট রক্ষণাবেক্ষণে আছে</title>
+    <title>Riseii - একটি জরুরি ঘোষণা</title>
     
-    <!-- Google Fonts: Hind Siliguri & Poppins -->
+    <!-- Google Fonts: Poppins (for English) & SolaimanLipi (for Bangla) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=SolaimanLipi&display=swap" rel="stylesheet">
     
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
@@ -18,228 +18,169 @@
            স্টাইল এবং ডিজাইন
            ================================================ */
         :root {
-            --primary-color: #007BFF;
-            --bg-color: #F4F7FC;
-            --container-bg: #FFFFFF;
-            --text-dark: #212529;
-            --text-light: #6C757D;
-            --border-color: #E5E7EB;
-            --font-bn: 'Hind Siliguri', sans-serif;
+            --primary-color: #FBBF24;
+            --danger-color: #F43F5E;
+            --success-color: #2DD4BF;
+            --dark-bg: #0D1117;
+            --card-bg: #161B22;
+            --text-main: #E5E7EB;
+            --text-secondary: #9CA3AF;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --font-bn: 'SolaimanLipi', sans-serif;
             --font-en: 'Poppins', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* স্ক্রলিং চালু করার জন্য পরিবর্তন */
         body {
             font-family: var(--font-bn);
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            padding: 40px 20px;
         }
 
-        .maintenance-container {
-            background-color: var(--container-bg);
+        /* ব্যাকগ্রাউন্ড অ্যানিমেশন */
+        .background-shapes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .background-shapes span { position: absolute; display: block; list-style: none; width: 20px; height: 20px; background: rgba(255, 255, 255, 0.05); animation: animate-shapes 25s linear infinite; bottom: -150px; }
+        .background-shapes span:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .background-shapes span:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .background-shapes span:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .background-shapes span:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+
+        @keyframes animate-shapes {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+            100% { transform: translateY(-120vh) rotate(720deg); opacity: 0; border-radius: 50%; }
+        }
+
+        .notice-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            max-width: 700px;
+            box-shadow: 0 10px 60px rgba(0, 0, 0, 0.4);
+            max-width: 900px;
             width: 100%;
+            margin: 40px auto; /* পেজের উপরে ও নিচে স্পেস */
             padding: 40px;
             text-align: center;
-        }
-        
-        /* অ্যানিমেটেড আইকন */
-        .icon-container {
-            font-size: 64px;
-            color: var(--primary-color);
-            margin-bottom: 24px;
-            display: inline-block;
-            animation: spin 8s linear infinite;
+            z-index: 1;
         }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .left-column, .right-column { text-align: left; margin-bottom: 40px; }
+        .right-column:last-child { margin-bottom: 0; }
+        
+        .page-header h1 { font-family: var(--font-en); font-size: 32px; color: var(--primary-color); margin-bottom: 8px; }
+        .page-header p { font-size: 16px; color: var(--text-secondary); }
 
-        .maintenance-container h1 {
-            font-size: 32px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .maintenance-container p {
-            font-size: 18px;
-            color: var(--text-light);
-            line-height: 1.7;
-            margin-bottom: 32px;
-        }
-        
-        /* কাউন্টডাউন টাইমার */
-        .countdown-timer {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-        
-        .time-block {
-            background-color: var(--bg-color);
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            min-width: 80px;
-        }
-        
-        .time-block span {
-            display: block;
-            font-family: var(--font-en);
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        
-        .time-block p {
-            font-size: 14px;
-            color: var(--text-light);
-            margin: 0;
-        }
-
-        .return-time {
-            font-weight: 600;
-            font-size: 20px;
-            background-color: #E9F5FF;
-            color: var(--primary-color);
-            padding: 12px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-        
-        .thank-you {
-            font-size: 16px;
-            margin-top: 32px !important; /* Important to override default margin */
-        }
-
-        .social-links {
+        .founder-message {
             margin-top: 24px;
+            padding: 20px;
+            background-color: rgba(251, 191, 36, 0.05);
+            border-left: 3px solid var(--primary-color);
+            border-radius: 8px;
+        }
+        .founder-message h3 { font-size: 20px; margin-bottom: 16px; color: var(--primary-color); }
+        .founder-message p { color: var(--text-secondary); line-height: 1.9; font-size: 16px; }
+        .founder-message p:not(:last-child) { margin-bottom: 16px; }
+        
+        .instructions-section { margin-top: 24px; }
+        .instructions-section h3 { font-size: 20px; margin-bottom: 16px; }
+        .instruction-list { display: flex; flex-direction: column; gap: 16px; }
+        .instruction-item { display: flex; align-items: flex-start; gap: 12px; background-color: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 8px; }
+        .instruction-item i { font-size: 20px; margin-top: 4px; }
+        .instruction-item p strong { color: var(--primary-color); }
+        
+        .call-to-action {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+        .call-to-action p { color: var(--text-secondary); margin-bottom: 20px; text-align: center; }
+        .btn-action {
+            background: var(--card-bg); border: 1px solid #25D366; color: #25D366;
+            border-radius: 8px; padding: 12px 24px; text-decoration: none;
+            font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 10px;
+            transition: all 0.3s ease; width: 100%; justify-content: center;
+        }
+        .btn-action:hover { background-color: rgba(37, 211, 102, 0.1); transform: translateY(-3px); }
+        
+        /* Responsive Design: গ্রিড লেআউট বড় স্ক্রিনের জন্য */
+        @media (min-width: 901px) {
+            .notice-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+            }
+            .left-column, .right-column {
+                margin-bottom: 0;
+            }
         }
 
-        .social-links a {
-            color: var(--text-light);
-            font-size: 24px;
-            margin: 0 12px;
-            transition: color 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--primary-color);
-        }
-
-        /* Responsive Design */
+        /* ছোট ডিভাইসের জন্য */
         @media (max-width: 576px) {
-            .maintenance-container {
-                padding: 24px;
-            }
-            .maintenance-container h1 {
-                font-size: 24px;
-            }
-            .maintenance-container p {
-                font-size: 16px;
-            }
-            .countdown-timer {
-                gap: 10px;
-            }
-            .time-block {
-                min-width: 60px;
-                padding: 10px;
-            }
-            .time-block span {
-                font-size: 28px;
-            }
-            .return-time {
-                font-size: 16px;
-            }
+            body { padding: 20px 10px; }
+            .notice-container { padding: 20px; }
+            .page-header h1 { font-size: 24px; }
         }
-
     </style>
 </head>
 <body>
-
-    <div class="maintenance-container">
-        <div class="icon-container">
-            <i class="fas fa-cogs"></i>
-        </div>
-        <h1>সাইটটি বর্তমানে রক্ষণাবেক্ষণে আছে</h1>
-        <p>দুঃখিত, আমরা কিছু গুরুত্বপূর্ণ আপডেট এবং উন্নতির কাজ করছি। সাময়িক অসুবিধার জন্য আমরা আন্তরিকভাবে ক্ষমাপ্রার্থী।</p>
-        
-        <div class="countdown-timer">
-            <div class="time-block">
-                <span id="hours">00</span>
-                <p>ঘন্টা</p>
-            </div>
-            <div class="time-block">
-                <span id="minutes">00</span>
-                <p>মিনিট</p>
-            </div>
-            <div class="time-block">
-                <span id="seconds">00</span>
-                <p>সেকেন্ড</p>
-            </div>
-        </div>
-        
-        <div class="return-time">
-            সাইটটি আজ দুপুর 1 টায় ফিরে আসবে
-        </div>
-
-        <p class="thank-you">আপনার ধৈর্যের জন্য ধন্যবাদ।</p>
-        
-        <div class="social-links">
-            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
-            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-        </div>
+    <div class="background-shapes">
+        <span></span><span></span><span></span><span></span>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // টার্গেট সময় সেট করা: আজকের তারিখ, দুপুর ১২টা
-            const targetDate = new Date();
-            targetDate.setHours(13, 0, 0, 0); // ঘন্টা, মিনিট, সেকেন্ড, মিলিসেকেন্ড
+    <div class="notice-container">
+        <!-- বাম কলাম -->
+        <div class="left-column">
+            <header class="page-header">
+                <h1>একটি জরুরি ঘোষণা</h1>
+                <p>Riseii পরিবারের সকল সদস্য এবং শুভাকাঙ্ক্ষীদের উদ্দেশ্যে কিছু কথা।</p>
+            </header>
 
-            const hoursEl = document.getElementById('hours');
-            const minutesEl = document.getElementById('minutes');
-            const secondsEl = document.getElementById('seconds');
-            const countdownContainer = document.querySelector('.countdown-timer');
-            const returnTimeEl = document.querySelector('.return-time');
+            <section class="founder-message">
+                <h3><i class="fas fa-pen-nib"></i> প্রতিষ্ঠাতার চিঠি</h3>
+                <p>
+                    সম্মানীত ইউজার, এবং শুভাকাঙ্ক্ষী! 
+                    গত ১ বছর থেকে Riseii LLC কাজ করে আসছে। কিন্তু গত এক সপ্তাহ যা হয়েছে তা বলার নয়। দুই দিনে ১৫০০০ নতুন ইউজার পেয়েছি। Riseii এর অনেক দুর্বলতা ছিলো, আছে। কিন্তু বাঙালি টিকতে দিলোনা। ফেক রেফার, ভুয়া ইউজার, ভুয়া কাজ। যাচ্ছে তাই। মেসেজে গালি, হ্যাকাররা সাইট হ্যাক করার চেষ্টা। ৩ জনে আর কত সামলাবো?
+                </p>
+                <p>
+                    আচ্ছা বলুন তো, আপনার একাউন্ট থেকে যদি লাভ না হয়, তাহলে আপনাকে টাকা কীভাবে দিবো? গতকাল Ai Payment Bot এড করলাম, সেটাও এতোই বোকা ছিলো, সবাইকে টাকা দিয়ে দিতো, একাউন্ট যাচাই না করেই। গত দুই দিনে, কোম্পানির লস ১৯৮৭৬ টাকা। বাকি দুজন কাজ বাদ দিয়েছে। দোষ কী এটাই, ১৭ বছরের ছেলে একটি বিজনেস অপেন করেছিলো, আর সবাই ধোঁকা দিলো? লাইক দিয়ে আনলাইক করা, সাবস্ক্রাইব করে আনসাবস্ক্রাইব করা, পোস্ট দিয়ে ডিলেট করা।
+                </p>
+            </section>
+        </div>
 
-            function updateCountdown() {
-                const now = new Date().getTime();
-                const distance = targetDate - now;
+        <!-- ডান কলাম -->
+        <div class="right-column">
+             <section class="instructions-section">
+                <h3><i class="fas fa-bullhorn"></i> আমাদের সিদ্ধান্ত এবং ভবিষ্যৎ পরিকল্পনা</h3>
+                <div class="instruction-list">
+                    <div class="instruction-item">
+                        <i class="fas fa-hammer" style="color: #A855F7;"></i>
+                        <p><strong>সব শেষ না!</strong> আগামী ৭ দিনের মধ্যে, আমি একাই সাইটটিকে প্রপার আপডেট করে দাঁড় করাবো।</p>
+                    </div>
+                    <div class="instruction-item">
+                        <i class="fas fa-user-plus" style="color: #F43F5E;"></i>
+                        <p>এখন থেকে নতুন একাউন্ট খুলতে <strong>২০ টাকা রেজিস্ট্রেশন ফি</strong> দিতে হবে।</p>
+                    </div>
+                    <div class="instruction-item">
+                        <i class="fas fa-coins" style="color: #2DD4BF;"></i>
+                        <p>সকল প্রকার হিডেন চার্জ বা **"গ্যাস ফি" স্থায়ীভাবে বাতিল** করা হয়েছে।</p>
+                    </div>
+                    <div class="instruction-item">
+                        <i class="fas fa-user-clock" style="color: #FBBF24;"></i>
+                        <p>যাদের একাউন্ট আছে, তারা যদি কাজ করতে চান, অনুগ্রহ করে আগামী <strong>১৪ দিনের মধ্যে</strong> ফিরে আসুন, না হলে আপনার একাউন্টটি মুছে ফেলা হবে।</p>
+                    </div>
+                </div>
+            </section>
 
-                if (distance < 0) {
-                    clearInterval(timerInterval);
-                    countdownContainer.innerHTML = "<h2>সাইটটি এখন লাইভ!</h2>";
-                    returnTimeEl.style.display = "none";
-                    return;
-                }
-
-                // সময় গণনা করা
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                // ডিসপ্লে আপডেট করা
-                hoursEl.innerText = hours.toString().padStart(2, '0');
-                minutesEl.innerText = minutes.toString().padStart(2, '0');
-                secondsEl.innerText = seconds.toString().padStart(2, '0');
-            }
-
-            // প্রতি সেকেন্ডে টাইমার আপডেট করা
-            const timerInterval = setInterval(updateCountdown, 1000);
-        });
-    </script>
+            <section class="call-to-action">
+                <h3>আরও আপডেটের জন্য আবার আসবেন</h3>
+                <p>এই কঠিন সময়ে আপনাদের সমর্থনই আমার পথ চলার শক্তি। আমার সাথে সরাসরি কথা বলতে বা আপডেটের জন্য আমাদের সাথে যুক্ত থাকুন।</p>
+                <a href="https://wa.me/আপনার_হোয়াটসঅ্যাপ_নম্বর" class="btn-action">
+                    <i class="fab fa-whatsapp"></i> CEO's WhatsApp
+                </a>
+            </section>
+        </div>
+    </div>
 </body>
 </html>
