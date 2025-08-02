@@ -228,7 +228,7 @@ responsive-ad-container {
                 
                 <div class="eligibility-item {{ 'pass' if eligibility.are_referrals_eligible else 'fail' }}">
                     <i class="fas {{ 'fa-check-circle' if eligibility.are_referrals_eligible else 'fa-times-circle' }}"></i>
-                    <span>কমপক্ষে 2টি রেফারেল (আপনার আছে: {{ eligibility.referral_count }}টি)</span>
+                    <span>কমপক্ষে 0টি রেফারেল (আপনার আছে: {{ eligibility.referral_count }}টি)</span>
                 </div>
 
                 <div class="eligibility-item {{ 'pass' if eligibility.is_account_old_enough else 'fail' }}">
