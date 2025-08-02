@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 
-
 # --- অ্যাপ এবং Firebase ইনিশিয়ালাইজেশন ---
 load_dotenv()
 app = Flask(__name__)
