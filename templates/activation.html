@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>একাউন্ট অ্যাক্টিভেশন রিকোয়েস্ট - অ্যাডমিন</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #1a1b20; --primary-dark: #2a2b30; --border-dark: #353740;
+            --text-light: #e0e0e0; --text-secondary: #a0a0a0; --accent-green: #28a745;
+            --accent-red: #dc3545; --accent-blue: #007bff; --accent-cyan: #00ffc6;
+        }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-dark); color: var(--text-light); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary-dark); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); margin-bottom: 25px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .back-link { color: var(--accent-cyan); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .card { background: var(--primary-dark); border: 1px solid var(--border-dark); border-radius: 12px; padding: 25px; margin-bottom: 25px; }
+        .card h2 { margin-top: 0; font-size: 20px; color: var(--accent-cyan); }
+        .request-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .request-table th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-dark); }
+        .request-table th { font-weight: 600; color: var(--text-secondary); }
+        .actions a { text-decoration: none; color: white; padding: 6px 12px; border-radius: 5px; font-size: 14px; }
+        .btn-approve { background-color: var(--accent-green); }
+        .btn-reject { background-color: var(--accent-red); margin-left: 10px; }
+        .no-data { color: var(--text-secondary); text-align: center; padding: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>অ্যাক্টিভেশন রিকোয়েস্ট</h1>
+            <a href="/{{ admin_path }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> অ্যাডমিন ড্যাশবোর্ডে ফিরে যান</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <h2>পেন্ডিং একাউন্ট অ্যাক্টিভেশন</h2>
+            <div style="overflow-x: auto;">
+                {% if pending_requests %}
+                    <table class="request-table">
+                        <thead>
+                            <tr>
+                                <th>তারিখ</th>
+                                <th>ইউজার আইডি</th>
+                                <th>সেন্ডার নম্বর</th>
+                                <th>ট্রানজেকশন আইডি (TrxID)</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for req in pending_requests %}
+                            <tr>
+                                <td>{{ req.get('requested_at').strftime('%d-%b-%Y %H:%M') if req.get('requested_at') else 'N/A' }}</td>
+                                <td><small>{{ req.get('user_id', 'N/A') }}</small></td>
+                                <td>{{ req.get('sender_number', 'N/A') }}</td>
+                                <td>{{ req.get('trx_id', 'N/A') }}</td>
+                                <td class="actions">
+                                    <a href="/{{ admin_path }}/activations/approve/{{ req.id }}" class="btn-approve">Approve</a>
+                                    <!-- আপনি চাইলে reject করার জন্যও একটি রুট তৈরি করতে পারেন -->
+                                    <!-- <a href="/{{ admin_path }}/activations/reject/{{ req.id }}" class="btn-reject">Reject</a> -->
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">বর্তমানে কোনো পেন্ডিং অ্যাক্টিভেশন রিকোয়েস্ট নেই।</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
