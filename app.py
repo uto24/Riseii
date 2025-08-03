@@ -590,7 +590,6 @@ def activate_account():
         return redirect(url_for('dashboard'))
 
     return render_template('activate.html')
-
 # app.py -> Admin Panel সেকশনে যোগ করুন
 @app.route(f'/{SECRET_ADMIN_PATH}/activations')
 def manage_activations():
