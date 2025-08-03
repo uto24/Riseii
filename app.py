@@ -605,84 +605,115 @@ def manage_activations():
 
 # app.py -> approve_activation ফাংশনটি প্রতিস্থাপন করুন
 # app.py -> approve_activation ফাংশনটি প্রতিস্থাপন করুন
+# app.py ফাইলের অ্যাডমিন প্যানেল সেকশনে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
 
 @app.route(f'/{SECRET_ADMIN_PATH}/activations/approve/<req_id>')
 def approve_activation(req_id):
+    """
+    একজন ব্যবহারকারীর একাউন্ট অ্যাক্টিভেশন রিকোয়েস্ট অ্যাপ্রুভ করে।
+    এটি ট্রানজেকশনের বাইরে সমস্ত রিড অপারেশন সম্পন্ন করে এবং ট্রানজেকশনের
+    ভেতরে শুধুমাত্র রাইট অপারেশনগুলো সম্পাদন করে।
+    """
     req_ref = db.collection('activation_requests').document(req_id)
     
-    # ট্রানজেকশন ব্যবহার করে ডেটা সামঞ্জস্যতা নিশ্চিত করা হচ্ছে
-    @firestore.transactional
-    def activate_user_in_transaction(transaction, req_ref):
-        req_doc = req_ref.get(transaction=transaction)
+    try:
+        # --- ধাপ ১: ট্রানজেকশনের বাইরে সমস্ত পড়ার কাজ সম্পন্ন করা ---
+
+        # ক. অ্যাক্টিভেশন রিকোয়েস্টের ডেটা পড়া
+        req_doc = req_ref.get()
         if not req_doc.exists or req_doc.to_dict().get('status') != 'pending':
-            raise ValueError("Request is already processed or does not exist.")
+            flash("এই রিকোয়েস্টটি আর পেন্ডিং নেই অথবা খুঁজে পাওয়া যায়নি।", "warning")
+            return redirect(url_for('manage_activations'))
         
         req_data = req_doc.to_dict()
         user_id = req_data.get('user_id')
-        if not user_id:
-            raise ValueError("User ID not found in activation request.")
-
-        user_ref = db.collection('users').document(user_id)
-        user_doc = user_ref.get(transaction=transaction)
-        if not user_doc.exists:
-            raise ValueError("User to be activated does not exist.")
         
+        if not user_id:
+            flash("রিকোয়েস্টে ইউজার আইডি পাওয়া যায়নি।", "error")
+            return redirect(url_for('manage_activations'))
+
+        # খ. অ্যাক্টিভেট করা হবে এমন ইউজারের ডেটা পড়া
+        user_ref = db.collection('users').document(user_id)
+        user_doc = user_ref.get()
+
+        if not user_doc.exists:
+            # যদি ইউজার না থাকে, রিকোয়েস্টটি ডিলিট করে দেওয়া যেতে পারে
+            req_ref.update({'status': 'failed', 'failure_reason': 'User not found'})
+            flash("অ্যাক্টিভেট করার জন্য ইউজারকে খুঁজে পাওয়া যায়নি। রিকোয়েস্ট বাতিল করা হয়েছে।", "error")
+            return redirect(url_for('manage_activations'))
+            
         user_data = user_doc.to_dict()
-
-        # ১. ইউজারের স্ট্যাটাস 'active' করা
-        transaction.update(user_ref, {'account_status': 'active'})
-        # ২. রিকোয়েস্টের স্ট্যাটাস 'completed' করা
-        transaction.update(req_ref, {'status': 'completed', 'processed_at': firestore.SERVER_TIMESTAMP})
-
-        # ৩. রেফারেল বোনাস এবং হিস্টোরি তৈরি করা (যদি থাকে)
+        
+        # গ. রেফারারকে খুঁজে বের করা (যদি থাকে)
+        referrer_doc = None
         referrer_code = user_data.get('referred_by')
         if referrer_code:
             query = db.collection('users').where(filter=FieldFilter('my_referral_code', '==', referrer_code)).limit(1)
-            referrer_docs = list(query.get(transaction=transaction)) # ট্রানজেকশনের ভেতরে .get() ব্যবহার করতে হয়
+            referrer_list = list(query.stream())
+            if referrer_list:
+                referrer_doc = referrer_list[0]
 
-            if referrer_docs:
-                referrer_doc = referrer_docs[0]
-                referrer_ref = db.collection('users').document(referrer_doc.id)
+        # --- ধাপ ২: ট্রানজেকশন শুরু করা ---
+        
+        @firestore.transactional
+        def activate_user_in_transaction(transaction, user_ref, req_ref, referrer_doc_param):
+            """
+            এই ফাংশনের ভেতরে শুধুমাত্র লেখার কাজ করা হবে।
+            """
+            # --- লেখার কাজ (Writes) ---
+            
+            # ১. ইউজারের স্ট্যাটাস 'active' করা
+            transaction.update(user_ref, {'account_status': 'active'})
+            # ২. রিকোয়েস্টের স্ট্যাটাস 'completed' করা
+            transaction.update(req_ref, {'status': 'completed', 'processed_at': firestore.SERVER_TIMESTAMP})
+
+            # ৩. যদি রেফারার পাওয়া যায়, তাহলে বোনাস এবং হিস্টোরি তৈরি
+            if referrer_doc_param:
+                referrer_ref = db.collection('users').document(referrer_doc_param.id)
                 reward_amount = 10.0
                 
-                # ক. রেফারার এবং নতুন ইউজারকে বোনাস দেওয়া
+                # ক. ব্যালেন্স আপডেট
                 transaction.update(referrer_ref, {'balance': firestore.Increment(reward_amount)})
                 transaction.update(user_ref, {'balance': firestore.Increment(reward_amount)})
                 
-                # খ. `referrals` কালেকশনে নতুন ডকুমেন্ট তৈরি করা (এটিই মূল সমাধান)
+                # খ. `referrals` কালেকশনে এন্ট্রি তৈরি
                 referral_history_ref = db.collection('referrals').document()
                 transaction.set(referral_history_ref, {
-                    'referrer_id': referrer_doc.id, 
+                    'referrer_id': referrer_doc_param.id, 
                     'referred_id': user_id,
-                    'referred_user_email': user_data.get('email', 'N/A'), 
-                    'reward_amount': reward_amount,
+                    'referred_user_email': user_data.get('email', 'N/A'),
+                    'reward_amount': reward_amount, 
                     'timestamp': firestore.SERVER_TIMESTAMP
                 })
                 
-                # গ. রেফারারের জন্য `balance_history` তৈরি করা
-                referrer_balance_history_ref = db.collection('balance_history').document()
-                transaction.set(referrer_balance_history_ref, {
-                    'user_id': referrer_doc.id, 'amount': reward_amount,
+                # গ. রেফারারের জন্য `balance_history` তৈরি
+                referrer_balance_ref = db.collection('balance_history').document()
+                transaction.set(referrer_balance_ref, {
+                    'user_id': referrer_doc_param.id, 'amount': reward_amount,
                     'type': 'referral_bonus', 'description': f"Bonus for referring {user_data.get('email')}",
                     'timestamp': firestore.SERVER_TIMESTAMP
                 })
                 
-                # ঘ. নতুন ইউজারের জন্য `balance_history` তৈরি করা
-                new_user_balance_history_ref = db.collection('balance_history').document()
-                transaction.set(new_user_balance_history_ref, {
+                # ঘ. নতুন ইউজারের জন্য `balance_history` তৈরি
+                new_user_balance_ref = db.collection('balance_history').document()
+                transaction.set(new_user_balance_ref, {
                     'user_id': user_id, 'amount': reward_amount,
                     'type': 'signup_referral_bonus', 'description': f"Bonus for joining with code {referrer_code}",
                     'timestamp': firestore.SERVER_TIMESTAMP
                 })
-
-    # --- ট্রানজেকশনটি চালানোর চেষ্টা করা ---
-    try:
+        
+        # --- ধাপ ৩: ট্রানজেকশনটি চালানো ---
+        
         transaction = db.transaction()
-        activate_user_in_transaction(transaction, req_ref)
-        flash("একাউন্ট সফলভাবে অ্যাক্টিভেট করা হয়েছে এবং বোনাস যোগ করা হয়েছে!", "success")
+        activate_user_in_transaction(transaction, user_ref, req_ref, referrer_doc)
+        
+        flash("একাউন্ট সফলভাবে অ্যাক্টিভেট করা হয়েছে এবং বোনাস (যদি প্রযোজ্য হয়) যোগ করা হয়েছে!", "success")
+
     except Exception as e:
-        print(f"ERROR during activation approval: {e}")
-        flash(f"একটি সমস্যা হয়েছে: {e}", "error")
+        print(f"--- ERROR in approve_activation for req_id: {req_id} ---")
+        print(f"Error details: {e}")
+        print(f"-------------------------------------------------------")
+        flash(f"একটি অপ্রত্যাশিত সমস্যা হয়েছে: {e}", "error")
 
     return redirect(url_for('manage_activations'))
 
