@@ -143,7 +143,7 @@
         @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } .header { flex-direction: column; gap: 10px; } }
     </style>
 </head>
-<body class="{{ 'banned' if is_banned }}">
+<body class="{{ 'banned' if is_banned else ('inactive-user' if account_status == 'inactive') }}">
     <div class="container">
         <div class="header">
             <h2>স্বাগতম, {{ user.get('name', 'Guest') | e }}!</h2>
@@ -152,7 +152,29 @@
                 <a href="{{ url_for('withdraw_page') }}">উইথড্র</a>
             </div>
         </div>
+<!-- dashboard.html -> container এর ভেতরে উপরের দিকে যোগ করুন -->
+{% if account_status == 'inactive' %}
+    <div class="activation-notice">
+        <h3><i class="fas fa-exclamation-triangle"></i> আপনার একাউন্টটি ইনঅ্যাক্টিভ</h3>
+        <p>সকল ফিচার আনলক করতে এবং কাজ শুরু করতে, অনুগ্রহ করে আপনার একাউন্টটি অ্যাক্টিভেট করুন।</p>
+        <a href="{{ url_for('activate_account') }}" class="btn-activate">এখনই অ্যাক্টিভেট করুন (৳২০)</a>
+    </div>
+    <style>
+        .activation-notice { background: #fffbe6; border: 1px solid #ffe58f; color: #8a6d3b; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px; }
+        .btn-activate { display: inline-block; margin-top: 15px; background: #28a745; color: white; padding: 10px 25px; text-decoration: none; border-radius: 8px; font-weight: 600; }
+        /* ইনঅ্যাক্টিভ থাকলে বাটন/লিঙ্ক নিষ্ক্রিয় করা */
+        .inactive-user .app-icon-grid a, .inactive-user .nav-links a[href*="withdraw"] { pointer-events: none; opacity: 0.5; filter: grayscale(1); }
+    </style>
+    <script>document.body.classList.add('inactive-user');</script>
+{% elif account_status == 'pending_activation' %}
+    <!-- যখন ইউজার পেমেন্ট সাবমিট করেছে এবং পর্যালোচনার জন্য অপেক্ষা করছে -->
+    <div class="activation-notice" style="background: #e9f5ff; border-color: #b3e5fc; color: #0277bd;">
+        <h3>আপনার অ্যাক্টিভেশন রিকোয়েস্ট পর্যালোচনার অধীনে আছে</h3>
+        <p>আমরা আপনার পেমেন্টের তথ্য পেয়েছি। ভেরিফিকেশন সম্পন্ন হলে আপনার একাউন্টটি স্বয়ংক্রিয়ভাবে অ্যাক্টিভেট হয়ে যাবে।</p>
+    </div>
+{% endif %}
 
+<!-- body ট্যাগে ক্লাস যোগ করা -->
 
         <!-- dashboard.html -->
 
