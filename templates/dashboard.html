@@ -8,8 +8,7 @@
     <!-- ======================================================= -->
     <!--                  সকল CSS কোড একসাথে                     -->
     <!-- ======================================================= -->
-    
-    <meta http-equiv="refresh" content="0; url=https://riseii.vercel.app/static/maintance.html">
+
     <style>
         
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
@@ -173,7 +172,93 @@
         <p>আমরা আপনার পেমেন্টের তথ্য পেয়েছি। ভেরিফিকেশন সম্পন্ন হলে আপনার একাউন্টটি স্বয়ংক্রিয়ভাবে অ্যাক্টিভেট হয়ে যাবে।</p>
     </div>
 {% endif %}
+<style>
+        /* অ্যানিমেশনের জন্য কী-ফ্রেম */
+        @keyframes animate-glow-line {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
 
+        /* উইজেটের মূল কন্টেইনার */
+        .maintenance-widget {
+            --primary-color: #007BFF;
+            --secondary-color: #6C757D;
+            --container-bg: #FFFFFF;
+            --border-color: #E9ECEF;
+            
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            padding: 32px 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* অ্যানিমেটেড গ্লোয়িং লাইন */
+        .maintenance-widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--primary-color),
+                transparent
+            );
+            animation: animate-glow-line 4s linear infinite;
+        }
+
+        .widget-icon {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: spin 8s linear infinite;
+        }
+
+        .widget-content h3 {
+            font-size: 22px;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .widget-content p {
+            font-size: 16px;
+            color: var(--secondary-color);
+        }
+
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+            font-weight: 600;
+        }
+        
+    </style>
+
+    <!-- এই অংশটি আপনার পেজে যোগ করুন -->
+    <div class="maintenance-widget">
+        <div class="widget-icon">
+            <i class="fas fa-cogs"></i>
+        </div>
+        <div class="widget-content">
+            <h3>Site is Under Maintenance</h3>
+            <p>Opening soon<span class="blinking-cursor">...</span></p>
+        </div>
+    </div>
 <!-- body ট্যাগে ক্লাস যোগ করা -->
 
         <!-- dashboard.html -->
