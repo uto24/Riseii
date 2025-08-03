@@ -596,7 +596,7 @@ def activate_account():
 def manage_activations():
     reqs_query = db.collection('activation_requests').where('status', '==', 'pending').stream()
     pending_requests = [dict(req.to_dict(), **{'id': req.id}) for req in reqs_query]
-    return render_template('admin/activations.html', pending_requests=pending_requests, admin_path=SECRET_ADMIN_PATH)
+    return render_template('activations.html', pending_requests=pending_requests, admin_path=SECRET_ADMIN_PATH)
 
 @app.route(f'/{SECRET_ADMIN_PATH}/activations/approve/<req_id>')
 def approve_activation(req_id):
