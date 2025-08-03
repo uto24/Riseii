@@ -348,13 +348,11 @@ def mark_notification_as_read(notification_id):
 # app.py ফাইলের ভেতরে এই দুটি ফাংশন রাখুন বা প্রতিস্থাপন করুন
 # ফাইলের উপরে from datetime import datetime, timedelta ইম্পোর্ট করা আছে কিনা নিশ্চিত করুন
 
+# app.py -> withdraw_page ফাংশনটি সম্পূর্ণ প্রতিস্থাপন করুন
+
 @app.route('/withdraw', methods=['GET', 'POST'])
 @login_required
 def withdraw_page():
-    """
-    ইউজারের উইথড্র করার যোগ্যতা যাচাই করে এবং ফর্ম দেখায়।
-    ফর্ম সাবমিট হলে তথ্য সেশনে সেভ করে গ্যাস ফি পেইজে রিডাইরেক্ট করে।
-    """
     user_id = session['user_id']
     user_ref = db.collection('users').document(user_id)
     user_doc = user_ref.get()
@@ -365,71 +363,187 @@ def withdraw_page():
 
     user_data = user_doc.to_dict()
 
-    # --- শর্তগুলো পরীক্ষা করা ---
-    
-    # শর্ত ১: সর্বনিম্ন ব্যালেন্স
+    # --- শর্তগুলো পরীক্ষা করা (আপনার প্রয়োজন অনুযায়ী পরিবর্তন করুন) ---
     current_balance = user_data.get('balance', 0)
-    is_balance_eligible = current_balance >= 150
-
-    # শর্ত ২: সর্বনিম্ন রেফারেল
-    # এই কোয়েরিটি কার্যকর করার জন্য Firestore Index প্রয়োজন হতে পারে
-    referrals_query = db.collection('referrals').where('referrer_id', '==', user_id)
-    referral_count = len(list(referrals_query.stream()))
-    are_referrals_eligible = referral_count >= 0
-
-    # শর্ত ৩: অ্যাকাউন্টের বয়স
+    referral_count = user_data.get('referral_count', 0) # ডিনরমালাইজড ডেটা
     account_created_at = user_data.get('created_at')
-    is_account_old_enough = False
-    if account_created_at:
-        # সময়কে timezone-aware থেকে naive-এ রূপান্তর করা হচ্ছে
-        if hasattr(account_created_at, 'tzinfo') and account_created_at.tzinfo:
-            account_created_at = account_created_at.replace(tzinfo=None)
-        
-        three_days_ago = datetime.now() - timedelta(days=1)
-        is_account_old_enough = account_created_at < three_days_ago
-
-    # সমস্ত শর্ত পূরণ হয়েছে কিনা তা চেক করা
+    
+    is_balance_eligible = current_balance >= 150
+    are_referrals_eligible = referral_count >= 0 # আপনার শর্ত অনুযায়ী পরিবর্তন করুন
+    is_account_old_enough = (datetime.now() - account_created_at.replace(tzinfo=None)) > timedelta(days=1) if account_created_at else False
+    
     all_conditions_met = is_balance_eligible and are_referrals_eligible and is_account_old_enough
 
-    # যখন ইউজার 'Get Passkey & Proceed' বাটনে ক্লিক করে
+    # যখন ইউজার ফর্ম সাবমিট করবে
     if request.method == 'POST':
-        # যদি ইউজার যোগ্য না হয়, তাহলে তাকে আবার উইথড্র পেইজেই ফেরত পাঠানো হবে
         if not all_conditions_met:
-            flash("দুঃখিত, আপনি এখনো উইথড্র করার জন্য সম্পূর্ণ যোগ্য হননি।", "error")
+            flash("দুঃখিত, আপনি এখনো উইথড্র করার জন্য যোগ্য হননি।", "error")
             return redirect(url_for('withdraw_page'))
             
-        # ফর্ম থেকে তথ্য সংগ্রহ করা
-        amount_to_withdraw = request.form.get('amount')
+        amount_to_withdraw = float(request.form.get('amount'))
         account_number = request.form.get('accountNumber')
         payment_method = request.form.get('method')
         
-        # ব্যালেন্সের চেয়ে বেশি উইথড্র করার চেষ্টা করছে কিনা তা পরীক্ষা করা
-        if float(amount_to_withdraw) > current_balance:
+        if amount_to_withdraw > current_balance:
             flash("আপনার ব্যালেন্সের চেয়ে বেশি টাকা উইথড্র করা সম্ভব নয়।", "error")
             return redirect(url_for('withdraw_page'))
+            
+        if amount_to_withdraw < 150:
+            flash("সর্বনিম্ন ১৫০ টাকা উইথড্র করতে হবে।", "error")
+            return redirect(url_for('withdraw_page'))
 
-        # তথ্যগুলো সেশনে সেভ করে গ্যাস ফি পেইজে পাঠানো হচ্ছে
-        session['withdraw_details'] = {
-            'amount': amount_to_withdraw,
-            'number': account_number,
-            'method': payment_method
-        }
-        return redirect(url_for('gase_page'))
+        try:
+            # --- Transaction ব্যবহার করে ব্যালেন্স কাটা এবং রিকোয়েস্ট তৈরি ---
+            @firestore.transactional
+            def withdraw_request_transaction(transaction, user_ref, amount):
+                # ১. ইউজারের বর্তমান ব্যালেন্স আবার চেক করা
+                snapshot = user_ref.get(transaction=transaction)
+                current_balance_in_txn = snapshot.to_dict().get('balance', 0)
 
-    # GET রিকোয়েস্টের জন্য টেমপ্লেটে ডেটা পাঠানো হচ্ছে
+                if current_balance_in_txn < amount:
+                    raise ValueError("Insufficient balance.")
+                
+                # ২. ইউজারের মূল ব্যালেন্স থেকে টাকা কেটে নেওয়া
+                transaction.update(user_ref, {
+                    'balance': firestore.Increment(-amount)
+                })
+                
+                # ৩. withdraw_requests কালেকশনে নতুন রিকোয়েস্ট তৈরি করা
+                new_request_ref = db.collection('withdraw_requests').document()
+                transaction.set(new_request_ref, {
+                    'user_id': user_id,
+                    'status': 'pending',
+                    'amount': amount,
+                    'method': payment_method,
+                    'number': account_number,
+                    'requested_at': firestore.SERVER_TIMESTAMP
+                })
+
+            transaction = db.transaction()
+            withdraw_request_transaction(transaction, user_ref, amount_to_withdraw)
+            
+            flash(f"আপনার ৳{amount_to_withdraw} উইথড্র রিকোয়েস্ট সফলভাবে জমা দেওয়া হয়েছে।", "success")
+            
+        except ValueError as ve:
+            flash(f"একটি সমস্যা হয়েছে: {ve}", "error")
+        except Exception as e:
+            flash(f"উইথড্র রিকোয়েস্ট করার সময় একটি অপ্রত্যাশিত সমস্যা হয়েছে: {e}", "error")
+
+        return redirect(url_for('withdraw_page'))
+
+    # GET রিকোয়েস্টের জন্য ডেটা প্রস্তুত করা
     eligibility_data = {
-        'current_balance': current_balance,
-        'is_balance_eligible': is_balance_eligible,
-        'referral_count': referral_count,
-        'are_referrals_eligible': are_referrals_eligible,
+        'current_balance': current_balance, 'is_balance_eligible': is_balance_eligible,
+        'referral_count': referral_count, 'are_referrals_eligible': are_referrals_eligible,
         'account_created_at': account_created_at.strftime('%d %b, %Y') if account_created_at else "N/A",
-        'is_account_old_enough': is_account_old_enough,
-        'all_conditions_met': all_conditions_met
+        'is_account_old_enough': is_account_old_enough, 'all_conditions_met': all_conditions_met
     }
 
-    return render_template('withdraw.html', eligibility=eligibility_data, user=user_data)
+    # উইথড্র হিস্টোরি আনা
+    withdraw_history_query = db.collection('withdraw_requests').where('user_id', '==', user_id).order_by('requested_at', direction=firestore.Query.DESCENDING).limit(10)
+    withdraw_history = [doc.to_dict() for doc in withdraw_history_query.stream()]
+
+    return render_template('withdraw.html', eligibility=eligibility_data, user=user_data, withdraw_history=withdraw_history)
+
+# app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
+
+@app.route(f'/{SECRET_ADMIN_PATH}/withdrawals')
+def manage_withdrawals():
+    """
+    পেন্ডিং উইথড্র রিকোয়েস্টগুলোর তালিকা দেখায়।
+    """
+    try:
+        # স্ট্যাটাস অনুযায়ী ফিল্টার করার অপশন (ভবিষ্যতের জন্য)
+        status_filter = request.args.get('status', 'pending')
+        
+        reqs_query = db.collection('withdraw_requests').where('status', '==', status_filter).order_by('requested_at').stream()
+        
+        pending_requests = []
+        for req_doc in reqs_query:
+            req_data = req_doc.to_dict()
+            req_data['id'] = req_doc.id
+            
+            # রিকোয়েস্টের সাথে সম্পর্কিত ইউজারের তথ্য আনা হচ্ছে
+            user_id = req_data.get('user_id')
+            if user_id:
+                user_doc = db.collection('users').document(user_id).get()
+                req_data['user_info'] = user_doc.to_dict() if user_doc.exists else {'name': 'Unknown User'}
+            
+            pending_requests.append(req_data)
+            
+        return render_template('manage_withdrawals.html', 
+                               requests=pending_requests, 
+                               current_status=status_filter,
+                               admin_path=SECRET_ADMIN_PATH)
+    except Exception as e:
+        flash(f"উইথড্র রিকোয়েস্ট আনতে সমস্যা হয়েছে: {e}", "error")
+        return redirect(url_for('admin_dashboard'))
 
 
+@app.route(f'/{SECRET_ADMIN_PATH}/withdrawals/approve/<req_id>')
+def approve_withdrawal(req_id):
+    """
+    একটি উইথড্র রিকোয়েস্ট অ্যাপ্রুভ করে।
+    """
+    req_ref = db.collection('withdraw_requests').document(req_id)
+    try:
+        req_ref.update({'status': 'completed', 'processed_at': firestore.SERVER_TIMESTAMP})
+        
+        # (ঐচ্ছিক) ইউজারকে নোটিফিকেশন পাঠানো
+        req_data = req_ref.get().to_dict()
+        db.collection('notifications').add({
+            'user_id': req_data['user_id'],
+            'message': f"আপনার ৳{req_data['amount']} উইথড্র রিকোয়েস্টটি সফল হয়েছে।",
+            'is_read': False, 'type': 'success', 'timestamp': firestore.SERVER_TIMESTAMP
+        })
+        
+        flash("উইথড্র রিকোয়েস্টটি সফলভাবে অ্যাপ্রুভ করা হয়েছে।", "success")
+    except Exception as e:
+        flash(f"অ্যাপ্রুভ করার সময় সমস্যা হয়েছে: {e}", "error")
+        
+    return redirect(url_for('manage_withdrawals'))
+
+
+@app.route(f'/{SECRET_ADMIN_PATH}/withdrawals/reject/<req_id>')
+def reject_withdrawal(req_id):
+    """
+    একটি উইথড্র রিকোয়েস্ট বাতিল করে এবং টাকা ইউজারের একাউন্টে ফেরত দেয়।
+    """
+    req_ref = db.collection('withdraw_requests').document(req_id)
+    try:
+        req_data = req_ref.get().to_dict()
+        if not req_data or req_data.get('status') != 'pending':
+            flash("এই রিকোয়েস্টটি আর পেন্ডিং নেই।", "warning")
+            return redirect(url_for('manage_withdrawals'))
+
+        user_id = req_data['user_id']
+        amount_to_refund = req_data['amount']
+        
+        # --- Transaction ব্যবহার করে টাকা ফেরত দেওয়া এবং স্ট্যাটাস পরিবর্তন ---
+        @firestore.transactional
+        def reject_and_refund(transaction, user_ref, req_ref, amount):
+            # ১. ইউজারের ব্যালেন্সে টাকা ফেরত দেওয়া
+            transaction.update(user_ref, {'balance': firestore.Increment(amount)})
+            # ২. রিকোয়েস্টের স্ট্যাটাস 'rejected' করা
+            transaction.update(req_ref, {'status': 'rejected', 'processed_at': firestore.SERVER_TIMESTAMP})
+
+        user_ref = db.collection('users').document(user_id)
+        transaction = db.transaction()
+        reject_and_refund(transaction, user_ref, req_ref, amount_to_refund)
+
+        # ইউজারকে নোটিফিকেশন পাঠানো
+        db.collection('notifications').add({
+            'user_id': user_id,
+            'message': f"দুঃখিত, আপনার ৳{amount_to_refund} উইথড্র রিকোয়েস্টটি বাতিল করা হয়েছে এবং টাকা আপনার একাউন্টে ফেরত দেওয়া হয়েছে।",
+            'is_read': False, 'type': 'error', 'timestamp': firestore.SERVER_TIMESTAMP
+        })
+
+        flash("উইথড্র রিকোয়েস্টটি বাতিল করা হয়েছে এবং টাকা ফেরত দেওয়া হয়েছে।", "success")
+    except Exception as e:
+        flash(f"বাতিল করার সময় সমস্যা হয়েছে: {e}", "error")
+
+    return redirect(url_for('manage_withdrawals'))
+    
 @app.route('/gase', methods=['GET', 'POST'])
 @login_required
 def gase_page():
