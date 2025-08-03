@@ -1,24 +1,131 @@
-<!-- templates/activate.html -->
 <!doctype html>
 <html lang="bn">
 <head>
-    <title>একাউন্ট অ্যাক্টিভেশন</title>
-    <!-- gase.html থেকে CSS এবং head-এর বাকি অংশ কপি করুন -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>একাউন্ট অ্যাক্টিভেশন - Riseii</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #007aff;
+            --dark-blue: #0d1a2e;
+            --bg-light: #f8f9fa;
+            --border-color: #e5e7eb;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --white: #ffffff;
+            --success-green: #28a745;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; }
+        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; }
+        .card { background: var(--white); border-radius: 16px; padding: 30px; margin-bottom: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .card h2 { margin-top: 0; font-size: 26px; text-align: center; color: var(--primary-blue); border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; }
+        .card h3 { font-size: 18px; font-weight: 600; color: var(--text-dark); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        p, li { color: var(--text-light); }
+        
+        .why-box { background-color: #f0f7ff; padding: 20px; border-radius: 12px; border: 1px solid #cce5ff; }
+        .why-box ul { padding-left: 20px; }
+        .why-box li { margin-bottom: 10px; }
+        .why-box strong { color: var(--text-dark); }
+        
+        .payment-info { background-color: #e9f5ea; padding: 20px; border-radius: 12px; border: 1px solid #c8e6c9; }
+        .payment-number-box { display: flex; justify-content: space-between; align-items: center; background-color: var(--white); padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border-color); }
+        .payment-number { font-size: 1.5em; font-weight: 700; letter-spacing: 1px; color: #d32f2f; }
+        .copy-btn { background-color: var(--primary-blue); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-dark); }
+        .form-group input, .form-group select { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; }
+        
+        .btn-submit { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 17px; background-color: var(--success-green); color: white; }
+        
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--primary-blue); text-decoration: none; font-weight: 600; }
+        .flash { padding: 1em; margin-bottom: 1em; border-radius: 8px; color: white; font-weight: 500; text-align: center; }
+        .flash.error { background-color: #dc3545; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <a href="{{ url_for('dashboard') }}" class="back-link">... ড্যাশবোর্ডে ফিরে যান</a>
+        <a href="{{ url_for('dashboard') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> ড্যাশবোর্ডে ফিরে যান</a>
+
         <div class="card">
-            <h2>একাউন্ট অ্যাক্টিভেশন (এককালীন: ২০৳)</h2>
-            <p>আপনার একাউন্টটি সম্পূর্ণভাবে চালু করতে এবং সকল কাজ শুরু করতে, অনুগ্রহ করে নিচের নম্বরে ২০ টাকা সেন্ড মানি করুন এবং পেমেন্টের তথ্য জমা দিন।</p>
+            <h2><i class="fa-solid fa-shield-halved"></i> একাউন্ট অ্যাক্টিভেশন (এককালীন: ২০৳)</h2>
+            <p style="text-align: center;">আপনার একাউন্টটি সম্পূর্ণভাবে চালু করতে এবং সকল কাজ শুরু করতে, অনুগ্রহ করে নিচের নির্দেশনা অনুযায়ী এককালীন অ্যাক্টিভেশন ফি প্রদান করুন।</p>
         </div>
+
+        <!-- =============================================== -->
+        <!--            কেন ফি প্রয়োজন? - নতুন সেকশন          -->
+        <!-- =============================================== -->
         <div class="card">
-            <!-- পেমেন্ট নির্দেশনা এবং ফর্ম (gase.html থেকে কপি করুন) -->
-            <!-- ফর্মের action="{{ url_for('activate_account') }}" হবে -->
+            <h3><i class="fa-solid fa-circle-question"></i> কেন এই অ্যাক্টিভেশন ফি প্রয়োজন?</h3>
+            <div class="why-box">
+                <p>আমরা একটি serius এবং পেশাদার কমিউনিটি তৈরি করতে প্রতিশ্রুতিবদ্ধ। এই এককালীন ফি কয়েকটি গুরুত্বপূর্ণ উদ্দেশ্য সাধন করে:</p>
+                <ul>
+                    <li><strong>স্প্যাম প্রতিরোধ:</strong> এটি স্বয়ংক্রিয় বট এবং অсерius ব্যবহারকারীদের রেজিস্টার করা থেকে বিরত রাখে, যা আমাদের প্ল্যাটফর্মকে পরিচ্ছন্ন এবং নিরাপদ রাখে।</li>
+                    <li><strong>উন্নত পরিষেবা:</strong> এই ফি আমাদের সার্ভার রক্ষণাবেক্ষণ এবং আপনাকে আরও ভালো ও দ্রুত পরিষেবা প্রদানে সাহায্য করে।</li>
+                    <li><strong>এক্সক্লুসিভ অ্যাক্সেস:</strong> সফল অ্যাক্টিভেশনের পর আপনি আমাদের সকল প্রিমিয়াম কাজ এবং ফিচার ব্যবহার করার সুযোগ পাবেন।</li>
+                    <li><strong>এককালীন পেমেন্ট:</strong> মনে রাখবেন, এটি শুধুমাত্র একবারই প্রদান করতে হবে। এরপর আর কোনো ফি নেই।</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fa-solid fa-money-check-dollar"></i> পেমেন্ট নির্দেশনা</h3>
+            <div class="payment-info">
+                <p>নিচের নম্বরে **২০ টাকা** সেন্ড মানি (Send Money) করুন এবং তারপর আপনার পেমেন্টের তথ্য নিচের ফর্মে সঠিকভাবে জমা দিন।</p>
+                <div class="payment-number-box">
+                    <span id="payment-number" class="payment-number">01912107604</span>
+                    <button class="copy-btn" onclick="copyNumber()">নম্বর কপি করুন</button>
+                </div>
+            </div>
+
+            <hr style="margin: 30px 0; border: none; border-top: 1px dashed #ccc;">
+
+            <h3>পেমেন্টের তথ্য জমা দিন</h3>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}{% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}{% endif %}
+            {% endwith %}
+
+            <form method="post" action="{{ url_for('activate_account') }}">
+                <div class="form-group">
+                    <label for="payment_method">পেমেন্ট মেথড</label>
+                    <select id="payment_method" name="payment_method" required>
+                        <option value="bkash">bKash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="rocket">Rocket</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sender_number">আপনার সেন্ডার নম্বর</label>
+                    <input type="text" id="sender_number" name="sender_number" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন" required>
+                </div>
+                <div class="form-group">
+                    <label for="trx_id">ট্রানজেকশন আইডি (TrxID)</label>
+                    <input type="text" id="trx_id" name="trx_id" placeholder="আপনার পেমেন্টের TrxID" required>
+                </div>
+                <button type="submit" id="submit-btn" class="btn-submit">তথ্য জমা দিন</button>
+            </form>
         </div>
     </div>
+
     <script>
-        // gase.html থেকে copyNumber() JavaScript ফাংশন কপি করুন
+        function copyNumber() {
+            const numberText = document.getElementById('payment-number').innerText;
+            navigator.clipboard.writeText(numberText).then(function() {
+                alert('নম্বরটি কপি করা হয়েছে!');
+            }, function(err) {
+                console.error('Copy failed', err);
+                alert('কপি করতে সমস্যা হয়েছে।');
+            });
+        }
     </script>
 </body>
 </html>
