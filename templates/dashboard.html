@@ -29,6 +29,8 @@
         
         /* --- App Icon Grid --- */
         .app-icon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1.5rem; margin-bottom: 25px; }
+        
+        .app-icon-gridx { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1.5rem; margin-bottom: 25px; }
         .app-icon { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); text-decoration: none; color: #333; transition: all 0.2s ease-in-out; }
         .app-icon:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); }
         .app-icon i { font-size: 2.5rem; margin-bottom: 0.75rem; color: #007aff; }
@@ -292,6 +294,10 @@
             <a href="{{ url_for('tasks_page') }}" class="app-icon"><i class="fa-solid fa-list-ul"></i><span class="app-icon-title">কাজ করুন - Task</span></a>
             <a href="{{ url_for('withdraw_page') }}" class="app-icon"><i class="fa-solid fa-dollar-sign"></i><span class="app-icon-title">টাকা তুলুন - Withdraw</span></a>
             
+    </div>
+        
+        <div class="app-icon-gridx">
+        
             <a href="https://riseii.vercel.app/static/update/index.html" class="app-icon"><i class="fa-regular fa-bell"></i><span class="app-icon-title">নোটিস এবং আপডেট </span></a>
             <a href="https://www.facebook.com/riseii.support" class="app-icon"><i class="fab fa-facebook"></i><span class="app-icon-title">Facebook ID - Support </span></a>
             <a href="https://t.me/websitesupportr" class="app-icon"><i class="fab fa-telegram"></i><span class="app-icon-title"> Telegram  ID - Support</span></a>
