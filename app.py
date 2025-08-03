@@ -1,7 +1,6 @@
 # ==============================================================================
 #           ULTIMATE & COMPLETE APPLICATION FILE (with Notifications): app.py
 # ==============================================================================
-
 import os
 import uuid
 import json
