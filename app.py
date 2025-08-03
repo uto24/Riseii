@@ -504,7 +504,7 @@ def dashboard():
             return redirect(url_for('login'))
             
         user = user_doc.to_dict()
-        
+        account_status = user.get('account_status', 'inactive')
         # --- ব্যান স্ট্যাটাস চেক করা ---
         is_banned = user.get('status') == 'banned'
 
@@ -546,6 +546,7 @@ def dashboard():
         return render_template(
             'dashboard.html', 
             user=user, 
+            account_status=account_status, # <-- স্ট্যাটাস পাঠানো হচ্ছে
             is_banned=is_banned,
             referral_link=referral_link, 
             notifications=notifications, 
@@ -563,14 +564,94 @@ def dashboard():
         flash("ড্যাশবোর্ড লোড করার সময় একটি সমস্যা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।", "error")
         # এরর হলে লগআউট করে দেওয়া যেতে পারে অথবা একটি এরর পেইজে পাঠানো যেতে পারে
         return redirect(url_for('login'))
+
+
+# app.py -> User-Facing Pages সেকশনে যোগ করুন
+@app.route('/activate', methods=['GET', 'POST'])
+@login_required
+def activate_account():
+    if request.method == 'POST':
+        # এই ফর্মটি gase.html এর মতো হবে
+        sender_number = request.form.get('sender_number')
+        trx_id = request.form.get('trx_id')
+        if not all([sender_number, trx_id]):
+            flash("অনুগ্রহ করে সব তথ্য পূরণ করুন।", "error")
+            return redirect(url_for('activate_account'))
+
+        # activation_requests কালেকশনে রিকোয়েস্ট সেভ করা
+        db.collection('activation_requests').add({
+            'user_id': session['user_id'],
+            'sender_number': sender_number,
+            'trx_id': trx_id,
+            'status': 'pending',
+            'requested_at': firestore.SERVER_TIMESTAMP
+        })
+        flash("আপনার অ্যাক্টিভেশন রিকোয়েস্ট জমা দেওয়া হয়েছে। পর্যালোচনার জন্য অপেক্ষা করুন।", "info")
+        return redirect(url_for('dashboard'))
+
+    return render_template('activate.html')
+
+# app.py -> Admin Panel সেকশনে যোগ করুন
+@app.route(f'/{SECRET_ADMIN_PATH}/activations')
+def manage_activations():
+    reqs_query = db.collection('activation_requests').where('status', '==', 'pending').stream()
+    pending_requests = [dict(req.to_dict(), **{'id': req.id}) for req in reqs_query]
+    return render_template('admin/activations.html', pending_requests=pending_requests, admin_path=SECRET_ADMIN_PATH)
+
+@app.route(f'/{SECRET_ADMIN_PATH}/activations/approve/<req_id>')
+def approve_activation(req_id):
+    req_ref = db.collection('activation_requests').document(req_id)
+    req_data = req_ref.get().to_dict()
+
+    if not req_data or req_data.get('status') != 'pending':
+        flash("এই রিকোয়েস্টটি আর পেন্ডিং নেই।", "warning")
+        return redirect(url_for('manage_activations'))
+        
+    user_id = req_data.get('user_id')
+    user_ref = db.collection('users').document(user_id)
+    user_data = user_ref.get().to_dict()
+
+    # --- ট্রানজেকশন শুরু ---
+    try:
+        # ১. ইউজারের স্ট্যাটাস 'active' করা
+        user_ref.update({'account_status': 'active'})
+        # ২. রিকোয়েস্টের স্ট্যাটাস 'completed' করা
+        req_ref.update({'status': 'completed'})
+
+        # ৩. রেফারেল বোনাস দেওয়া (যদি থাকে)
+        referrer_code = user_data.get('referred_by')
+        if referrer_code:
+            query = db.collection('users').where('my_referral_code', '==', referrer_code).limit(1).stream()
+            referrer_list = list(query)
+            if referrer_list:
+                referrer_doc = referrer_list[0]
+                referrer_ref = db.collection('users').document(referrer_doc.id)
+                reward_amount = 10.0
+                
+                # রেফারার এবং নতুন ইউজারকে বোনাস
+                referrer_ref.update({'balance': firestore.Increment(reward_amount)})
+                user_ref.update({'balance': firestore.Increment(reward_amount)})
+                
+                # হিস্টোরি তৈরি (balance_history, referrals)
+                # ... (আগের signup ফাংশন থেকে এই কোড কপি করে আনুন) ...
+
+        flash("একাউন্ট সফলভাবে অ্যাক্টিভেট করা হয়েছে!", "success")
+    except Exception as e:
+        flash(f"একটি সমস্যা হয়েছে: {e}", "error")
+
+    return redirect(url_for('manage_activations'))
+
+
+
 @app.route('/tasks')
 @login_required
 def tasks_page():
-    """
-    সমস্ত অ্যাক্টিভ টাস্কের একটি তালিকা দেখায়।
-    """
     user_id = session['user_id']
+    user_status = db.collection('users').document(user_id).get().to_dict().get('account_status', 'inactive')
     
+    if user_status != 'active':
+        flash("কাজ করার জন্য অনুগ্রহ করে প্রথমে আপনার একাউন্টটি অ্যাক্টিভেট করুন।", "warning")
+        return redirect(url_for('dashboard'))
     # প্রথমে ইউজারের করা সব টাস্কের আইডিগুলো একটি সেটে নিয়ে আসা হচ্ছে
     submissions_query = db.collection('task_submissions').where('user_id', '==', user_id).stream()
     completed_task_ids = {sub.to_dict().get('task_id') for sub in submissions_query}
