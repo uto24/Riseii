@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>উইথড্র ম্যানেজমেন্ট - অ্যাডমিন প্যানেল</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <style>
+        /* admin_dashboard.html বা users_list.html থেকে CSS এখানে ব্যবহার করা যেতে পারে */
+        :root {
+            --bg-dark: #1a1b20; --primary-dark: #2a2b30; --border-dark: #353740;
+            --text-light: #e0e0e0; --text-secondary: #a0a0a0; --accent-green: #28a745;
+            --accent-red: #dc3545; --accent-blue: #007bff; --accent-cyan: #00ffc6;
+        }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-dark); color: var(--text-light); margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary-dark); padding: 15px 25px; border-radius: 12px; margin-bottom: 25px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .back-link { color: var(--accent-cyan); text-decoration: none; font-weight: 600; }
+        .card { background: var(--primary-dark); border-radius: 12px; padding: 25px; margin-bottom: 25px; }
+        .request-table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        .request-table th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-dark); }
+        .action-links a { display: inline-block; padding: 6px 12px; border-radius: 5px; color: white; text-decoration: none; font-weight: 600; margin-right: 10px; }
+        .approve { background-color: var(--accent-green); } .reject { background-color: var(--accent-red); }
+        .no-data { text-align: center; padding: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>উইথড্র রিকোয়েস্ট ম্যানেজমেন্ট ({{ current_status|capitalize }})</h1>
+            <a href="/{{ admin_path }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> অ্যাডমিন ড্যাশবোর্ডে ফিরে যান</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <div style="overflow-x: auto;">
+                {% if requests %}
+                    <table class="request-table">
+                        <thead>
+                            <tr>
+                                <th>তারিখ</th>
+                                <th>ইউজার</th>
+                                <th>পরিমাণ (৳)</th>
+                                <th>মেথড</th>
+                                <th>নম্বর</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for req in requests %}
+                            <tr>
+                                <td>{{ req.requested_at.strftime('%d-%b-%Y %H:%M') if req.requested_at else 'N/A' }}</td>
+                                <td>
+                                    <div>
+                                        <strong>{{ req.user_info.name }}</strong><br>
+                                        <small>{{ req.user_info.email }}</small>
+                                    </div>
+                                </td>
+                                <td><strong>{{ "%.2f"|format(req.amount) }}</strong></td>
+                                <td>{{ req.method|capitalize }}</td>
+                                <td>{{ req.number }}</td>
+                                <td class="action-links">
+                                    <a href="/{{ admin_path }}/withdrawals/approve/{{ req.id }}" class="approve">Approve</a>
+                                    <a href="/{{ admin_path }}/withdrawals/reject/{{ req.id }}" class="reject">Reject</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">কোনো পেন্ডিং উইথড্র রিকোয়েস্ট নেই।</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
