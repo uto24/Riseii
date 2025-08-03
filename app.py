@@ -565,13 +565,15 @@ def dashboard():
         # এরর হলে লগআউট করে দেওয়া যেতে পারে অথবা একটি এরর পেইজে পাঠানো যেতে পারে
         return redirect(url_for('login'))
 
+# app.py -> activate_account ফাংশনটি আপডেট করুন
 
-# app.py -> User-Facing Pages সেকশনে যোগ করুন
 @app.route('/activate', methods=['GET', 'POST'])
 @login_required
 def activate_account():
+    user_id = session['user_id']
+    user_ref = db.collection('users').document(user_id)
+    
     if request.method == 'POST':
-        # এই ফর্মটি gase.html এর মতো হবে
         sender_number = request.form.get('sender_number')
         trx_id = request.form.get('trx_id')
         if not all([sender_number, trx_id]):
@@ -580,12 +582,16 @@ def activate_account():
 
         # activation_requests কালেকশনে রিকোয়েস্ট সেভ করা
         db.collection('activation_requests').add({
-            'user_id': session['user_id'],
+            'user_id': user_id,
             'sender_number': sender_number,
             'trx_id': trx_id,
             'status': 'pending',
             'requested_at': firestore.SERVER_TIMESTAMP
         })
+
+        # --- নতুন পরিবর্তন: ইউজারের স্ট্যাটাস 'pending_activation' করা ---
+        user_ref.update({'account_status': 'pending_activation'})
+        
         flash("আপনার অ্যাক্টিভেশন রিকোয়েস্ট জমা দেওয়া হয়েছে। পর্যালোচনার জন্য অপেক্ষা করুন।", "info")
         return redirect(url_for('dashboard'))
 
