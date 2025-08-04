@@ -47,32 +47,46 @@
             <h2>পেন্ডিং একাউন্ট অ্যাক্টিভেশন</h2>
             <div style="overflow-x: auto;">
                 {% if pending_requests %}
-                    <table class="request-table">
-                        <thead>
-                            <tr>
-                                <th>তারিখ</th>
-                                <th>ইউজার আইডি</th>
-                                <th>সেন্ডার নম্বর</th>
-                                <th>ট্রানজেকশন আইডি (TrxID)</th>
-                                <th>অ্যাকশন</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for req in pending_requests %}
-                            <tr>
-                                <td>{{ req.get('requested_at').strftime('%d-%b-%Y %H:%M') if req.get('requested_at') else 'N/A' }}</td>
-                                <td><small>{{ req.get('user_id', 'N/A') }}</small></td>
-                                <td>{{ req.get('sender_number', 'N/A') }}</td>
-                                <td>{{ req.get('trx_id', 'N/A') }}</td>
-                                <td class="actions">
-                                    <a href="/{{ admin_path }}/activations/approve/{{ req.id }}" class="btn-approve">Approve</a>
-                                    <!-- আপনি চাইলে reject করার জন্যও একটি রুট তৈরি করতে পারেন -->
-                                    <!-- <a href="/{{ admin_path }}/activations/reject/{{ req.id }}" class="btn-reject">Reject</a> -->
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                    <!-- templates/admin/activations.html -> টেবিলটি আপডেট করুন -->
+<!-- templates/admin/activations.html -> টেবিলটি আপডেট করুন -->
+
+<table class="request-table">
+    <thead>
+        <tr>
+            <th>তারিখ</th>
+            <th>ইউজার আইডি</th>
+            <th>পেমেন্ট মেথড</th> <!-- নতুন কলাম -->
+            <th>সেন্ডার নম্বর</th>
+            <th>ট্রানজেকশন আইডি (TrxID)</th>
+            <th>অ্যাকশন</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for req in pending_requests %}
+        <tr>
+            <td>{{ req.get('requested_at').strftime('%d-%b-%Y %H:%M') if req.get('requested_at') else 'N/A' }}</td>
+            <td><small>{{ req.get('user_id', 'N/A') }}</small></td>
+            <td><strong>{{ req.get('payment_method', 'N/A')|capitalize }}</strong></td> <!-- নতুন ডেটা -->
+            <td>{{ req.get('sender_number', 'N/A') }}</td>
+            <td>{{ req.get('trx_id', 'N/A') }}</td>
+            <td class="actions">
+                <a href="/{{ admin_path }}/activations/approve/{{ req.id }}" class="btn-approve">Approve</a>
+                <!-- নতুন Reject বাটন -->
+                <a href="/{{ admin_path }}/activations/reject/{{ req.id }}" class="btn-reject"
+                   onclick="return confirm('আপনি কি নিশ্চিতভাবে এই রিকোয়েস্টটি বাতিল করতে চান?');">Reject</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!-- কিছু নতুন CSS যোগ করুন -->
+<style>
+    /* ... আগের CSS ... */
+    .btn-reject {
+        background-color: var(--accent-red);
+    }
+</style>
                 {% else %}
                     <p class="no-data">বর্তমানে কোনো পেন্ডিং অ্যাক্টিভেশন রিকোয়েস্ট নেই।</p>
                 {% endif %}
