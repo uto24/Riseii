@@ -127,16 +127,19 @@
                 <div style="overflow-x: auto;">
                     <table class="history-table">
                         <thead><tr><th>তারিখ</th><th>পরিমাণ</th><th>নম্বর</th><th>স্ট্যাটাস</th></tr></thead>
-                        <tbody>
-                        {% for req in withdraw_history %}
-                            <tr>
-                                <td>{{ req.requested_at.strftime('%d-%b-%Y') if req.requested_at else 'N/A' }}</td>
-                                <td>৳ {{ "%.2f"|format(req.amount) }}</td>
-                                <td>{{ req.number }} ({{ req.method|capitalize }})</td>
-                                <td><span class="status {{ req.status }}">{{ req.status|replace('_', ' ')|capitalize }}</span></td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
+                       <!-- withdraw.html -> tbody অংশ আপডেট করুন -->
+<tbody>
+{% for req in withdraw_history %}
+    <tr>
+        <td>{{ req.requested_at.strftime('%d-%b-%Y') if req.requested_at else 'N/A' }}</td>
+        <!-- পরিবর্তন: req.withdraw_details.amount ব্যবহার করা হচ্ছে -->
+        <td>৳ {{ "%.2f"|format(req.withdraw_details.amount|float) }}</td>
+        <!-- পরিবর্তন: req.withdraw_details থেকে নম্বর এবং মেথড নেওয়া হচ্ছে -->
+        <td>{{ req.withdraw_details.number }} ({{ req.withdraw_details.method|capitalize }})</td>
+        <td><span class="status {{ req.status }}">{{ req.status|replace('_', ' ')|capitalize }}</span></td>
+    </tr>
+{% endfor %}
+</tbody>
                     </table>
                 </div>
             {% else %}
