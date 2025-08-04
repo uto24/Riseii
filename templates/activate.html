@@ -94,25 +94,31 @@
                 {% endfor %}{% endif %}
             {% endwith %}
 
-            <form method="post" action="{{ url_for('activate_account') }}">
-                <div class="form-group">
-                    <label for="payment_method">পেমেন্ট মেথড</label>
-                    <select id="payment_method" name="payment_method" required>
-                        <option value="bkash">bKash</option>
-                        <option value="nagad">Nagad</option>
-                        <option value="rocket">Rocket</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="sender_number">আপনার সেন্ডার নম্বর</label>
-                    <input type="text" id="sender_number" name="sender_number" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন" required>
-                </div>
-                <div class="form-group">
-                    <label for="trx_id">ট্রানজেকশন আইডি (TrxID)</label>
-                    <input type="text" id="trx_id" name="trx_id" placeholder="আপনার পেমেন্টের TrxID" required>
-                </div>
-                <button type="submit" id="submit-btn" class="btn-submit">তথ্য জমা দিন</button>
-            </form>
+            <!-- templates/activate.html -> form অংশটি আপডেট করুন -->
+
+<!-- templates/activate.html -> form অংশটি আপডেট করুন -->
+
+<form method="post" action="{{ url_for('activate_account') }}">
+    <!-- নতুন: পেমেন্ট মেথড ফিল্ড -->
+    <div class="form-group">
+        <label for="payment_method">পেমেন্ট মেথড</label>
+        <select id="payment_method" name="payment_method" required>
+            <option value="bkash">bKash</option>
+            <option value="nagad">Nagad</option>
+            <option value="rocket">Rocket</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="sender_number">আপনার সেন্ডার নম্বর</label>
+        <input type="text" id="sender_number" name="sender_number" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন" required>
+    </div>
+    <div class="form-group">
+        <label for="trx_id">ট্রানজেকশন আইডি (TrxID)</label>
+        <input type="text" id="trx_id" name="trx_id" placeholder="আপনার পেমেন্টের TrxID" required>
+    </div>
+    <button type="submit" id="submit-btn" class="btn-submit">তথ্য জমা দিন</button>
+</form>
         </div>
     </div>
 
