@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -22,7 +22,7 @@
             --warning-red: #dc3545;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; }
+        body { font-family: 'Anek Bangla', sans-serif; background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; }
         .container { max-width: 700px; margin: 40px auto; padding: 0 20px; }
         .card { background: var(--white); border-radius: 16px; padding: 30px; margin-bottom: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
         .card h2 { margin-top: 0; font-size: 26px; text-align: center; color: var(--primary-blue); border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; }
@@ -82,7 +82,7 @@
                 </div>
                 <div class="eligibility-item {{ 'pass' if eligibility.are_referrals_eligible else 'fail' }}">
                     <i class="fas {{ 'fa-check-circle' if eligibility.are_referrals_eligible else 'fa-times-circle' }}"></i>
-                    <span>কমপক্ষে ০টি রেফারেল (আপনার আছে: {{ eligibility.referral_count }}টি)</span>
+                    <span>কমপক্ষে ২টি রেফারেল (আপনার আছে: {{ eligibility.referral_count }}টি)</span>
                 </div>
                 <div class="eligibility-item {{ 'pass' if eligibility.is_account_old_enough else 'fail' }}">
                     <i class="fas {{ 'fa-check-circle' if eligibility.is_account_old_enough else 'fa-times-circle' }}"></i>
