@@ -176,6 +176,43 @@ def delete_user(user_id):
     
     return redirect(url_for('manage_users'))
 
+    # app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
+
+@app.route(f'/{SECRET_ADMIN_PATH}/activations/reject/<req_id>')
+def reject_activation(req_id):
+    """
+    একটি একাউন্ট অ্যাক্টিভেশন রিকোয়েস্ট বাতিল করে।
+    """
+    try:
+        req_ref = db.collection('activation_requests').document(req_id)
+        req_doc = req_ref.get()
+        
+        if req_doc.exists and req_doc.to_dict().get('status') == 'pending':
+            # স্ট্যাটাস 'rejected' এ পরিবর্তন করা হচ্ছে
+            req_ref.update({
+                'status': 'rejected',
+                'processed_at': firestore.SERVER_TIMESTAMP
+            })
+            
+            # (ঐচ্ছিক) ইউজারকে নোটিফিকেশন পাঠানো
+            req_data = req_doc.to_dict()
+            db.collection('notifications').add({
+                'user_id': req_data['user_id'],
+                'message': "দুঃখিত, আপনার একাউন্ট অ্যাক্টিভেশন রিকোয়েস্টটি বাতিল করা হয়েছে। পেমেন্টের তথ্যে কোনো সমস্যা থাকতে পারে। অনুগ্রহ করে সাপোর্টে যোগাযোগ করুন।",
+                'is_read': False,
+                'type': 'error',
+                'timestamp': firestore.SERVER_TIMESTAMP
+            })
+            
+            flash("অ্যাক্টিভেশন রিকোয়েস্টটি সফলভাবে বাতিল করা হয়েছে।", "success")
+        else:
+            flash("এই রিকোয়েস্টটি খুঁজে পাওয়া যায়নি অথবা এটি ইতিমধ্যে প্রসেস করা হয়ে গেছে।", "warning")
+            
+    except Exception as e:
+        flash(f"রিকোয়েস্ট বাতিল করার সময় একটি সমস্যা হয়েছে: {e}", "error")
+
+    return redirect(url_for('manage_activations'))
+
 @app.route(f'/{SECRET_ADMIN_PATH}/users/update-balance/<user_id>', methods=['POST'])
 def update_user_balance(user_id):
     """
@@ -680,33 +717,31 @@ def dashboard():
         return redirect(url_for('login'))
 
 # app.py -> activate_account ফাংশনটি আপডেট করুন
+# app.py -> activate_account ফাংশনটি আপডেট করুন
 
 @app.route('/activate', methods=['GET', 'POST'])
 @login_required
 def activate_account():
-    user_id = session['user_id']
-    user_ref = db.collection('users').document(user_id)
-    
     if request.method == 'POST':
+        # --- নতুন: payment_method গ্রহণ করা হচ্ছে ---
+        payment_method = request.form.get('payment_method')
         sender_number = request.form.get('sender_number')
         trx_id = request.form.get('trx_id')
-        if not all([sender_number, trx_id]):
-            flash("অনুগ্রহ করে সব তথ্য পূরণ করুন।", "error")
+        
+        if not all([payment_method, sender_number, trx_id]):
+            flash("অনুগ্রহ করে সব তথ্য সঠিকভাবে পূরণ করুন।", "error")
             return redirect(url_for('activate_account'))
 
         # activation_requests কালেকশনে রিকোয়েস্ট সেভ করা
         db.collection('activation_requests').add({
-            'user_id': user_id,
+            'user_id': session['user_id'],
+            'payment_method': payment_method, # <-- নতুন ফিল্ড সেভ করা হচ্ছে
             'sender_number': sender_number,
             'trx_id': trx_id,
             'status': 'pending',
             'requested_at': firestore.SERVER_TIMESTAMP
         })
-
-        # --- নতুন পরিবর্তন: ইউজারের স্ট্যাটাস 'pending_activation' করা ---
-        user_ref.update({'account_status': 'pending_activation'})
-        
-        flash("আপনার অ্যাক্টিভেশন রিকোয়েস্ট জমা দেওয়া হয়েছে। পর্যালোচনার জন্য অপেক্ষা করুন।", "info")
+        flash("আপনার অ্যাক্টিভেশন রিকোয়েস্ট সফলভাবে জমা দেওয়া হয়েছে। পর্যালোচনার জন্য অপেক্ষা করুন।", "info")
         return redirect(url_for('dashboard'))
 
     return render_template('activate.html')
