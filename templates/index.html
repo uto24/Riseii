@@ -138,6 +138,198 @@
             </div>
         </section>
 
+    <style>
+        /* ================================================
+           ইউনিক ফিচার সেকশন স্টাইল (লাইট থিম)
+           ================================================ */
+        .unique-features-section-light {
+            /* ভেরিয়েবলগুলো এখানে ডিফাইন করা হয়েছে */
+            --gradient-start: #2DD4BF;
+            --gradient-end: #3B82F6;
+            --primary-gradient: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            --card-bg: #FFFFFF;
+            --text-dark: #212529;
+            --text-light: #6C757D;
+            --border-color: #E9ECEF;
+            --font-bn: 'Hind Siliguri', sans-serif;
+            --font-en: 'Poppins', sans-serif;
+
+            font-family: var(--font-bn);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .unique-features-section-light .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        /* ইউজার সংখ্যা হাইলাইট করার জন্য নতুন বার */
+        .unique-features-section-light .success-highlight-bar {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #E0F2FE;
+            color: #0284C7;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+        .unique-features-section-light .success-highlight-bar strong {
+            font-family: var(--font-en);
+        }
+
+        .unique-features-section-light .section-title {
+            font-family: var(--font-en);
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+        }
+        
+        .unique-features-section-light .gradient-text {
+            background-image: var(--primary-gradient);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .unique-features-section-light .section-subtitle {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .unique-features-section-light .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .unique-features-section-light .feature-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .unique-features-section-light .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .unique-features-section-light .card-icon {
+            font-size: 28px;
+            margin-bottom: 20px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            background-color: #E9F5FF; /* হালকা নীল ব্যাকগ্রাউন্ড */
+            color: #3B82F6; /* নীল রঙ */
+        }
+        
+        .unique-features-section-light .feature-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .unique-features-section-light .feature-card p {
+            color: var(--text-light);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 576px) {
+            .unique-features-section-light .section-title {
+                font-size: 28px;
+            }
+            .unique-features-section-light .success-highlight-bar {
+                font-size: 14px;
+                padding: 6px 16px;
+            }
+        }
+        
+    </style>
+        
+    <!-- ইউনিক ফিচার সেকশন শুরু (লাইট থিম) -->
+    <section class="unique-features-section-light">
+        <div class="section-header">
+            <div class="success-highlight-bar">
+                <i class="fas fa-users"></i>
+                <span>আমাদের সাথে আছেন <strong>60,000+</strong> সন্তুষ্ট ব্যবহারকারী!</span>
+            </div>
+            <h2 class="section-title">আমাদের <span class="gradient-text">অসাধারণ ফিচারসমূহ</span></h2>
+            <p class="section-subtitle">আমরা আপনার কাজের অভিজ্ঞতাকে সেরা করতে এবং আপনার আয়কে সুরক্ষিত রাখতে সর্বাধুনিক প্রযুক্তি ব্যবহার করি।</p>
+        </div>
+
+        <div class="features-grid">
+            <!-- ফিচার কার্ড ১ -->
+            <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-robot"></i></div>
+                <h3>AI চালিত পেমেন্ট বট</h3>
+                <p>আমাদের নতুন AI বট স্বয়ংক্রিয়ভাবে আপনার পেমেন্ট যাচাই করে, যা আগের চেয়ে অনেক বেশি দ্রুত এবং নির্ভুল।</p>
+            </div>
+            
+            <!-- ফিচার কার্ড ২ -->
+            <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-bolt-lightning"></i></div>
+                <h3>৩ ঘণ্টায় অটোমেটিক উইথড্র</h3>
+                <p>আপনার আয়ের টাকা হাতে পেতে আর অপেক্ষা নয়। মাত্র ৩ ঘণ্টার মধ্যেই স্বয়ংক্রিয়ভাবে আপনার পেমেন্ট সম্পন্ন হবে।</p>
+            </div>
+
+            <!-- ফিচার কার্ড ৩ -->
+            <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-tasks"></i></div>
+                <h3>অসংখ্য টাস্কের সমাহার</h3>
+                <p>আমাদের প্ল্যাটফর্মে সব সময় নতুন নতুন কাজ যোগ করা হয়। আপনার আয়ের সুযোগ তাই কখনও শেষ হবে না।</p>
+            </div>
+
+            <!-- ফিচার কার্ড ৪ -->
+            <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-headset"></i></div>
+                <h3>২৪/৭ লাইভ সাপোর্ট</h3>
+                <p>যেকোনো সমস্যায় বা প্রয়োজনে আমাদের সাপোর্ট টিম সপ্তাহের ৭ দিন, ২৪ ঘণ্টা আপনার পাশে আছে।</p>
+            </div>
+
+            <!-- ফিচার কার্ড ৫ -->
+            <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-eye"></i></div>
+                <h3>সম্পূর্ণ স্বচ্ছতা</h3>
+                <p>কোনো হিডেন চার্জ বা জটিল শর্ত নেই। আপনার প্রতিটি আয় এবং লেনদেনের হিসাব থাকবে পানির মতো স্বচ্ছ।</p>
+            </div>
+            
+            <!-- ফিচার কার্ড ৬ -->
+            <div class="feature-card">
+                <div class="card-icon"><i class="fab fa-hive"></i></div>
+                <h3>Web3 ভিত্তিক পারফর্মেন্স</h3>
+                <p>আমরা সর্বাধুনিক Web3 প্রযুক্তি ব্যবহার করি, যা আমাদের প্ল্যাটফর্মকে দিয়েছে অবিশ্বাস্য গতি এবং মসৃণ পারফর্মেন্স।</p>
+            </div>
+            
+            <!-- ফিচার কার্ড ৭ -->
+            <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
+                <h3>Z++ লেভেল নিরাপত্তা</h3>
+                <p>আপনার একাউন্ট এবং তথ্য সুরক্ষিত রাখতে আমরা Z++ লেভেলের নিরাপত্তা ব্যবস্থা ব্যবহার করি, যা হ্যাকিং থেকে আপনাকে রাখে সম্পূর্ণ নিরাপদ।</p>
+            </div>
+            
+             <!-- ফিচার কার্ড ৮ (অতিরিক্ত) -->
+            <div class="feature-card">
+                <div class="card-icon"><i class="fas fa-magic-wand-sparkles"></i></div>
+                <h3>সহজ এবং আধুনিক ইন্টারফেস</h3>
+                <p>আমাদের প্ল্যাটফর্মটি এমনভাবে ডিজাইন করা হয়েছে, যেন যে কেউ খুব সহজেই এটি ব্যবহার করে আয় করা শুরু করতে পারে।</p>
+            </div>
+        </div>
+    </section>
+    <!-- ইউনিক ফিচার সেকশন শেষ -->
         <!-- Testimonials Section (নতুন কন্টেন্ট) -->
         <section id="testimonials" class="section text-center" style="background-color: var(--bg-light);">
             <div class="container">
