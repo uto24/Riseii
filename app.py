@@ -386,65 +386,81 @@ def mark_notification_as_read(notification_id):
 
 # app.py -> withdraw_page ফাংশনটি সম্পূর্ণ প্রতিস্থাপন করুন
 
+# app.py ফাইলের ভেতরে এই ফাংশনটি রাখুন বা প্রতিস্থাপন করুন
+# ফাইলের উপরে from datetime import datetime, timedelta এবং FieldFilter ইম্পোর্ট করা আছে কিনা নিশ্চিত করুন
+
 @app.route('/withdraw', methods=['GET', 'POST'])
 @login_required
 def withdraw_page():
-    user_id = session['user_id']
-    user_ref = db.collection('users').document(user_id)
-    user_doc = user_ref.get()
+    """
+    ব্যবহারকারীর উইথড্র পেইজ পরিচালনা করে। যোগ্যতা যাচাই করে,
+    ফর্ম সাবমিশন গ্রহণ করে এবং উইথড্রর ইতিহাস দেখায়।
+    """
+    try:
+        user_id = session['user_id']
+        user_ref = db.collection('users').document(user_id)
+        user_doc = user_ref.get()
 
-    if not user_doc.exists:
-        flash("ব্যবহারকারী খুঁজে পাওয়া যায়নি।", "error")
-        return redirect(url_for('dashboard'))
+        if not user_doc.exists:
+            flash("ব্যবহারকারী খুঁজে পাওয়া যায়নি।", "error")
+            return redirect(url_for('dashboard'))
 
-    user_data = user_doc.to_dict()
+        user_data = user_doc.to_dict()
 
-    # --- শর্তগুলো পরীক্ষা করা (আপনার প্রয়োজন অনুযায়ী পরিবর্তন করুন) ---
-    current_balance = user_data.get('balance', 0)
-    referral_count = user_data.get('referral_count', 0) # ডিনরমালাইজড ডেটা
-    account_created_at = user_data.get('created_at')
-    
-    is_balance_eligible = current_balance >= 150
-    are_referrals_eligible = referral_count >= 0 # আপনার শর্ত অনুযায়ী পরিবর্তন করুন
-    is_account_old_enough = (datetime.now() - account_created_at.replace(tzinfo=None)) > timedelta(days=1) if account_created_at else False
-    
-    all_conditions_met = is_balance_eligible and are_referrals_eligible and is_account_old_enough
-
-    # যখন ইউজার ফর্ম সাবমিট করবে
-    if request.method == 'POST':
-        if not all_conditions_met:
-            flash("দুঃখিত, আপনি এখনো উইথড্র করার জন্য যোগ্য হননি।", "error")
-            return redirect(url_for('withdraw_page'))
-            
-        amount_to_withdraw = float(request.form.get('amount'))
-        account_number = request.form.get('accountNumber')
-        payment_method = request.form.get('method')
+        # --- শর্তগুলো পরীক্ষা করা ---
         
-        if amount_to_withdraw > current_balance:
-            flash("আপনার ব্যালেন্সের চেয়ে বেশি টাকা উইথড্র করা সম্ভব নয়।", "error")
-            return redirect(url_for('withdraw_page'))
-            
-        if amount_to_withdraw < 150:
-            flash("সর্বনিম্ন ১৫০ টাকা উইথড্র করতে হবে।", "error")
-            return redirect(url_for('withdraw_page'))
+        # শর্ত ১: সর্বনিম্ন ব্যালেন্স
+        current_balance = user_data.get('balance', 0)
+        is_balance_eligible = current_balance >= 150
 
-        try:
+        # শর্ত ২: সর্বনিম্ন রেফারেল (রিয়েল-টাইম গণনা)
+        referrals_query = db.collection('referrals').where(filter=FieldFilter('referrer_id', '==', user_id))
+        referral_count = len(list(referrals_query.stream()))
+        # আপনার শর্ত অনুযায়ী রেফারেল সংখ্যা পরিবর্তন করুন (যেমন: >= 5)
+        are_referrals_eligible = referral_count >= 0
+
+        # শর্ত ৩: অ্যাকাউন্টের বয়স
+        account_created_at = user_data.get('created_at')
+        is_account_old_enough = False
+        if account_created_at:
+            if hasattr(account_created_at, 'tzinfo') and account_created_at.tzinfo:
+                account_created_at = account_created_at.replace(tzinfo=None)
+            # আপনার শর্ত অনুযায়ী দিন পরিবর্তন করুন (যেমন: days=3)
+            is_account_old_enough = (datetime.now() - account_created_at) > timedelta(days=1)
+
+        all_conditions_met = is_balance_eligible and are_referrals_eligible and is_account_old_enough
+
+        # যখন ইউজার ফর্ম সাবমিট করবে
+        if request.method == 'POST':
+            if not all_conditions_met:
+                flash("দুঃখিত, আপনি এখনো উইথড্র করার জন্য যোগ্য হননি।", "error")
+                return redirect(url_for('withdraw_page'))
+                
+            amount_to_withdraw = float(request.form.get('amount'))
+            account_number = request.form.get('accountNumber')
+            payment_method = request.form.get('method')
+            
+            if amount_to_withdraw > current_balance:
+                flash("আপনার ব্যালেন্সের চেয়ে বেশি টাকা উইথড্র করা সম্ভব নয়।", "error")
+                return redirect(url_for('withdraw_page'))
+                
+            if amount_to_withdraw < 150:
+                flash("সর্বনিম্ন ১৫০ টাকা উইথড্র করতে হবে।", "error")
+                return redirect(url_for('withdraw_page'))
+
             # --- Transaction ব্যবহার করে ব্যালেন্স কাটা এবং রিকোয়েস্ট তৈরি ---
             @firestore.transactional
-            def withdraw_request_transaction(transaction, user_ref, amount):
-                # ১. ইউজারের বর্তমান ব্যালেন্স আবার চেক করা
-                snapshot = user_ref.get(transaction=transaction)
+            def withdraw_request_transaction(transaction, user_ref_txn, amount):
+                snapshot = user_ref_txn.get(transaction=transaction)
                 current_balance_in_txn = snapshot.to_dict().get('balance', 0)
 
                 if current_balance_in_txn < amount:
-                    raise ValueError("Insufficient balance.")
+                    raise ValueError("Insufficient balance to complete the transaction.")
                 
-                # ২. ইউজারের মূল ব্যালেন্স থেকে টাকা কেটে নেওয়া
-                transaction.update(user_ref, {
-                    'balance': firestore.Increment(-amount)
-                })
+                # ইউজারের মূল ব্যালেন্স থেকে টাকা কেটে নেওয়া
+                transaction.update(user_ref_txn, {'balance': firestore.Increment(-amount)})
                 
-                # ৩. withdraw_requests কালেকশনে নতুন রিকোয়েস্ট তৈরি করা
+                # withdraw_requests কালেকশনে নতুন রিকোয়েস্ট তৈরি করা
                 new_request_ref = db.collection('withdraw_requests').document()
                 transaction.set(new_request_ref, {
                     'user_id': user_id,
@@ -459,28 +475,27 @@ def withdraw_page():
             withdraw_request_transaction(transaction, user_ref, amount_to_withdraw)
             
             flash(f"আপনার ৳{amount_to_withdraw} উইথড্র রিকোয়েস্ট সফলভাবে জমা দেওয়া হয়েছে।", "success")
-            
-        except ValueError as ve:
-            flash(f"একটি সমস্যা হয়েছে: {ve}", "error")
-        except Exception as e:
-            flash(f"উইথড্র রিকোয়েস্ট করার সময় একটি অপ্রত্যাশিত সমস্যা হয়েছে: {e}", "error")
+            return redirect(url_for('withdraw_page'))
 
-        return redirect(url_for('withdraw_page'))
+        # GET রিকোয়েস্টের জন্য ডেটা প্রস্তুত করা
+        eligibility_data = {
+            'current_balance': current_balance, 'is_balance_eligible': is_balance_eligible,
+            'referral_count': referral_count, 'are_referrals_eligible': are_referrals_eligible,
+            'account_created_at': account_created_at.strftime('%d %b, %Y') if account_created_at else "N/A",
+            'is_account_old_enough': is_account_old_enough, 'all_conditions_met': all_conditions_met
+        }
 
-    # GET রিকোয়েস্টের জন্য ডেটা প্রস্তুত করা
-    eligibility_data = {
-        'current_balance': current_balance, 'is_balance_eligible': is_balance_eligible,
-        'referral_count': referral_count, 'are_referrals_eligible': are_referrals_eligible,
-        'account_created_at': account_created_at.strftime('%d %b, %Y') if account_created_at else "N/A",
-        'is_account_old_enough': is_account_old_enough, 'all_conditions_met': all_conditions_met
-    }
+        # উইথড্র হিস্টোরি আনা
+        withdraw_history_query = db.collection('withdraw_requests').where(filter=FieldFilter('user_id', '==', user_id)).order_by('requested_at', direction=firestore.Query.DESCENDING).limit(10)
+        withdraw_history = [doc.to_dict() for doc in withdraw_history_query.stream()]
 
-    # উইথড্র হিস্টোরি আনা
-    withdraw_history_query = db.collection('withdraw_requests').where('user_id', '==', user_id).order_by('requested_at', direction=firestore.Query.DESCENDING).limit(10)
-    withdraw_history = [doc.to_dict() for doc in withdraw_history_query.stream()]
+        return render_template('withdraw.html', eligibility=eligibility_data, user=user_data, withdraw_history=withdraw_history)
 
-    return render_template('withdraw.html', eligibility=eligibility_data, user=user_data, withdraw_history=withdraw_history)
-
+    except Exception as e:
+        print(f"--- ERROR in /withdraw route for user {session.get('user_id')} ---")
+        print(f"Error details: {e}")
+        flash("উইথড্র পেইজ লোড করার সময় একটি অপ্রত্যাশিত সমস্যা হয়েছে।", "error")
+        return redirect(url_for('dashboard'))
 # app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
 @app.route(f'/{SECRET_ADMIN_PATH}/withdrawals')
