@@ -1,4 +1,4 @@
-
+<!doctype html>
 <html lang="bn">
 <head>
     <meta charset="utf-8">
@@ -9,81 +9,87 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
+    <style>
         :root {
             --primary-blue: #007aff;
             --dark-blue: #0d1a2e;
-            --bg-light: #f8f9fa;
-            --border-color: #e5e7eb;
-            --text-dark: #1F2937;
-            --text-light: #6B7280;
             --white: #ffffff;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --text-dark: #1F2937;
+            --success-green: #28a745;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--white); color: var(--text-dark); line-height: 1.6; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-        .section { padding: 80px 0; }
+        body { font-family: 'Hind Siliguri', sans-serif; color: var(--white); line-height: 1.6; }
         
-        /* --- Header --- */
-        .header { background-color: ver(--bg-light); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid rgba(255,255,255,0.1); box-shadow: 0 0 10px #ddd; }
-        .navbar { display: flex; justify-content: space-between; align-items: center; height: 70px; }
-        .logo { font-size: 24px; font-weight: 700; color: --primary-blue; text-decoration: none; }
-        .nav-actions { display: flex; gap: 16px; }
-        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; border: 1px solid transparent; }
-        .btn-primary { background-color: var(--primary-blue); color: var(--white); }
-        .btn-light { background: var(--dark-blue); color: #fff; border-color: rgba(255,255,255,0.2); }
-
-	    
-        /* --- Signup Section --- */
-        .main-content { display: flex; justify-content: center; align-items: center; padding: 60px 20px; background: url(https://i.postimg.cc/xTzSndXN/Picsart-25-07-28-13-15-19-079.jpg); background-size: cover; }
-        .signup-container { max-width: 450px; width: 100%; /* From https://css.glass */
-/* From https://css.glass */
-background: rgba(0, 182, 255, 0.2);
-border-radius: 16px;
-box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-backdrop-filter: blur(5px);
--webkit-backdrop-filter: blur(5px);
-border: 1px solid rgba(0, 182, 255, 0.3); padding: 40px;  text-align: center;  }
-        .signup-container h2 { color: var(--dark-blue); font-size: 28px; margin-bottom: 25px; }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #000; }
-        .form-group input { width: 100%; padding: 12px; /* From https://css.glass */
-/* From https://css.glass */
-background: rgba(0, 182, 255, 0.2);
-border-radius: 8px;
-box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-backdrop-filter: blur(5px);
--webkit-backdrop-filter: blur(5px);
-border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
-		; }
-        .btn-signup { width: 100%; background: var(--primary-blue); color: var(--white); padding: 14px; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 10px; cursor: pointer; }
-        .btn-google { width: 100%; background: var(--white); color: var(--text-dark); padding: 14px; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .divider { text-align: center; color: #718096; margin: 25px 0; }
-        .login-link { margin-top: 25px; }
-        .login-link a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
-        .flash { padding: 1rem; margin-bottom: 1rem; border-radius: 8px; color: var(--white); }
-
-        /* --- Footer --- */
-        .footer { background-color: var(--dark-blue); color: #9CA3AF; padding-top: 80px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .footer-main { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 48px; padding-bottom: 64px; }
-        .footer-links h4 { color: var(--white); }
-        .footer-links ul { list-style: none; }
-        .footer-links li { margin-bottom: 16px; }
-        .footer-links a { color: #9CA3AF; text-decoration: none; }
-        .footer-bottom { padding: 32px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
-
-        @media (max-width: 768px) {
-            .footer-main { grid-template-columns: 1fr; }
+        /* --- Main Content with Background --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
+            background: url(https://i.postimg.cc/xTzSndXN/Picsart-25-07-28-13-15-19-079.jpg) no-repeat center center/cover;
+            position: relative;
         }
+        .main-content::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(13, 26, 46, 0.7);
+        }
+        
+        /* --- Header & Footer --- */
+        .site-header, .site-footer { position: relative; z-index: 10; background-color: rgba(13, 26, 46, 0.5); backdrop-filter: blur(5px); }
+        .header-container, .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--white); text-decoration: none; }
+        .nav-actions .btn { padding: 8px 18px; text-decoration: none; font-weight: 600; border-radius: 8px; }
+        .btn-light { background: rgba(255,255,255,0.1); color: var(--white); border: 1px solid var(--border-color); }
+        .footer { padding: 3rem 2rem; text-align: center; }
+        .footer-links ul { list-style: none; display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .footer-links a { color: #a0aec0; text-decoration: none; }
+        .footer-bottom { border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
+
+        /* --- Signup Form (Glassmorphism) --- */
+        .signup-section { display: flex; justify-content: center; align-items: center; padding: 40px 20px; }
+        .signup-container {
+            max-width: 480px; width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px; text-align: center;
+        }
+        .signup-container h2 { font-size: 28px; margin-bottom: 10px; }
+        
+        /* --- Activation Notice --- */
+        .activation-notice {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #FFD54F;
+            text-align: left;
+        }
+        .activation-notice p { font-size: 15px; }
+        .activation-notice strong { color: #fff; }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; color: var(--white); }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-primary { background-color: var(--primary-blue); color: var(--white); }
+        .btn-google { background-color: var(--white); color: var(--text-dark); }
+        .divider { text-align: center; color: #a0aec0; margin: 25px 0; }
+        .login-link a { color: var(--primary-blue); text-decoration: none; }
     </style>
 </head>
 <body>
-
-    <!-- ======================= HEADER START ======================= -->
-    <header class="header">
-        <div class="container">
-            <nav class="navbar">
+    <div class="main-content">
+        <!-- ======================= HEADER START ======================= -->
+        <header class="site-header">
+            <div class="header-container">
                 <a href="{{ url_for('index') }}" class="logo"><i class="fas fa-bolt"></i> Riseii</a>
                 <div class="nav-actions">
                     {% if is_logged_in %}
@@ -93,311 +99,83 @@ border: 1px solid rgba(0, 182, 255, 0.3); font-size: 16px;  color: black;
                     {% endif %}
                 </div>
             </nav>
-        </div>
+        </header>
+        <!-- ======================== HEADER END ======================== -->
 
-    <style>
-
-        /* পপ-আপ ওভারলে (অস্পষ্ট ব্যাকগ্রাউন্ড) */
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .popup-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* পপ-আপ কন্টেন্ট বক্স */
-        .popup-content {
-            background-color: #FFFFFF;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            max-width: 600px;
-            width: 100%;
-            padding: 32px;
-            border-top: 5px solid #FFC107;
-            position: relative;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .popup-overlay.active .popup-content {
-            transform: scale(1);
-        }
-        
-        .popup-header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .popup-header .icon {
-            font-size: 48px;
-            color: #FFC107;
-            margin-bottom: 12px;
-        }
-
-        .popup-header h2 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 28px;
-            color: #212529;
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #aaa;
-            cursor: pointer;
-        }
-
-        .user-info-box {
-            background-color: #FFF3CD;
-            border: 1px solid #FFEEBA;
-            color: #664d03;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .user-info-box p { display: flex; align-items: center; gap: 10px; font-weight: 500; }
-        .user-info-box p:first-child { margin-bottom: 8px; }
-        .user-info-box p i { width: 20px; text-align: center;}
-        .user-info-box span { font-family: 'Poppins', sans-serif; font-weight: 600; }
-        
-        .rules-content h3 { font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .rules-content h3.rules-forbidden { color: #DC3545; }
-        .rules-content h3.rules-allowed { color:#28a745; }
-        .rules-content ul { list-style: none; padding-left: 5px; }
-        .rules-content li { margin-bottom: 12px; line-height: 1.7; display: flex; align-items: flex-start; gap: 10px; }
-        .rules-content li i { margin-top: 5px; }
-        .rules-forbidden li i { color: #DC3545; }
-        .rules-allowed li i { color: #28a745; }
-        
-        .btn-proceed {
-            width: 100%; padding: 14px; margin-top: 32px; border: none;
-            border-radius: 8px; background-color: #007BFF;
-            color: white; font-size: 18px; font-weight: 600; font-family: 'Hind Siliguri', sans-serif;
-            cursor: pointer; transition: background-color 0.3s;
-        }
-        .btn-proceed:hover { background-color: #0056b3; }
-        
-        /* ডেমোর জন্য পেজের মূল কন্টেন্ট */
-        .page-content { padding: 40px; text-align: center; }
-
-
-        /* ================================================
-           Responsive Design
-           ================================================ */
-
-        /* ট্যাবলেট এবং ছোট ডিভাইসের জন্য */
-        @media (max-width: 768px) {
-            .popup-content {
-                padding: 24px;
-            }
-
-            .popup-header h2 {
-                font-size: 24px;
-            }
-
-            .popup-header .icon {
-                font-size: 40px;
-            }
-        }
-
-        /* মোবাইল ফোনের জন্য */
-        @media (max-width: 576px) {
-            .popup-content {
-                padding: 20px 16px;
-            }
-
-            .popup-header h2 {
-                font-size: 22px;
-            }
-            
-            .user-info-box p {
-                font-size: 14px;
-            }
-
-            .rules-content h3 {
-                font-size: 18px;
-            }
-
-            .rules-content li {
-                font-size: 15px;
-            }
-
-            .btn-proceed {
-                font-size: 16px;
-                padding: 12px;
-            }
-        }
-        
-    </style>
-    
-
-    <!-- সতর্কবার্তা পপ-আপ -->
-    <div class="popup-overlay" id="warning-popup-overlay">
-        <div class="popup-content">
-            <button class="close-btn" id="close-popup-btn">×</button>
-            <div class="popup-header">
-                <div class="icon"><i class="fas fa-triangle-exclamation"></i></div>
-                <h2>গুরুত্বপূর্ণ সতর্কবার্তা</h2>
-            </div>
-
-            <div class="user-info-box">
-                <p><i class="fas fa-network-wired"></i> আপনার আইপি অ্যাড্রেস: <span id="user-ip">লোড হচ্ছে...</span></p>
-                <p><i class="fas fa-mobile-screen-button"></i> আপনার ডিভাইস মডেল: <span id="user-device">লোড হচ্ছে...</span></p>
-            </div>
-            
-            <div class="rules-content">
-                <h3 class="rules-forbidden"><i class="fas fa-ban"></i> যা করা কঠোরভাবে নিষিদ্ধ:</h3>
-                <ul>
-                    <li><i class="fas fa-times-circle"></i> <strong style="color: #DC3545;">ফেক রেফার করবেন না।</strong> আমাদের সিস্টেম স্বয়ংক্রিয়ভাবে ফেক রেফার শনাক্ত করতে পারে।</li>
-                    <li><i class="fas fa-times-circle"></i> একজনের একাধিক একাউন্ট খোলা সম্পূর্ণ নিষিদ্ধ। ধরা পড়লে সকল একাউন্ট ব্লক করা হবে।</li>
-                </ul>
-
-                <h3 class="rules-allowed" style="margin-top: 24px;"><i class="fas fa-check-circle"></i> যা আপনাকে করতে উৎসাহিত করা হচ্ছে:</h3>
-                <ul>
-                    <li><i class="fas fa-check-circle"></i> ভালোভাবে একটি মাত্র একাউন্ট খুলুন এবং সঠিকভাবে কাজ করুন।</li>
-                    <li><i class="fas fa-check-circle"></i> আপনার বন্ধুদের মাঝে <strong style="color: #28a745;">রিয়েল রেফার করুন</strong> এবং আপনার আয় বৃদ্ধি করুন।</li>
-                </ul>
-            </div>
-            
-            <button class="btn-proceed" id="proceed-btn">আমি নিয়মগুলো বুঝেছি</button>
-        </div>
-    </div>
-
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const popupOverlay = document.getElementById('warning-popup-overlay');
-            const closeBtn = document.getElementById('close-popup-btn');
-            const proceedBtn = document.getElementById('proceed-btn');
-
-            // ডিভাইসের মডেল বের করার ফাংশন
-            function getDeviceModel() {
-                const ua = navigator.userAgent;
-                if (/android/i.test(ua)) {
-                    const match = ua.match(/;\s?([^;]+)\s?Build\//);
-                    if (match && match[1]) {
-                        return match[1];
-                    }
-                    return "Android Device";
-                }
-                if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return "Apple Device (iPhone/iPad)";
-                if (/Windows Phone/i.test(ua)) return "Windows Phone";
-                if (/Macintosh|Mac OS X/i.test(ua)) return "Apple Mac";
-                if (/Windows/i.test(ua)) return "Windows PC";
-                if (/Linux/i.test(ua)) return "Linux PC";
-                return "Unknown Device";
-            }
-
-            // পপ-আপ দেখানোর ফাংশন
-            function showPopup() {
-                document.getElementById('user-device').textContent = getDeviceModel();
-
-                fetch('https://api.ipify.org?format=json')
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('user-ip').textContent = data.ip;
-                    })
-                    .catch(() => {
-                        document.getElementById('user-ip').textContent = 'পাওয়া যায়নি';
-                    });
+        <section class="signup-section">
+            <div class="signup-container">
+                <h2>নতুন একাউন্ট খুলুন</h2>
                 
-                popupOverlay.classList.add('active');
-            }
-
-            // পপ-আপ বন্ধ করার ফাংশন
-            function closePopup() {
-                popupOverlay.classList.remove('active');
-            }
-
-            // পেজ লোড হওয়ার সাথে সাথে পপ-আপ দেখানো
-            showPopup();
-
-            closeBtn.addEventListener('click', closePopup);
-            proceedBtn.addEventListener('click', closePopup);
-            
-            popupOverlay.addEventListener('click', (event) => {
-                if (event.target === popupOverlay) {
-                    closePopup();
-                }
-            });
-        });
-    </script>
-
-    <main class="main-content">
-        <div class="signup-container">
-            <h2>নতুন একাউন্ট খুলুন</h2>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}{% for category, message in messages %}
-                    <div class="flash {{ 'bg-success' if category == 'success' else 'bg-danger' }}">{{ message }}</div>
-                {% endfor %}{% endif %}
-            {% endwith %}
-            <div id="client-message" class="flash" style="display: none;"></div>
-
-            <form id="signup-form" method="post" action="{{ url_for('signup') }}">
-                <div class="form-group">
-                    <label for="name">আপনার নাম</label>
-                    <input type="text" id="name" name="name" required>
+                <!-- ===================================================== -->
+                <!--       নতুন একাউন্ট অ্যাক্টিভেশন নোটিশ (গুরুত্বপূর্ণ)      -->
+                <!-- ===================================================== -->
+                <div class="activation-notice">
+                    <p><i class="fas fa-info-circle" style="margin-right: 8px;"></i>অনুগ্রহ করে মনে রাখবেন, একাউন্ট তৈরি করার পর সকল ফিচার ব্যবহার করার জন্য আপনাকে <strong>৳২০</strong> দিয়ে এককালীন **একাউন্ট অ্যাক্টিভেট** করতে হবে।</p>
                 </div>
-                <div class="form-group">
-                    <label for="email">ইমেইল</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">পাসওয়ার্ড</label>
-                    <input type="password" id="password" name="password" required minlength="6">
-                </div>
-                <div class="form-group">
-                    <label for="facebook_profile">ফেসবুক প্রোফাইল লিঙ্ক </label>
-                    <input type="url" id="facebook_profile" name="facebook_profile" placeholder="https://facebook.com/your.profile">
-                </div>
-                <div class="form-group">
-                    <label for="referrer_code">রেফার কোড </label>
-                    <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
-                </div>
-                <button type="submit" id="signup-button" class="btn-signup">একাউন্ট খুলুন</button>
-            </form>
-            
-            <p class="divider">অথবা</p>
 
-            <button id="google-signup-btn" class="btn-google"><i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান</button>
-            <p class="login-link">একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></p>
-        </div>
-    </main>
-    
-    <!-- ======================= FOOTER START ======================= -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>© 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।</p>
+                <!-- Flash messages for server-side notifications -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}{% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}{% endif %}
+                {% endwith %}
+                <div id="client-message" class="flash" style="display: none;"></div>
+
+                <form id="signup-form" method="post" action="{{ url_for('signup') }}">
+                    <div class="form-group">
+                        <label for="name">আপনার নাম</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">ইমেইল</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">পাসওয়ার্ড</label>
+                        <input type="password" id="password" name="password" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="facebook_profile">ফেসবুক প্রোফাইল লিঙ্ক (ঐচ্ছিক)</label>
+                        <input type="url" id="facebook_profile" name="facebook_profile" placeholder="https://facebook.com/your.profile">
+                    </div>
+                    <div class="form-group">
+                        <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
+                        <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
+                    </div>
+                    <button type="submit" id="signup-button" class="btn btn-primary">একাউন্ট খুলুন</button>
+                </form>
+                
+                <p class="divider">অথবা</p>
+                <button id="google-signup-btn" class="btn btn-google"><i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান</button>
+                <p class="login-link">একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></p>
             </div>
-        </div>
-    </footer>
-    <!-- ======================== FOOTER END ======================== -->
+        </section>
 
+        <!-- ======================= FOOTER START ======================= -->
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-links">
+                    <ul>
+                        <li><a href="#">আমাদের সম্পর্কে</a></li>
+                        <li><a href="#">শর্তাবলী</a></li>
+                        <li><a href="#">গোপনীয়তা নীতি</a></li>
+                        <li><a href="#">যোগাযোগ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-bottom">
+                    © 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।
+                </div>
+            </div>
+        </footer>
+        <!-- ======================== FOOTER END ======================== -->
+    </div>
+    
+    <!-- Firebase SDK Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
     <script>
+
         // আপনার সম্পূর্ণ JavaScript কোড এখানে থাকবে
         // ... (আগের উত্তর থেকে কপি করুন)
     
