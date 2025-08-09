@@ -289,17 +289,6 @@
         
     </style>
 
-    <!-- এই অংশটি আপনার পেজে যোগ করুন -->
-    <div class="maintenance-widget">
-        <div class="widget-icon">
-            <i class="fas fa-cogs"></i>
-        </div>
-        <div class="widget-content">
-            <h3>Site is Under Maintenance</h3>
-            <p>Opening soon<span class="blinking-cursor">...</span></p>
-        </div>
-    </div>
-
             <form id="login-form">
                 <div class="form-group">
                     <label for="email">ইমেইল</label>
@@ -319,10 +308,87 @@
         </div>
     </main>
     
-    <footer class="site-footer">
-        <div class="footer-bottom">© 2025 Riseii. সর্বস্বত্ব সংরক্ষিত।</div>
+        <style>
+      
+        /* মুভিং গ্লো অ্যানিমেশনের জন্য কী-ফ্রেম */
+        @keyframes animate-glow-line {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* ফুটারের মূল কন্টেইনার */
+        .advanced-footer {
+            --primary-color: #007BFF;
+            --secondary-color: #6C757D;
+            --container-bg: #FFFFFF;
+            --border-color: #E9ECEF;
+            
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+
+            position: relative; /* অ্যানিমেটেড লাইনের জন্য */
+            overflow: hidden; /* অ্যানিমেটেড লাইনকে কন্টেইনারের মধ্যে সীমাবদ্ধ রাখতে */
+        }
+        
+        /* অ্যানিমেটেড গ্লোয়িং লাইন */
+        .advanced-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px; /* লাইনের উচ্চতা */
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--primary-color),
+                transparent
+            );
+            
+            /* অ্যানিমেশন প্রয়োগ */
+            animation: animate-glow-line 4s linear infinite;
+        }
+
+        .footer-content {
+            position: relative; /* কন্টেন্ট যেন লাইনের উপরে থাকে */
+            z-index: 1;
+        }
+
+        .copyright-text {
+            font-size: 15px;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        .footer-tagline {
+            font-size: 14px;
+            color: #AAB2BD;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
+    </style>
+    <!-- এই অংশটি আপনার পেজের শেষে যোগ করুন -->
+    <footer class="advanced-footer">
+        <div class="footer-content">
+            <p class="copyright-text">
+                © ২০২৪-২০২৫ Riseii LLC. সর্বস্বত্ব সংরক্ষিত। v3
+            </p>
+            <p class="footer-tagline">
+                Crafted with passion and precision.
+            </p>
+        </div>
     </footer>
-    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script>
