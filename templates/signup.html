@@ -12,11 +12,16 @@
     <style>
         :root {
             --primary-blue: #007aff;
+            --primary-blue-hover: #0056b3;
             --dark-blue: #0d1a2e;
             --white: #ffffff;
             --border-color: rgba(255, 255, 255, 0.2);
             --text-dark: #1F2937;
             --success-green: #28a745;
+            --error-red: #dc3545;
+            --warning-yellow-text: #FFD54F;
+            --warning-yellow-bg: rgba(255, 193, 7, 0.1);
+            --warning-yellow-border: rgba(255, 193, 7, 0.3);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -33,56 +38,113 @@
         }
         .main-content::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(13, 26, 46, 0.7);
+            background: rgba(13, 26, 46, 0.8); /* Increased overlay for better text readability */
         }
         
         /* --- Header & Footer --- */
-        .site-header, .site-footer { position: relative; z-index: 10; background-color: rgba(13, 26, 46, 0.5); backdrop-filter: blur(5px); }
+        .site-header, .site-footer { position: relative; z-index: 10; background-color: rgba(13, 26, 46, 0.5); backdrop-filter: blur(8px); }
         .header-container, .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
         .navbar { display: flex; justify-content: space-between; align-items: center; height: 70px; }
         .logo { font-size: 24px; font-weight: 700; color: var(--white); text-decoration: none; }
-        .nav-actions .btn { padding: 8px 18px; text-decoration: none; font-weight: 600; border-radius: 8px; }
+        .nav-actions .btn { padding: 8px 18px; text-decoration: none; font-weight: 600; border-radius: 8px; transition: all 0.3s ease; }
         .btn-light { background: rgba(255,255,255,0.1); color: var(--white); border: 1px solid var(--border-color); }
+        .btn-light:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
         .footer { padding: 3rem 2rem; text-align: center; }
-        .footer-links ul { list-style: none; display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .footer-links a { color: #a0aec0; text-decoration: none; }
+        .footer-links ul { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .footer-links a { color: #a0aec0; text-decoration: none; transition: color 0.3s ease; }
+        .footer-links a:hover { color: var(--white); }
         .footer-bottom { border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
 
         /* --- Signup Form (Glassmorphism) --- */
-        .signup-section { display: flex; justify-content: center; align-items: center; padding: 40px 20px; }
+        .signup-section { display: flex; justify-content: center; align-items: center; padding: 40px 20px; z-index: 5;}
         .signup-container {
             max-width: 480px; width: 100%;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.4); /* Darker, less transparent background for better contrast */
             border-radius: 16px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 40px; text-align: center;
         }
-        .signup-container h2 { font-size: 28px; margin-bottom: 10px; }
+        .signup-container h2 { font-size: 28px; margin-bottom: 10px; font-weight: 700; }
         
-        /* --- Activation Notice --- */
+        /* --- Notification Styles --- */
         .activation-notice {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
+            background: var(--warning-yellow-bg);
+            border: 1px solid var(--warning-yellow-border);
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 25px;
-            color: #FFD54F;
+            color: var(--warning-yellow-text);
             text-align: left;
         }
         .activation-notice p { font-size: 15px; }
+        .activation-notice i { vertical-align: middle; margin-right: 8px; }
         .activation-notice strong { color: #fff; }
-        
+
+        /* Flash message styling */
+        .flash {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .flash.success { background-color: rgba(40, 167, 69, 0.3); border: 1px solid rgba(40, 167, 69, 0.5); color: #c3e6cb; }
+        .flash.error { background-color: rgba(220, 53, 69, 0.3); border: 1px solid rgba(220, 53, 69, 0.5); color: #f5c6cb; }
+
+        /* --- Form Elements --- */
         .form-group { margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
-        .form-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; color: var(--white); }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .form-group input { 
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.3); 
+            border: 1px solid var(--border-color); border-radius: 8px; 
+            font-size: 16px; color: var(--white);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-group input::placeholder { color: rgba(255,255,255,0.4); }
+        .form-group input:focus { 
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn { 
+            width: 100%; padding: 14px; border: none; border-radius: 8px; 
+            font-weight: 600; font-size: 16px; margin-top: 10px; cursor: pointer; 
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: all 0.3s ease;
+        }
         .btn-primary { background-color: var(--primary-blue); color: var(--white); }
+        .btn-primary:hover { background-color: var(--primary-blue-hover); }
+        .btn-primary:disabled { background-color: #555; cursor: not-allowed; opacity: 0.7; }
+
         .btn-google { background-color: var(--white); color: var(--text-dark); }
-        .divider { text-align: center; color: #a0aec0; margin: 25px 0; }
-        .login-link a { color: var(--primary-blue); text-decoration: none; }
+        .btn-google:hover { background-color: #f1f1f1; }
+        
+        .divider { 
+            display: flex; align-items: center; text-align: center; 
+            color: #a0aec0; margin: 25px 0;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; border-bottom: 1px solid var(--border-color);
+        }
+        .divider:not(:empty)::before { margin-right: .5em; }
+        .divider:not(:empty)::after { margin-left: .5em; }
+        
+        .login-link { margin-top: 20px; }
+        .login-link a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
+        .login-link a:hover { text-decoration: underline; }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 600px) {
+            .header-container, .footer-container, .signup-section { padding: 20px; }
+            .signup-container { padding: 30px 25px; }
+            .signup-container h2 { font-size: 24px; }
+            .footer-links ul { flex-direction: column; gap: 1rem; }
+        }
+
     </style>
 </head>
 <body>
@@ -90,66 +152,68 @@
         <!-- ======================= HEADER START ======================= -->
         <header class="site-header">
             <div class="header-container">
-                <a href="{{ url_for('index') }}" class="logo"><i class="fas fa-bolt"></i> Riseii</a>
-                <div class="nav-actions">
-                    {% if is_logged_in %}
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-light">ড্যাশবোর্ড</a>
-                    {% else %}
-                        <a href="{{ url_for('login') }}" class="btn btn-light">লগইন</a>
-                    {% endif %}
-                </div>
-            </nav>
+                <!-- Fixed: Changed <div> to <nav> for semantic correctness and to fix unclosed tag -->
+                <nav class="navbar">
+                    <a href="{{ url_for('index') }}" class="logo"><i class="fas fa-bolt"></i> Riseii</a>
+                    <div class="nav-actions">
+                        {% if is_logged_in %}
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-light">ড্যাশবোর্ড</a>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-light">লগইন</a>
+                        {% endif %}
+                    </div>
+                </nav>
+            </div>
         </header>
         <!-- ======================== HEADER END ======================== -->
 
-        <section class="signup-section">
-            <div class="signup-container">
-                <h2>নতুন একাউন্ট খুলুন</h2>
-                
-                <!-- ===================================================== -->
-                <!--       নতুন একাউন্ট অ্যাক্টিভেশন নোটিশ (গুরুত্বপূর্ণ)      -->
-                <!-- ===================================================== -->
-                <div class="activation-notice">
-                    <p><i class="fas fa-info-circle" style="margin-right: 8px;"></i>অনুগ্রহ করে মনে রাখবেন, একাউন্ট তৈরি করার পর সকল ফিচার ব্যবহার করার জন্য আপনাকে <strong>৳২০</strong> দিয়ে এককালীন **একাউন্ট অ্যাক্টিভেট** করতে হবে।</p>
+        <main>
+            <section class="signup-section">
+                <div class="signup-container">
+                    <h2>নতুন একাউন্ট খুলুন</h2>
+                    
+                    <div class="activation-notice">
+                        <p><i class="fas fa-info-circle"></i>অনুগ্রহ করে মনে রাখবেন, একাউন্ট তৈরি করার পর সকল ফিচার ব্যবহার করার জন্য আপনাকে <strong>৳২০</strong> দিয়ে এককালীন <strong>একাউন্ট অ্যাক্টিভেট</strong> করতে হবে।</p>
+                    </div>
+
+                    <!-- Flash messages will appear here -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}{% for category, message in messages %}
+                            <div class="flash {{ category }}">{{ message }}</div>
+                        {% endfor %}{% endif %}
+                    {% endwith %}
+                    <div id="client-message" style="display: none;"></div>
+
+                    <form id="signup-form" method="post" action="{{ url_for('signup') }}" novalidate>
+                        <div class="form-group">
+                            <label for="name">আপনার নাম</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">ইমেইল</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষরের)</label>
+                            <input type="password" id="password" name="password" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="facebook_profile">ফেসবুক প্রোফাইল লিঙ্ক (ঐচ্ছিক)</label>
+                            <input type="url" id="facebook_profile" name="facebook_profile" placeholder="https://facebook.com/your.profile">
+                        </div>
+                        <div class="form-group">
+                            <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
+                            <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
+                        </div>
+                        <button type="submit" id="signup-button" class="btn btn-primary">একাউন্ট খুলুন</button>
+                    </form>
+                    
+                    <div class="divider">অথবা</div>
+                    <button id="google-signup-btn" class="btn btn-google"><i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান</button>
+                    <p class="login-link">আপনার একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></p>
                 </div>
-
-                <!-- Flash messages for server-side notifications -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}{% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
-                    {% endfor %}{% endif %}
-                {% endwith %}
-                <div id="client-message" class="flash" style="display: none;"></div>
-
-                <form id="signup-form" method="post" action="{{ url_for('signup') }}">
-                    <div class="form-group">
-                        <label for="name">আপনার নাম</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">ইমেইল</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">পাসওয়ার্ড</label>
-                        <input type="password" id="password" name="password" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="facebook_profile">ফেসবুক প্রোফাইল লিঙ্ক (ঐচ্ছিক)</label>
-                        <input type="url" id="facebook_profile" name="facebook_profile" placeholder="https://facebook.com/your.profile">
-                    </div>
-                    <div class="form-group">
-                        <label for="referrer_code">রেফার কোড (যদি থাকে)</label>
-                        <input type="text" id="referrer_code" name="referrer_code" value="{{ ref_code }}">
-                    </div>
-                    <button type="submit" id="signup-button" class="btn btn-primary">একাউন্ট খুলুন</button>
-                </form>
-                
-                <p class="divider">অথবা</p>
-                <button id="google-signup-btn" class="btn btn-google"><i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান</button>
-                <p class="login-link">একাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></p>
-            </div>
-        </section>
+            </section>
+        </main>
 
         <!-- ======================= FOOTER START ======================= -->
         <footer class="site-footer">
@@ -175,10 +239,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     
     <script>
-
-        // আপনার সম্পূর্ণ JavaScript কোড এখানে থাকবে
-        // ... (আগের উত্তর থেকে কপি করুন)
-    
         const firebaseConfig = {
             apiKey: "{{ config.firebase_api_key }}",
             authDomain: "{{ config.firebase_auth_domain }}",
@@ -197,24 +257,33 @@
             clientMessage.style.display = 'block';
         }
         
-        signupForm.addEventListener('submit', function() {
+        signupForm.addEventListener('submit', function(e) {
             signupButton.disabled = true;
-            signupButton.textContent = 'প্রসেসিং...';
+            signupButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> প্রসেসিং...';
         });
 
         googleButton.addEventListener('click', function() {
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> অপেক্ষা করুন...';
+
             const provider = new firebase.auth.GoogleAuthProvider();
             const referrerCode = document.getElementById('referrer_code').value;
+            
             auth.signInWithPopup(provider)
                 .then(result => result.user.getIdToken())
                 .then(idToken => {
-                    return fetch('/api/set_session', { // Updated to use set_session which handles new users
+                    return fetch('/api/set_session', { 
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ idToken: idToken, referrerCode: referrerCode })
                     });
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || 'Something went wrong') });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.status === 'success') {
                         window.location.href = data.redirect_url;
@@ -224,8 +293,10 @@
                 })
                 .catch(error => {
                     showMessage(error.message, 'error');
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fab fa-google"></i> Google দিয়ে চালিয়ে যান';
                 });
         });
     </script>
 </body>
-	</html>
+</html>
