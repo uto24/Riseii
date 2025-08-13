@@ -151,7 +151,48 @@ def signup():
 
 # app.py ফাইলের অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
+# app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
+@app.route(f'/{SECRET_ADMIN_PATH}/create-post', methods=['GET', 'POST'])
+def create_post():
+    """
+    অ্যাডমিনদের জন্য নতুন আপডেট পোস্ট তৈরি করার ফর্ম এবং লজিক।
+    """
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        image_url = request.form.get('image_url') # ImgBB থেকে পাওয়া লিঙ্ক
 
+        if not all([title, description, image_url]):
+            flash("অনুগ্রহ করে সব ফিল্ড পূরণ করুন।", "error")
+            return redirect(url_for('create_post'))
+
+        db.collection('posts').add({
+            'title': title,
+            'description': description,
+            'image_url': image_url,
+            'timestamp': firestore.SERVER_TIMESTAMP
+        })
+        flash("নতুন পোস্ট সফলভাবে যোগ করা হয়েছে!", "success")
+        return redirect(url_for('updates_page')) # পোস্ট করার পর আপডেট পেইজে পাঠানো হচ্ছে
+
+    return render_template('create_post.html', admin_path=SECRET_ADMIN_PATH)
+
+# app.py -> User-Facing Pages সেকশনে যোগ করুন
+@app.route('/updates')
+def updates_page():
+    """
+    সকল ব্যবহারকারীর জন্য আপডেট পোস্টগুলো দেখায় (লগইন ছাড়াই)।
+    """
+    try:
+        # Firestore থেকে পোস্টগুলো নতুন থেকে পুরনো ক্রমে আনা হচ্ছে
+        posts_query = db.collection('posts').order_by('timestamp', direction=firestore.Query.DESCENDING).stream()
+        all_posts = [post.to_dict() for post in posts_query]
+    except Exception as e:
+        print(f"Error fetching posts: {e}")
+        all_posts = []
+
+    is_logged_in = 'user_id' in session
+    return render_template('updates.html', all_posts=all_posts, is_logged_in=is_logged_in)
 
 # app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
