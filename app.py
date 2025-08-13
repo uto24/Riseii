@@ -15,7 +15,6 @@ from google.cloud.firestore_v1.base_query import FieldFilter
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "final_build_secret_key_for_production_app")
-
 # .env ফাইল থেকে গোপন অ্যাডমিন পাথ লোড করুন
 SECRET_ADMIN_PATH = os.getenv("SECRET_ADMIN_PATH", "secure_admin_panel_final_build_e5f8")
 
