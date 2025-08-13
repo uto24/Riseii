@@ -88,8 +88,13 @@
             .widget-toggle-btn { width: 50px; height: 50px; font-size: 24px; }
         }
     </style>
-    
-        <div class="light-notice-board">
+        <div class="main-container" style="text-align: center;">
+        <header class="page-header">
+            <h1>সর্বশেষ আপডেট</h1>
+            <p>আমাদের প্ল্যাটফর্মের নতুন ফিচার এবং পরিবর্তনসমূহ।</p>
+        </header>
+
+        <div class="light-notice-board" style="margin: 2%;">
             <div class="notice-header">
                 <span class="icon"><i class="fas fa-bell"></i></span>
                 <h3>📍নোটিশ বোর্ড</h3>
@@ -122,11 +127,6 @@
         </div>
     </div>
 
-    <div class="main-container">
-        <header class="page-header">
-            <h1>সর্বশেষ আপডেট</h1>
-            <p>আমাদের প্ল্যাটফর্মের নতুন ফিচার এবং পরিবর্তনসমূহ।</p>
-        </header>
 
         <main class="update-feed">
             {% if all_posts %}
@@ -239,4 +239,4 @@
 
     <!-- সাপোর্ট উইজেট এবং ফুটার এখানে যোগ করা যেতে পারে -->
 </body>
-</html>
+    </html>
