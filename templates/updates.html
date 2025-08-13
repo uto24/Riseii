@@ -1,0 +1,61 @@
+<!-- templates/updates.html -->
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সর্বশেষ আপডেট - Riseii</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* আপনার দেওয়া সম্পূর্ণ CSS কোড এখানে থাকবে (ভিউ ও লাভ বাটন ছাড়া) */
+        :root { /* ... */ }
+        body { /* ... */ }
+        .main-container { max-width: 800px; margin: 40px auto; padding: 20px; }
+        .update-feed { display: flex; flex-direction: column; gap: 30px; }
+        .update-card { background-color: #FFFFFF; border: 1px solid #E9ECEF; border-radius: 12px; overflow: hidden; }
+        .update-image { width: 100%; height: auto; object-fit: cover; }
+        .update-content { padding: 24px; }
+        .update-meta { display: flex; align-items: center; gap: 8px; color: #6C757D; font-size: 14px; margin-bottom: 12px; }
+        .update-title { font-size: 24px; font-weight: 600; margin-bottom: 12px; }
+        .update-description { font-size: 16px; color: #495057; line-height: 1.8; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <!-- ডাইনামিক হেডার এখানে যোগ করা যেতে পারে -->
+    
+    <div class="main-container">
+        <header class="page-header">
+            <h1>সর্বশেষ আপডেট</h1>
+            <p>আমাদের প্ল্যাটফর্মের নতুন ফিচার এবং পরিবর্তনসমূহ।</p>
+        </header>
+
+        <main class="update-feed">
+            {% if all_posts %}
+                {% for post in all_posts %}
+                    <article class="update-card">
+                        {% if post.get('image_url') %}
+                            <img src="{{ post.get('image_url') }}" alt="{{ post.get('title') }}" class="update-image">
+                        {% endif %}
+                        <div class="update-content">
+                            <div class="update-meta">
+                                <i class="fas fa-calendar-days"></i>
+                                <!-- timestamp এখন ডাইনামিক -->
+                                <time datetime="{{ post.timestamp.isoformat() if post.timestamp else '' }}">
+                                    {{ post.timestamp.strftime('%B %d, %Y') if post.timestamp else 'তারিখ নেই' }}
+                                </time>
+                            </div>
+                            <h2 class="update-title">{{ post.get('title', 'শিরোনাম নেই') }}</h2>
+                            <p class="update-description">{{ post.get('description', 'বিবরণ নেই') }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <p style="text-align:center;">এখনো কোনো নতুন আপডেট নেই।</p>
+            {% endif %}
+        </main>
+    </div>
+
+    <!-- সাপোর্ট উইজেট এবং ফুটার এখানে যোগ করা যেতে পারে -->
+</body>
+</html>
