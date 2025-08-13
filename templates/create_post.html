@@ -1,0 +1,31 @@
+<!-- templates/admin/create_post.html -->
+<!doctype html>
+<html lang="bn">
+<head>
+    <title>নতুন পোস্ট তৈরি</title>
+    <!-- create_task.html থেকে CSS কপি করুন -->
+</head>
+<body>
+    <div class="container">
+        <a href="/{{ admin_path }}" class="back-link">&larr; অ্যাডমিন ড্যাশবোর্ডে ফিরে যান</a>
+        <div class="form-container">
+            <h2>নতুন আপডেট পোস্ট তৈরি করুন</h2>
+            <form method="post">
+                <div class="form-group">
+                    <label for="title">পোস্টের শিরোনাম</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">পোস্টের বিবরণ (Markdown সমর্থিত)</label>
+                    <textarea id="description" name="description" rows="10" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="image_url">ছবির URL (ImgBB থেকে আপলোড করুন)</label>
+                    <input type="url" id="image_url" name="image_url" placeholder="https://i.ibb.co/..." required>
+                </div>
+                <button type="submit" class="btn-submit">পোস্ট করুন</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
