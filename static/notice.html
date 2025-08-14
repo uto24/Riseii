@@ -3,257 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বড় আপডেট - নতুন ফিচারসমূহ</title>
-    
-    <!-- Google Fonts: Hind Siliguri & Poppins -->
+    <title>ক্লায়েন্ট ডেটাবেস</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ================================================
-           স্টাইল এবং ডিজাইন
-           ================================================ */
         :root {
-            --gradient-start: #10B981;
-            --gradient-end: #3B82F6;
-            --primary-gradient: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            --dark-bg: #0D1117;
-            --card-bg: #161B22;
-            --text-main: #E6EDF3;
-            --text-secondary: #8B949E;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --font-bn: 'Hind Siliguri', sans-serif;
-            --font-en: 'Poppins', sans-serif;
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --text-dark: #333;
+            --text-light: #777;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger-color: #dc3545;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: var(--font-bn);
-            background-color: var(--dark-bg);
-            color: var(--text-main);
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+        }
+
+        /* Controls: Search, Filter, Add Button */
+        .controls {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-filter-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box, .filter-box {
+            display: flex;
+            align-items: center;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 0 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-box input, .filter-box select {
+            border: none;
+            outline: none;
+            padding: 12px 8px;
+            background: transparent;
+            font-size: 15px;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-add:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        thead th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        td a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        td a:hover {
+            text-decoration: underline;
+        }
+
+        .status-select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--danger-color);
+            font-size: 18px;
+        }
+
+        /* Modal for adding new client */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 40px 20px;
+            z-index: 1000;
         }
 
-        .main-container {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
-            max-width: 800px;
-            width: 100%;
-            padding: 40px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .header .icon {
-            font-size: 64px;
-            margin-bottom: 24px;
-            display: inline-block;
-            background-image: var(--primary-gradient);
-            -webkit-background-clip: text;
-            color: transparent;
-            animation: pulse-icon 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse-icon {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .modal-overlay.active {
+            display: flex;
         }
 
-        .header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            font-family: var(--font-en);
-        }
-        
-        .header p {
-            font-size: 18px;
-            color: var(--text-secondary);
-        }
-
-        .update-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            margin-bottom: 40px;
-        }
-        
-        .update-card {
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 24px;
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
             border-radius: 12px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-        
-        .update-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--gradient-end);
+            width: 90%;
+            max-width: 500px;
         }
 
-        .update-card .card-icon {
-            font-size: 28px;
-            color: var(--gradient-start);
-            margin-bottom: 16px;
+        .modal-content h2 {
+            margin-bottom: 20px;
         }
 
-        .update-card h3 {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-        
-        .update-card p {
-            color: var(--text-secondary);
-            font-size: 15px;
-            line-height: 1.7;
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        /* কপি করার জন্য নোটিশ বক্স */
-        .copy-notice-box {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 20px;
-            border-left: 4px solid var(--gradient-start);
-        }
-        .copy-notice-box p {
-            font-size: 16px;
-            line-height: 1.8;
-            color: var(--text-secondary);
-        }
-        .copy-notice-box .footer {
-            margin-top: 16px;
-            text-align: right;
-        }
-        .copy-btn {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            border-radius: 6px;
-            padding: 8px 16px;
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
             font-weight: 500;
-            font-family: var(--font-bn);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .copy-btn:hover {
-            background-color: var(--border-color);
-            color: var(--text-main);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .update-grid {
-                grid-template-columns: 1fr;
-            }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
         }
-        @media (max-width: 576px) {
-            .header h1 { font-size: 28px; }
-            .header p { font-size: 16px; }
-            .main-container { padding: 30px 20px; }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
         }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-save { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .btn-cancel { background-color: #f1f1f1; }
+
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <div class="header">
-            <div class="icon"><i class="fas fa-bullhorn"></i></div>
-            <h1>বড় আপডেট এবং নতুন ফিচার</h1>
-            <p>আমাদের প্ল্যাটফর্মকে আরও উন্নত করতে আমরা কিছু অসাধারণ ফিচার যোগ করেছি।</p>
+    <div class="container">
+        <h1>ক্লায়েন্ট ডেটাবেস</h1>
+
+        <div class="controls">
+            <div class="search-filter-group">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="নাম, ইমেইল দিয়ে সার্চ করুন...">
+                </div>
+                <div class="filter-box">
+                    <i class="fas fa-filter"></i>
+                    <select id="status-filter">
+                        <option value="all">সকল স্ট্যাটাস</option>
+                        <option value="Knock">Knock</option>
+                        <option value="Knocked">Knocked</option>
+                        <option value="Email Sent">Email Sent</option>
+                        <option value="Response Error">Response Error</option>
+                        <option value="Call Back">Call Back</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-add" id="add-new-btn"><i class="fas fa-plus"></i> নতুন যোগ করুন</button>
         </div>
 
-        <div class="update-grid">
-            <div class="update-card">
-                <div class="card-icon"><i class="fas fa-credit-card"></i></div>
-                <h3>AI পেমেন্ট সাপ্লাই</h3>
-                <p>আমাদের নতুন AI সিস্টেম এখন স্বয়ংক্রিয়ভাবে পেমেন্ট যাচাই করবে এবং দ্রুততার সাথে আপনার একাউন্টে টাকা যোগ করবে।</p>
-            </div>
-            <div class="update-card">
-                <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
-                <h3>দ্রুত লোডিং স্পিড</h3>
-                <p>ওয়েবসাইটের প্রথম লোডিং টাইম ৫০% পর্যন্ত কমানো হয়েছে, যা আপনার কাজের অভিজ্ঞতাকে আরও মসৃণ করবে।</p>
-            </div>
-            <div class="update-card">
-                <div class="card-icon"><i class="fas fa-bug-slash"></i></div>
-                <h3>বাগ ফিক্সড</h3>
-                <p>আপনাদের দেওয়া রিপোর্ট অনুযায়ী, আমরা ছোট-বড় সকল বাগ এবং সমস্যা সমাধান করেছি।</p>
-            </div>
-            <div class="update-card">
-                <div class="card-icon"><i class="fas fa-user-secret"></i></div>
-                <h3>ফেক রেফার ডিটেক্টর</h3>
-                <p>আমাদের নতুন সিস্টেম এখন আরও কার্যকরভাবে ফেক রেফার শনাক্ত এবং ব্লক করতে সক্ষম।</p>
-            </div>
-             <div class="update-card">
-                <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
-                <h3>উন্নত নিরাপত্তা</h3>
-                <p>আপনার একাউন্ট এবং তথ্য সুরক্ষিত রাখতে আমরা সর্বাধুনিক নিরাপত্তা ব্যবস্থা যোগ করেছি।</p>
-            </div>
-             <div class="update-card">
-                <div class="card-icon"><i class="fas fa-plus-circle"></i></div>
-                <h3>এবং আরও অনেক কিছু!</h3>
-                <p>সাইটের পারফর্মেন্স এবং ইউজার ইন্টারফেসে আরও অনেক ছোট ছোট উন্নতি করা হয়েছে।</p>
-            </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>নাম</th>
+                        <th>ফোন নম্বর</th>
+                        <th>ইমেইল</th>
+                        <th>ফেসবুক আইডি</th>
+                        <th>স্ট্যাটাস</th>
+                        <th>অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody id="client-table-body">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
         </div>
-        
-        <div class="copy-notice-box">
-            <p id="shareable-notice">
-                📢 **বড় আপডেট!** 📢<br>
-                আমাদের সাইটে নতুন আপডেট এসেছে! এখন থাকছে AI পেমেন্ট সাপ্লাই, দ্রুত লোডিং স্পিড, উন্নত নিরাপত্তা এবং ফেক রেফার ডিটেক্টর। সকল বাগ ফিক্স করা হয়েছে। আপনার কাজের অভিজ্ঞতাকে সেরা করতে আমরা প্রতিজ্ঞাবদ্ধ।
-            </p>
-            <div class="footer">
-                <button id="copy-btn" class="copy-btn">নোটিশ কপি করুন</button>
-            </div>
+    </div>
+
+    <!-- Add/Edit Client Modal -->
+    <div class="modal-overlay" id="add-client-modal">
+        <div class="modal-content">
+            <h2>নতুন ক্লায়েন্ট যোগ করুন</h2>
+            <form id="add-client-form">
+                <div class="form-group">
+                    <label for="name">নাম</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="no">ফোন নম্বর</label>
+                    <input type="tel" id="no">
+                </div>
+                <div class="form-group">
+                    <label for="email">ইমেইল</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="fb-id">ফেসবুক প্রোফাইল লিঙ্ক</label>
+                    <input type="url" id="fb-id" placeholder="https://facebook.com/username">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancel-btn">বাতিল</button>
+                    <button type="submit" class="btn btn-save">সেভ করুন</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const copyButton = document.getElementById('copy-btn');
-            const noticeTextElement = document.getElementById('shareable-notice');
+            const addNewBtn = document.getElementById('add-new-btn');
+            const modal = document.getElementById('add-client-modal');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const clientForm = document.getElementById('add-client-form');
+            const tableBody = document.getElementById('client-table-body');
+            const searchInput = document.getElementById('search-input');
+            const statusFilter = document.getElementById('status-filter');
 
-            if (copyButton && noticeTextElement) {
-                copyButton.addEventListener('click', () => {
-                    // শুধু ভেতরের টেক্সট কপি করা হবে, HTML ট্যাগ নয়
-                    const textToCopy = noticeTextElement.innerText;
+            const STATUS_OPTIONS = ["Knock", "Knocked", "Email Sent", "Response Error", "Call Back"];
+            const DB_KEY = 'clients_db';
+
+            // Function to get data from Local Storage
+            const getClients = () => {
+                const clientsJSON = localStorage.getItem(DB_KEY);
+                return clientsJSON ? JSON.parse(clientsJSON) : [];
+            };
+
+            // Function to save data to Local Storage
+            const saveClients = (clients) => {
+                localStorage.setItem(DB_KEY, JSON.stringify(clients));
+            };
+            
+            let clients = getClients();
+
+            const renderTable = () => {
+                tableBody.innerHTML = '';
+                
+                const searchTerm = searchInput.value.toLowerCase();
+                const filterValue = statusFilter.value;
+
+                const filteredClients = clients.filter(client => {
+                    const matchesSearch = client.name.toLowerCase().includes(searchTerm) ||
+                                          client.email.toLowerCase().includes(searchTerm) ||
+                                          client.no.toLowerCase().includes(searchTerm);
                     
-                    navigator.clipboard.writeText(textToCopy).then(() => {
-                        // সফলভাবে কপি হলে বাটনের লেখা ও স্টাইল পরিবর্তন করা
-                        copyButton.innerText = 'কপি হয়েছে!';
-                        copyButton.style.backgroundColor = '#10B981';
-                        copyButton.style.color = '#FFFFFF';
-                        copyButton.style.borderColor = '#10B981';
-
-                        // ২ সেকেন্ড পর আবার আগের অবস্থায় ফিরিয়ে আনা
-                        setTimeout(() => {
-                            copyButton.innerText = 'নোটিশ কপি করুন';
-                            copyButton.style.backgroundColor = 'transparent';
-                            copy-btn.style.color = 'var(--text-secondary)';
-                            copy-btn.style.borderColor = 'var(--border-color)';
-                        }, 2000);
-                        
-                    }).catch(err => {
-                        console.error('কপি করতে সমস্যা হয়েছে: ', err);
-                        alert('দুঃখিত, কপি করা সম্ভব হয়নি।');
-                    });
+                    const matchesFilter = filterValue === 'all' || client.status === filterValue;
+                    
+                    return matchesSearch && matchesFilter;
                 });
-            }
+
+                if (filteredClients.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">কোনো ডাটা পাওয়া যায়নি।</td></tr>`;
+                    return;
+                }
+
+                filteredClients.forEach((client, index) => {
+                    const row = document.createElement('tr');
+                    
+                    // Find original index to update/delete correctly
+                    const originalIndex = clients.findIndex(c => c.id === client.id);
+
+                    row.innerHTML = `
+                        <td>${client.name}</td>
+                        <td>${client.no || '-'}</td>
+                        <td><a href="mailto:${client.email}">${client.email}</a></td>
+                        <td>${client.fbId ? `<a href="${client.fbId}" target="_blank">প্রোফাইল</a>` : '-'}</td>
+                        <td>
+                            <select class="status-select" data-index="${originalIndex}">
+                                ${STATUS_OPTIONS.map(opt => `<option value="${opt}" ${client.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td>
+                            <button class="action-btn delete-btn" data-index="${originalIndex}"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            };
+
+            // Event handler for changing status or deleting
+            tableBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+                    const button = e.target.closest('.delete-btn');
+                    const index = button.dataset.index;
+                    if (confirm('আপনি কি এই ক্লায়েন্টকে মুছে ফেলতে চান?')) {
+                        clients.splice(index, 1);
+                        saveClients(clients);
+                        renderTable();
+                    }
+                }
+            });
+
+            tableBody.addEventListener('change', (e) => {
+                if (e.target.classList.contains('status-select')) {
+                    const index = e.target.dataset.index;
+                    clients[index].status = e.target.value;
+                    saveClients(clients);
+                    // No need to re-render, just a small visual confirmation can be added if needed
+                }
+            });
+
+            // Show modal
+            addNewBtn.addEventListener('click', () => {
+                modal.classList.add('active');
+            });
+
+            // Hide modal
+            const hideModal = () => {
+                modal.classList.remove('active');
+                clientForm.reset();
+            };
+            cancelBtn.addEventListener('click', hideModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal();
+                }
+            });
+
+            // Handle form submission
+            clientForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newClient = {
+                    id: Date.now(), // Unique ID for each client
+                    name: document.getElementById('name').value,
+                    no: document.getElementById('no').value,
+                    email: document.getElementById('email').value,
+                    fbId: document.getElementById('fb-id').value,
+                    status: 'Knock' // Default status
+                };
+                clients.push(newClient);
+                saveClients(clients);
+                renderTable();
+                hideModal();
+            });
+
+            // Live search and filter
+            searchInput.addEventListener('input', renderTable);
+            statusFilter.addEventListener('change', renderTable);
+
+            // Initial render
+            renderTable();
         });
     </script>
+
 </body>
 </html>
