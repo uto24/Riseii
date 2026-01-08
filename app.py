@@ -150,6 +150,26 @@ def signup():
 
 # app.py ফাইলের অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 
+
+# সতর্কতা: এটি এক ক্লিকে ইউজার, টাস্ক এবং পেমেন্ট রিকোয়েস্ট সব ডিলিট করে দিবে!
+@app.route(f'/{SECRET_ADMIN_PATH}/danger-zone/delete-all-data', methods=['POST'])
+def delete_all_data():
+    """
+    এক ক্লিকে ফায়ারবেসের প্রধান কালেকশনগুলোর সব ডাটা ডিলিট করে।
+    """
+    try:
+        collections = ['users', 'task_submissions', 'withdraw_requests', 'activation_requests', 'notifications', 'referrals', 'balance_history']
+        
+        for coll_name in collections:
+            docs = db.collection(coll_name).stream()
+            for doc in docs:
+                doc.reference.delete()
+        
+        flash("সফলভাবে ডাটাবেসের সমস্ত ডাটা ডিলিট করা হয়েছে!", "success")
+    except Exception as e:
+        flash(f"ডাটা ডিলিট করতে সমস্যা হয়েছে: {e}", "error")
+    
+    return redirect(url_for('admin_dashboard'))
 # app.py -> অ্যাডমিন প্যানেল সেকশনে যোগ করুন
 @app.route(f'/{SECRET_ADMIN_PATH}/create-post', methods=['GET', 'POST'])
 def create_post():
