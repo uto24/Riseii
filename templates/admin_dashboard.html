@@ -55,6 +55,17 @@
             {% endfor %}{% endif %}
         {% endwith %}
 
+
+        <div style="margin: 20px; padding: 20px; border: 2px solid red; border-radius: 10px; background-color: #fff5f5;">
+    <h3 style="color: red;">Danger Zone (বিপজ্জনক এলাকা)</h3>
+    <p>নিচের বাটনে ক্লিক করলে অ্যাপের সব ইউজার, ব্যালেন্স এবং কাজের হিস্টোরি চিরতরে মুছে যাবে।</p>
+    
+    <form action="/{{ admin_path }}/danger-zone/delete-all-data" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত? সব ডাটা ডিলিট হয়ে যাবে এবং এটি আর ফিরে পাওয়া যাবে না!');">
+        <button type="submit" style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+            সব ডাটা এক ক্লিকে ডিলিট করুন
+        </button>
+    </form>
+        </div>
         <div class="card">
             <h2><i class="fa-solid fa-hourglass-half"></i> পেন্ডিং টাস্ক সাবমিশন</h2>
             <div class="table-wrapper">
