@@ -486,7 +486,7 @@ def withdraw_page():
         referrals_query = db.collection('referrals').where(filter=FieldFilter('referrer_id', '==', user_id))
         referral_count = len(list(referrals_query.stream()))
         # আপনার শর্ত অনুযায়ী রেফারেল সংখ্যা পরিবর্তন করুন (যেমন: >= 5)
-        are_referrals_eligible = referral_count >= 0
+        are_referrals_eligible = referral_count >= 2
 
         # শর্ত ৩: অ্যাকাউন্টের বয়স
         account_created_at = user_data.get('created_at')
