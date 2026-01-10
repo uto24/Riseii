@@ -1,6 +1,3 @@
-# ==============================================================================
-#           ULTIMATE & COMPLETE APPLICATION FILE (with Notifications): app.py
-# ==============================================================================
 import os
 import uuid
 import json
@@ -11,13 +8,25 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 from google.cloud.firestore_v1.base_query import FieldFilter
+
 # --- অ্যাপ এবং Firebase ইনিশিয়ালাইজেশন ---
 load_dotenv()
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "final_build_secret_key_for_production_app")
-# .env ফাইল থেকে গোপন অ্যাডমিন পাথ লোড করুন
-SECRET_ADMIN_PATH = os.getenv("SECRET_ADMIN_PATH", "secure_admin_panel_final_build_e5f8")
 
+# ✅ secret_key শুধু একবার
+app.secret_key = os.getenv(
+    "FLASK_SECRET_KEY",
+    "final_build_secret_key_for_production_app"
+)
+
+# ✅ session lifetime যোগ করা (এটাই দরকার ছিল)
+app.permanent_session_lifetime = timedelta(days=7)
+
+# .env ফাইল থেকে গোপন অ্যাডমিন পাথ
+SECRET_ADMIN_PATH = os.getenv(
+    "SECRET_ADMIN_PATH",
+    "secure_admin_panel_final_build_e5f8"
+)
 try:
     firebase_creds_json_str = os.getenv('FIREBASE_CREDENTIALS_JSON')
     if not firebase_creds_json_str:
